@@ -3,6 +3,7 @@ import { ArrowRight, Heart, Star } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { destinationCategories, destinations, inr, type Destination } from "@/data/travel";
+import { smartTrip, useSmartTrip } from "@/lib/smarttrip-store";
 import { cn } from "@/lib/utils";
 import { Reveal, SectionHeading } from "./Reveal";
 
@@ -66,7 +67,7 @@ export function DestinationCard({
 
 export function ExploreDestinations({ grid = false }: { grid?: boolean }) {
   const [category, setCategory] = useState("All");
-  const [wishlist, setWishlist] = useState<string[]>([]);
+  const { wishlist } = useSmartTrip();
 
   const list = useMemo(
     () => (category === "All" ? destinations : destinations.filter((d) => d.category === category)),
@@ -74,11 +75,8 @@ export function ExploreDestinations({ grid = false }: { grid?: boolean }) {
   );
 
   const toggleWish = (id: string) => {
-    setWishlist((prev) => {
-      const has = prev.includes(id);
-      toast[has ? "message" : "success"](has ? "Removed from wishlist" : "Saved to wishlist");
-      return has ? prev.filter((x) => x !== id) : [...prev, id];
-    });
+    const added = smartTrip.toggleWish(id);
+    toast[added ? "success" : "message"](added ? "Saved to wishlist" : "Removed from wishlist");
   };
 
   return (

@@ -1,15 +1,31 @@
 import { useState } from "react";
-import { ArrowRight, Calendar, Coins, PiggyBank, Target, TrendingUp } from "lucide-react";
+import { Coins, PiggyBank, Plus, Target, Trash2, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { initialFutureTrips, inr, type FutureTrip } from "@/data/travel";
-import { cn } from "@/lib/utils";
+import { inr, type FutureTrip } from "@/data/travel";
+import { smartTrip, useSmartTrip } from "@/lib/smarttrip-store";
 import { Reveal, SectionHeading } from "./Reveal";
 
+const QUICK_ADD = [500, 1000, 2500];
+
 function FundCard({ trip }: { trip: FutureTrip }) {
+  const [amount, setAmount] = useState("");
   const progress = Math.min(100, Math.round((trip.saved / trip.target) * 100));
-  const monthly = Math.max(0, Math.round((trip.target - trip.saved) / trip.monthsLeft));
+  const monthly = Math.max(0, Math.round((trip.target - trip.saved) / Math.max(1, trip.monthsLeft)));
+  const done = trip.saved >= trip.target;
+
+  const contribute = (value: number) => {
+    if (!value || value <= 0) {
+      toast.error("Enter an amount to add");
+      return;
+    }
+    smartTrip.contribute(trip.id, value);
+    setAmount("");
+    toast.success(`${inr(value)} added to ${trip.name}`, {
+      description: done ? "Goal already reached!" : `${inr(Math.max(0, trip.target - trip.saved - value))} to go.`,
+    });
+  };
 
   return (
     <article className="surface-card overflow-hidden">
@@ -23,10 +39,23 @@ function FundCard({ trip }: { trip: FutureTrip }) {
           className="size-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
+        <button
+          type="button"
+          aria-label={`Delete ${trip.name} fund`}
+          onClick={() => {
+            smartTrip.removeFund(trip.id);
+            toast.message("Trip fund removed", { description: trip.name });
+          }}
+          className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-card/85 text-foreground/70 backdrop-blur transition-transform hover:scale-110 hover:text-destructive"
+        >
+          <Trash2 className="size-4" />
+        </button>
         <div className="absolute inset-x-4 bottom-4 text-primary-foreground">
           <p className="text-2xl">{trip.emoji}</p>
           <p className="font-display text-lg font-bold">{trip.name}</p>
-          <p className="text-xs opacity-90">{trip.targetDate} · {trip.travelers} travelers</p>
+          <p className="text-xs opacity-90">
+            {trip.targetDate} · {trip.travelers} travelers
+          </p>
         </div>
       </div>
       <div className="p-5">
@@ -47,10 +76,36 @@ function FundCard({ trip }: { trip: FutureTrip }) {
           />
         </div>
         <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-          <span>{progress}% saved</span>
+          <span>{done ? "🎉 Goal reached — time to book!" : `${progress}% saved`}</span>
           <span className="flex items-center gap-1">
             <Coins className="size-3" /> {inr(monthly)}/mo
           </span>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {QUICK_ADD.map((v) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => contribute(v)}
+              className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold transition-colors hover:border-primary hover:text-primary"
+            >
+              +{inr(v)}
+            </button>
+          ))}
+        </div>
+        <div className="mt-3 flex gap-2">
+          <Input
+            value={amount}
+            type="number"
+            inputMode="numeric"
+            placeholder="Custom amount"
+            aria-label={`Add money to ${trip.name}`}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+          <Button variant="soft" size="icon" aria-label="Add money" onClick={() => contribute(Number(amount))}>
+            <Plus />
+          </Button>
         </div>
       </div>
     </article>
@@ -58,30 +113,20 @@ function FundCard({ trip }: { trip: FutureTrip }) {
 }
 
 export function TripFund() {
-  const [trips, setTrips] = useState(initialFutureTrips);
+  const { funds } = useSmartTrip();
   const [name, setName] = useState("");
   const [target, setTarget] = useState("");
 
+  const totalSaved = funds.reduce((sum, f) => sum + f.saved, 0);
+  const totalTarget = funds.reduce((sum, f) => sum + f.target, 0);
+
   const addTrip = () => {
     const amount = Number(target);
-    if (!name || !amount || amount < 1000) {
-      toast.error("Enter a valid trip name and target amount");
+    if (!name.trim() || !amount || amount < 1000) {
+      toast.error("Enter a trip name and a target of at least ₹1,000");
       return;
     }
-    setTrips((prev) => [
-      {
-        id: "ft" + Date.now(),
-        emoji: "✈️",
-        name,
-        target: amount,
-        saved: 0,
-        targetDate: "Coming soon",
-        monthsLeft: 12,
-        travelers: 2,
-        image: "/src/assets/dest-manali.jpg",
-      },
-      ...prev,
-    ]);
+    smartTrip.addFund({ name: name.trim(), target: amount });
     setName("");
     setTarget("");
     toast.success("Trip fund created", { description: "Start saving and we'll keep you on track." });
@@ -108,18 +153,20 @@ export function TripFund() {
           </div>
 
           <div className="mt-5 space-y-3">
-            <label className="block text-xs font-semibold text-muted-foreground uppercase">
+            <label className="block text-xs font-semibold text-muted-foreground uppercase" htmlFor="fund-name">
               Trip name
             </label>
             <Input
+              id="fund-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Santorini 2027"
             />
-            <label className="block text-xs font-semibold text-muted-foreground uppercase">
+            <label className="block text-xs font-semibold text-muted-foreground uppercase" htmlFor="fund-target">
               Target amount (₹)
             </label>
             <Input
+              id="fund-target"
               value={target}
               onChange={(e) => setTarget(e.target.value)}
               placeholder="80000"
@@ -130,7 +177,18 @@ export function TripFund() {
             </Button>
           </div>
 
-          <div className="mt-6 rounded-2xl bg-secondary/50 p-4 text-sm text-muted-foreground">
+          <div className="mt-6 rounded-2xl bg-secondary/50 p-4 text-sm">
+            <p className="flex items-center justify-between font-semibold text-foreground">
+              <span>Total saved</span>
+              <span className="text-primary">{inr(totalSaved)}</span>
+            </p>
+            <p className="mt-1 flex items-center justify-between text-muted-foreground">
+              <span>Across {funds.length} funds</span>
+              <span>of {inr(totalTarget)}</span>
+            </p>
+          </div>
+
+          <div className="mt-4 rounded-2xl bg-secondary/50 p-4 text-sm text-muted-foreground">
             <p className="flex items-center gap-2 font-semibold text-foreground">
               <TrendingUp className="size-4" /> AI saving tip
             </p>
@@ -141,11 +199,17 @@ export function TripFund() {
         </Reveal>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:col-span-2">
-          {trips.map((trip, i) => (
-            <Reveal key={trip.id} delay={i * 80}>
-              <FundCard trip={trip} />
-            </Reveal>
-          ))}
+          {funds.length === 0 ? (
+            <div className="col-span-full rounded-3xl bg-secondary/50 py-16 text-center text-sm text-muted-foreground">
+              No trip funds yet — create your first dream on the left.
+            </div>
+          ) : (
+            funds.map((trip, i) => (
+              <Reveal key={trip.id} delay={i * 80}>
+                <FundCard trip={trip} />
+              </Reveal>
+            ))
+          )}
         </div>
       </div>
     </section>

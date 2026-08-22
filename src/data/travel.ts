@@ -325,3 +325,77 @@ export const myTrips = {
 
 export const inr = (n: number) =>
   "₹" + Math.round(n).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+
+export type TravelPackage = {
+  id: string;
+  name: string;
+  region: string;
+  nights: number;
+  includes: string[];
+  price: number;
+  rating: number;
+  image: string;
+};
+
+export const packages: TravelPackage[] = [
+  {
+    id: "pkg-goa",
+    name: "Goa Beach Escape",
+    region: "North Goa, India",
+    nights: 4,
+    includes: ["Return flights", "Beachfront stay", "Breakfast", "Sunset cruise"],
+    price: 24999,
+    rating: 4.7,
+    image: goa,
+  },
+  {
+    id: "pkg-manali",
+    name: "Himachal Snow Trail",
+    region: "Manali & Solang, India",
+    nights: 5,
+    includes: ["Volvo transfers", "Cottage stay", "Solang activities", "All breakfasts"],
+    price: 18499,
+    rating: 4.6,
+    image: manali,
+  },
+  {
+    id: "pkg-kashmir",
+    name: "Kashmir Houseboat Week",
+    region: "Srinagar & Gulmarg, India",
+    nights: 6,
+    includes: ["Houseboat night", "Shikara ride", "Gondola pass", "Private cab"],
+    price: 32999,
+    rating: 4.9,
+    image: kashmir,
+  },
+  {
+    id: "pkg-maldives",
+    name: "Maldives Overwater Villa",
+    region: "South Malé Atoll",
+    nights: 4,
+    includes: ["Return flights", "Overwater villa", "Half board", "Snorkel trip"],
+    price: 89999,
+    rating: 4.8,
+    image: maldives,
+  },
+  {
+    id: "pkg-japan",
+    name: "Japan Sakura Circuit",
+    region: "Tokyo · Kyoto · Osaka",
+    nights: 8,
+    includes: ["Return flights", "JR Pass", "3 city stays", "Guided temple walk"],
+    price: 149999,
+    rating: 4.9,
+    image: japan,
+  },
+  {
+    id: "pkg-rishikesh",
+    name: "Rishikesh Adventure Weekend",
+    region: "Uttarakhand, India",
+    nights: 2,
+    includes: ["Riverside camp", "Rafting", "Cliff jump", "Bonfire dinner"],
+    price: 6999,
+    rating: 4.5,
+    image: hero,
+  },
+];

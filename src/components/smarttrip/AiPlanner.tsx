@@ -1,101 +1,19 @@
 import { useEffect, useRef, useState } from "react";
-import { Bot, Send, Sparkles, Wand2 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Bot, BookmarkPlus, Send, Sparkles, Wand2 } from "lucide-react";
+
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { quickPrompts, inr } from "@/data/travel";
+import { smartTrip } from "@/lib/smarttrip-store";
+import { buildPlan, type GeneratedPlan } from "@/lib/trip-plan";
 import { cn } from "@/lib/utils";
 import { Reveal, SectionHeading } from "./Reveal";
 
-export type GeneratedPlan = {
-  title: string;
-  budget: number;
-  summary: string;
-  days: { day: string; title: string; items: string[] }[];
-  stays: string[];
-  transport: string;
-  food: string[];
-  weather: string;
-  packing: string[];
-  tips: string[];
-};
+export { buildPlan };
+export type { GeneratedPlan };
 
-export function buildPlan(prompt: string): GeneratedPlan {
-  const p = prompt.toLowerCase();
-  const budgetMatch = p.replace(/[, ]/g, "").match(/(\d{4,7})/);
-  const budget = budgetMatch ? Number(budgetMatch[1]) : 35000;
-  const beach = /goa|beach|maldives|coast/.test(p);
-  const intl = /japan|dubai|europe|international|bali|thailand/.test(p);
-  const place = intl
-    ? /japan/.test(p)
-      ? "Japan"
-      : "your international pick"
-    : beach
-      ? "Goa"
-      : /kashmir/.test(p)
-        ? "Kashmir"
-        : "Himachal Pradesh";
-
-  return {
-    title: `${place} · smart plan`,
-    budget,
-    summary: `A paced ${beach ? "coastal" : "mountain"} route through ${place} with buffer time, local food stops and a budget kept under ${inr(budget)}.`,
-    days: [
-      {
-        day: "Day 1",
-        title: "Arrival & easy start",
-        items: [
-          beach ? "✈ Land, taxi to the beach belt" : "🚌 Overnight Volvo → base town",
-          "🏨 Check-in and quick rest",
-          "🍽 Dinner at a well-rated local spot",
-        ],
-      },
-      {
-        day: "Day 2",
-        title: "The signature day",
-        items: [
-          beach ? "🏖 Morning beach + water sports" : "🏔 Sunrise viewpoint & valley drive",
-          "📍 Two highlight sights, spaced out",
-          "🍴 Café lunch, sunset walk",
-        ],
-      },
-      {
-        day: "Day 3",
-        title: "Adventure block",
-        items: [
-          beach ? "🚤 Island hop / kayaking" : "🎒 Trek or paragliding slot (book early)",
-          "☕ Slow evening, local market",
-        ],
-      },
-      {
-        day: "Day 4",
-        title: "Culture & food",
-        items: ["🏛 Heritage / village walk", "🍲 Food trail with 4 tasting stops"],
-      },
-      {
-        day: "Day 5",
-        title: "Buffer & return",
-        items: ["🛍 Souvenirs", "✈ Return with a 3-hour buffer"],
-      },
-    ],
-    stays: [
-      `Mid-range boutique stay · ${inr(Math.round(budget * 0.09))}/night`,
-      `Backup hostel/homestay · ${inr(Math.round(budget * 0.04))}/night`,
-    ],
-    transport: intl
-      ? "Rail pass + airport express; skip taxis in city centres."
-      : "Shared cab for arrival, scooter/bike rental for local movement.",
-    food: ["Two local thali / seafood meals a day", "One splurge dinner", "Street-food breakfast"],
-    weather: beach
-      ? "Warm 27–32°C, brief evening showers. Light cotton works."
-      : "Cold mornings 4–12°C. Layer up; carry a windproof shell.",
-    packing: ["Power bank & universal adapter", "Meds + basic first aid", "Reusable bottle", beach ? "Reef-safe sunscreen" : "Thermals & gloves"],
-    tips: [
-      `Book transport 3 weeks early to save ~${inr(Math.round(budget * 0.08))}`,
-      "Keep one unplanned half-day — it's always the best one",
-      "Carry ₹2,000 cash for remote stretches",
-    ],
-  };
-}
 
 export function AiPlanner({ compact = false }: { compact?: boolean }) {
   const [input, setInput] = useState(
@@ -250,6 +168,24 @@ function PlanView({ plan }: { plan: GeneratedPlan }) {
         <InfoBox title="Weather" items={[plan.weather]} />
         <InfoBox title="Packing" items={plan.packing} />
         <InfoBox title="Travel tips" items={plan.tips} />
+      </div>
+
+      <div className="mt-6 flex flex-wrap gap-2">
+        <Button
+          variant="hero"
+          className="flex-1"
+          onClick={() => {
+            const trip = smartTrip.savePlan(plan);
+            toast.success("Plan saved to My Trips", { description: trip.name });
+          }}
+        >
+          <BookmarkPlus /> Save to My Trips
+        </Button>
+        <Button variant="soft" asChild className="flex-1">
+          <Link to="/bookings">
+            <Send /> Book this trip
+          </Link>
+        </Button>
       </div>
     </div>
   );
