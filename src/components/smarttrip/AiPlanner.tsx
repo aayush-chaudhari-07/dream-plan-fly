@@ -167,6 +167,24 @@ function PlanView({ plan }: { plan: GeneratedPlan }) {
         <InfoBox title="Packing" items={plan.packing} />
         <InfoBox title="Travel tips" items={plan.tips} />
       </div>
+
+      <div className="mt-6 flex flex-wrap gap-2">
+        <Button
+          variant="hero"
+          className="flex-1"
+          onClick={() => {
+            const trip = smartTrip.savePlan(plan);
+            toast.success("Plan saved to My Trips", { description: trip.name });
+          }}
+        >
+          <BookmarkPlus /> Save to My Trips
+        </Button>
+        <Button variant="soft" asChild className="flex-1">
+          <Link to="/bookings">
+            <Send /> Book this trip
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 }
