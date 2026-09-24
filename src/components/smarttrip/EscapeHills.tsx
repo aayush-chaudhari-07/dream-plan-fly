@@ -25,7 +25,10 @@ export function EscapeHills() {
           subtitle="Cold air, slow mornings, tea at a viewpoint. The trips people remember for years."
         />
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <p className="mt-4 text-center text-xs font-medium text-muted-foreground">
+          Sample temperatures — not live weather data
+        </p>
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {hillStations.map((h, i) => (
             <Reveal key={h.name} delay={i * 60}>
               <article className="group relative h-64 overflow-hidden rounded-3xl shadow-soft transition-transform duration-500 hover:-translate-y-1.5">
