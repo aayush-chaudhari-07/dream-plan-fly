@@ -7,7 +7,8 @@ import { Footer } from "@/components/smarttrip/Footer";
 import { Navbar } from "@/components/smarttrip/Navbar";
 import { PageHeader } from "@/components/smarttrip/PageHeader";
 import { SupportDock } from "@/components/smarttrip/SupportDock";
-import { flights, hotels, rentals, railBus, inr } from "@/data/travel";
+import { flights, hotels, rentals, railBus, packages, inr } from "@/data/travel";
+import { smartTrip } from "@/lib/smarttrip-store";
 import { cn } from "@/lib/utils";
 
 type TabKey = "flights" | "stay" | "rental" | "rail" | "packages";
@@ -17,11 +18,21 @@ const tabs: { key: TabKey; label: string; icon: React.ComponentType<{ className?
   { key: "stay", label: "Hotels", icon: Hotel, items: hotels },
   { key: "rental", label: "Rentals", icon: Car, items: rentals },
   { key: "rail", label: "Train / Bus", icon: Bus, items: railBus },
-  { key: "packages", label: "Packages", icon: Luggage, items: [] },
+  { key: "packages", label: "Packages", icon: Luggage, items: packages },
 ];
 
 function ResultCard({ item, tab }: { item: unknown; tab: TabKey }) {
-  const book = () => toast.success("Booking started", { description: "Demo: reservation flow coming soon." });
+  const book = () => {
+    const i = item as { airline?: string; operator?: string; name?: string; dep?: string; arr?: string; location?: string; region?: string; type?: string; price: number };
+    const kind = tab === "flights" ? "flight" : tab === "stay" ? "stay" : tab === "rental" ? "rental" : tab === "rail" ? "rail" : "package";
+    const b = smartTrip.addBooking({
+      kind,
+      title: i.name ?? `${i.airline ?? i.operator} · ${i.dep} → ${i.arr}`,
+      subtitle: i.location ?? i.region ?? i.type ?? "Demo booking",
+      price: i.price,
+    });
+    toast.success("Booked (demo)", { description: `Ref ${b.reference} · see My Trips` });
+  };
 
   if (tab === "flights" || tab === "rail") {
     const i = item as { airline?: string; operator?: string; dep: string; arr: string; duration: string; stops?: string; price: number };
@@ -92,6 +103,24 @@ function ResultCard({ item, tab }: { item: unknown; tab: TabKey }) {
     );
   }
 
+  if (tab === "packages") {
+    const k = item as { name: string; region: string; nights: number; includes: string[]; price: number; image: string };
+    return (
+      <div className="surface-card overflow-hidden">
+        <img src={k.image} alt={k.name} loading="lazy" className="h-44 w-full object-cover" />
+        <div className="p-4">
+          <p className="font-display font-bold">{k.name}</p>
+          <p className="text-sm text-muted-foreground">{k.region} · {k.nights} nights</p>
+          <p className="mt-2 text-xs text-muted-foreground">{k.includes.join(" · ")}</p>
+          <div className="mt-4 flex items-center justify-between">
+            <span className="font-display text-lg font-bold text-primary">{inr(k.price)}</span>
+            <Button variant="hero" size="sm" className="rounded-full" onClick={book}>Book</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return null;
 }
 
@@ -141,6 +170,14 @@ function BookingsPage() {
             ))}
           </div>
 
+          <div className="mt-4 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              {current.label === "Packages" ? packages.length : current.items.length} results
+            </p>
+            <span className="rounded-full bg-sunset/20 px-3 py-1 text-xs font-semibold text-foreground">
+              Demo data · not a live API
+            </span>
+          </div>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {current.items.length === 0 ? (
               <div className="col-span-full rounded-2xl bg-secondary/50 py-12 text-center text-sm text-muted-foreground">
