@@ -11,12 +11,20 @@ export type GeneratedPlan = {
   weather: string;
   packing: string[];
   tips: string[];
+  travelers: number;
+  nights: number;
+  breakdown: { label: string; amount: number }[];
+  carbonKg: number;
 };
 
-export function buildPlan(prompt: string): GeneratedPlan {
+export type PlanOptions = { budget?: number; travelers?: number; days?: number };
+
+export function buildPlan(prompt: string, opts: PlanOptions = {}): GeneratedPlan {
   const p = prompt.toLowerCase();
   const budgetMatch = p.replace(/[, ]/g, "").match(/(\d{4,7})/);
-  const budget = budgetMatch ? Number(budgetMatch[1]) : 35000;
+  const budget = opts.budget ?? (budgetMatch ? Number(budgetMatch[1]) : 35000);
+  const trav = opts.travelers ?? Number(p.match(/(\d+)\s*(people|persons|travell?ers|friends|adults)/)?.[1] ?? 2);
+  const dayCount = Math.min(10, Math.max(2, opts.days ?? Number(p.match(/(\d+)\s*-?\s*day/)?.[1] ?? 5)));
   const beach = /goa|beach|maldives|coast/.test(p);
   const intl = /japan|dubai|europe|international|bali|thailand/.test(p);
   const place = intl
@@ -29,7 +37,7 @@ export function buildPlan(prompt: string): GeneratedPlan {
         ? "Kashmir"
         : "Himachal Pradesh";
 
-  return {
+  const base = {
     title: `${place} · smart plan`,
     budget,
     summary: `A paced ${beach ? "coastal" : "mountain"} route through ${place} with buffer time, local food stops and a budget kept under ${inr(budget)}.`,
@@ -94,4 +102,36 @@ export function buildPlan(prompt: string): GeneratedPlan {
       "Carry ₹2,000 cash for remote stretches",
     ],
   };
+  const extra = ["🌄 Offbeat day trip nearby", "🧘 Slow day: spa, café hopping", "📸 Photo walk & hidden viewpoints"];
+  let days = base.days.slice(0, dayCount - 1);
+  while (days.length < dayCount - 1) {
+    days.push({ day: "", title: "Bonus exploration", items: [extra[days.length % extra.length]!, "🍽 Try a new local kitchen"] });
+  }
+  days = [...days, base.days[base.days.length - 1]!].map((d, i) => ({ ...d, day: `Day ${i + 1}` }));
+  const pct = (n: number) => Math.round(budget * n);
+  const distKm = intl ? 5500 : beach ? 1500 : 550;
+  const perKm = intl || beach ? 0.15 : 0.04; // flight vs bus/rail kg CO2e per km
+  return {
+    ...base,
+    days,
+    travelers: trav,
+    nights: dayCount - 1,
+    summary: `A paced ${dayCount}-day ${beach ? "coastal" : intl ? "" : "mountain"} route through ${place} for ${trav} traveller${trav > 1 ? "s" : ""}, with buffer time, local food stops and a budget kept under ${inr(budget)}.`,
+    breakdown: [
+      { label: "Transport", amount: pct(0.3) },
+      { label: "Stays", amount: pct(0.35) },
+      { label: "Food", amount: pct(0.2) },
+      { label: "Activities", amount: pct(0.1) },
+      { label: "Buffer", amount: pct(0.05) },
+    ],
+    carbonKg: Math.round(distKm * 2 * perKm),
+  };
+}
+
+/** Rough round-trip CO2e estimate per person for a destination name. */
+export function carbonFor(text: string): number {
+  const t = text.toLowerCase();
+  if (/japan|dubai|europe|bali|thailand|maldives|international/.test(t)) return 1650;
+  if (/goa|kerala|andaman|beach/.test(t)) return 450;
+  return 45;
 }
