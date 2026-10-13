@@ -111,12 +111,49 @@ describe("smarttrip-store - actions", () => {
     });
   });
 
+  describe("notifications management", () => {
+    it("initializes with seed notifications and allows marking individual and all as read", () => {
+      const state = smartTrip.getState();
+      expect(state.notifications.length).toBeGreaterThan(0);
+      const firstNotif = state.notifications[0];
+      expect(firstNotif).toBeDefined();
+
+      if (firstNotif) {
+        smartTrip.markNotificationRead(firstNotif.id);
+        const updatedFirst = smartTrip.getState().notifications.find((n) => n.id === firstNotif.id);
+        expect(updatedFirst?.read).toBe(true);
+      }
+
+      smartTrip.markAllNotificationsRead();
+      const allRead = smartTrip.getState().notifications.every((n) => n.read);
+      expect(allRead).toBe(true);
+    });
+
+    it("automatically creates a notification when a booking is created", () => {
+      const prevCount = smartTrip.getState().notifications.length;
+      smartTrip.addBooking({
+        kind: "flight",
+        title: "Test Airlines DEL → BOM",
+        subtitle: "10 Oct - 15 Oct",
+        price: 5200,
+      });
+
+      const nextState = smartTrip.getState();
+      expect(nextState.notifications.length).toBe(prevCount + 1);
+      const newest = nextState.notifications[0];
+      expect(newest?.type).toBe("booking");
+      expect(newest?.title).toBe("Booking Confirmed");
+      expect(newest?.read).toBe(false);
+    });
+  });
+
   describe("reset action", () => {
     it("resets state back to seed values", () => {
       smartTrip.toggleWish("goa");
       smartTrip.addFund({ name: "Temporary", target: 5000 });
 
       smartTrip.reset();
+      expect(smartTrip.getState().wishlist).toEqual([]);
     });
   });
 });

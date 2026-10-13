@@ -220,3 +220,66 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `src/routeTree.gen.ts` (regenerated)
   - `src/components/smarttrip/__tests__/InteractiveMap.test.ts` (created)
   - `MIGRATION_LOG.md` (updated)
+
+---
+
+## [Task 6] - Navbar Real Features: Search Command Palette, Wishlist Sheet, Notifications Popover, Profile Dropdown & Settings Page
+
+- **Goal**: Replace all placeholder and "coming up next" panels in `Navbar.tsx` with real, production-ready features:
+  1. Search: Command palette (`cmdk`) triggered via Search button or `Ctrl/Cmd+K`, searching destinations, saved trips, and bookings, with keyboard navigation and recent searches.
+  2. Wishlist: Right-side `Sheet` listing wishlisted destinations with images, prices, remove button, and "Plan a trip" shortcut.
+  3. Notifications: Popover backed by the notifications table (booking confirmations, fund milestones, price drop alerts) with unread count and mark-all-read.
+  4. Profile: Dropdown menu showing user's name and avatar, links to My Trips, Trip Fund, Settings, and Logout. Built a `/settings` page to edit name, avatar, home city, and currency.
+  5. Guest Auth: Explicit Sign In and Sign Up buttons for guests.
+  6. Mobile Menu: Full mobile menu support for search, wishlist, settings, notifications, and guest auth.
+- **Changes**:
+  1. **Search Command Palette (`src/components/smarttrip/SearchCommandDialog.tsx`)**:
+     - Built using `cmdk` and Radix Dialog.
+     - Supports global shortcut `Ctrl+K` and `Cmd+K` across all pages.
+     - Instant search filtering across all 9 destinations, user's saved/upcoming trips, bookings, and quick action shortcuts.
+     - Persistent recent searches in `localStorage` with 1-click removal and "Clear all" action.
+  2. **Wishlist Sheet (`src/components/smarttrip/WishlistSheet.tsx`)**:
+     - Right-side slide-over sheet showing all saved destinations with thumbnail imagery, location, starting prices, and budget summary.
+     - 1-click remove destination action with toast feedback and instant store synchronization.
+     - Direct "Plan Trip" shortcut launching the AI Planner pre-filled with the selected destination.
+     - Empty state with direct link to Explore Destinations.
+  3. **Notifications Popover (`src/components/smarttrip/NotificationsPopover.tsx`)**:
+     - Backed by `public.notifications` table in Supabase and `useSmartTrip().notifications`.
+     - Displays formatted alerts for booking confirmations, fund milestones, and price drops with relative timestamps ("Just now", "35m ago", "4h ago", "1d ago").
+     - Animated unread counter badge on the navbar bell icon.
+     - "Mark all read" button calling `smartTrip.markAllNotificationsRead()` and server action `markAllNotificationsReadFn`.
+     - Individual notification mark-read on click with automatic route navigation when a link is attached.
+  4. **Avatar UI Component (`src/components/ui/avatar.tsx`)**:
+     - Created Radix UI Avatar primitive wrapper (`Avatar`, `AvatarImage`, `AvatarFallback`) with gradient initials fallback.
+  5. **Profile Dropdown in Navbar (`src/components/smarttrip/Navbar.tsx`)**:
+     - Shows user avatar image, full name, and email.
+     - Direct links to My Trips & Bookings (`/my-trips`), Trip Funds (`/save`), and Settings (`/settings`).
+     - Sign out action with redirect to home page and toast confirmation.
+  6. **Settings Page (`src/routes/settings.tsx`)**:
+     - Form to edit Full Name, Avatar Picture URL, Home Departure City, and Preferred Currency (`INR`, `USD`, `EUR`, `GBP`, `JPY`, `AED`).
+     - 6 curated traveler avatar presets with 1-click selection and live avatar preview.
+     - Quick select chips for popular Indian and global travel hubs (Mumbai, Delhi, Bengaluru, Goa, London, New York, etc.).
+     - Saves to Supabase user metadata and `public.profiles` table via `updateProfile` and `updateProfileFn`.
+  7. **Guest Authentication & Mobile Menu**:
+     - Desktop navbar displays both "Sign In" and "Sign Up" buttons for unauthenticated guests.
+     - Mobile menu provides quick search trigger, wishlist and settings shortcut pills, unread notifications indicator, and auth controls.
+  8. **Database & Store Updates**:
+     - Updated `supabase/migrations/001_init.sql` schema with `home_city` and `currency` in `profiles`, and `link` in `notifications` with insert RLS policy.
+     - Updated `src/lib/server/trip-actions.ts` to include notifications in `fetchUserDataFn`, `markAllNotificationsReadFn`, `markNotificationReadFn`, and `updateProfileFn`.
+     - Updated `src/lib/smarttrip-store.ts` with notification types, seeding, and actions.
+     - Added comprehensive unit tests in `src/lib/__tests__/smarttrip-store.test.ts` (42 total passing tests).
+- **Files Touched**:
+  - `src/components/ui/avatar.tsx` (created)
+  - `src/components/smarttrip/SearchCommandDialog.tsx` (created)
+  - `src/components/smarttrip/WishlistSheet.tsx` (created)
+  - `src/components/smarttrip/NotificationsPopover.tsx` (created)
+  - `src/routes/settings.tsx` (created)
+  - `src/components/smarttrip/Navbar.tsx` (updated)
+  - `src/lib/smarttrip-store.ts` (updated)
+  - `src/lib/auth-context.tsx` (updated)
+  - `src/lib/server/trip-actions.ts` (updated)
+  - `src/lib/__tests__/smarttrip-store.test.ts` (updated)
+  - `supabase/migrations/001_init.sql` (updated)
+  - `src/routeTree.gen.ts` (regenerated)
+  - `MIGRATION_LOG.md` (updated)
+
