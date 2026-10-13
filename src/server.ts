@@ -91,12 +91,21 @@ async function handleKeepAlive(): Promise<Response> {
   });
 }
 
+import { handlePriceFluctuationsCron } from "./server/price-fluctuations";
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const url = new URL(request.url);
       if (url.pathname === "/api/keep-alive") {
         return await handleKeepAlive();
+      }
+
+      if (
+        url.pathname === "/api/cron/price-fluctuations" ||
+        url.pathname === "/api/cron/daily-price-alerts"
+      ) {
+        return await handlePriceFluctuationsCron(request);
       }
 
       const handler = await getServerEntry();

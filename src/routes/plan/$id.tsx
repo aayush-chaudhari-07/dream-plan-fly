@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/smarttrip/Navbar";
 import { Footer } from "@/components/smarttrip/Footer";
 import { QuickTravelGuide } from "@/components/smarttrip/QuickTravelGuide";
-import { inr } from "@/data/travel";
+import { WeatherForecastCard } from "@/components/smarttrip/WeatherForecastCard";
+import { inr, destinations } from "@/data/travel";
 import { smartTrip } from "@/lib/smarttrip-store";
 import { getPublicPlanFn } from "@/server/generate-plan";
 
@@ -228,6 +229,32 @@ function PublicPlanPage() {
               <span className="text-[11px] text-muted-foreground">ID: {id}</span>
             </div>
           </div>
+
+          {/* Live Open-Meteo 7-Day Forecast & Destination Weather */}
+          {(() => {
+            const matchedDest = destinations.find(
+              (d) =>
+                plan.title.toLowerCase().includes(d.name.toLowerCase()) ||
+                plan.summary.toLowerCase().includes(d.name.toLowerCase()),
+            );
+            const planLat = matchedDest ? matchedDest.lat : 28.6139;
+            const planLng = matchedDest ? matchedDest.lng : 77.209;
+            const destName = matchedDest
+              ? matchedDest.name
+              : plan.title.replace(/ trip plan/i, "").slice(0, 20);
+
+            return (
+              <div className="mt-10 print:hidden">
+                <WeatherForecastCard
+                  lat={planLat}
+                  lng={planLng}
+                  destinationName={destName}
+                  bestTimeToVisit={matchedDest?.bestTimeToVisit}
+                  basePrice={plan.budget}
+                />
+              </div>
+            );
+          })()}
 
           {/* Quick Travel Guide (Before You Go, During Your Trip, Smart Tips) */}
           <div className="mt-12 pt-8 border-t border-border/60 print:hidden">

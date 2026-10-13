@@ -476,3 +476,57 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `src/lib/server/__tests__/booking-lifecycle.test.ts` (created)
   - `.env.example` (updated)
   - `MIGRATION_LOG.md` (updated)
+
+---
+
+## [Task 10] - Live Data with Open-Meteo Weather, Frankfurter Currency & Price Alerts Cron
+
+- **Goal**: Integrate live data using only free, key-less sources (Open-Meteo & Frankfurter), add a currency switcher with ECB rates, implement deterministic demo price fluctuations with watch alerts, and schedule a free GitHub Actions daily cron job:
+  1. **Open-Meteo Weather Service**:
+     - Key-less API client in `src/server/weather.ts` with WMO weather interpretation code mapping.
+     - 30-minute in-memory caching (`WEATHER_CACHE_TTL_MS`) to protect performance and quota.
+     - Graceful offline fallback providing estimated seasonal weather if the external API fails.
+     - Terms-compliant attribution: "Weather data by Open-Meteo.com" linking to https://open-meteo.com/.
+     - Replaced hardcoded sample temperatures in `EscapeHills.tsx` with live current weather for all 8 hill stations.
+     - Built `WeatherForecastCard.tsx` displaying live conditions, humidity, wind, 7-day daily forecast cards, and optimal travel windows, mounted on destination detail pages (`/destination/$id`) and generated plan views (`/plan/$id`).
+  2. **Frankfurter Currency Service**:
+     - Key-less ECB reference rates client in `src/server/currency.ts` with INR base currency.
+     - Daily 24-hour caching (`CURRENCY_CACHE_TTL_MS`).
+     - Clean currency conversion (`convertCurrency`) for USD, EUR, GBP, JPY, AUD, CAD, SGD, etc.
+     - Strict fallback: unsupported currencies (e.g. AED) automatically fall back to INR (₹) only, as specified.
+     - Integrated live ECB exchange rates status, calculation previews, and ECB attribution in `/settings` (`src/routes/settings.tsx`).
+  3. **Deterministic Price Fluctuations & Price Alerts**:
+     - Deterministic seeded daily price fluctuation engine (`src/server/price-fluctuations.ts`) applying bounded (-12% to +8%) variations to seeded fares, prominently labeled "Demo pricing" in the UI.
+     - Price watch dialog on `/bookings` and destination pages allowing users to watch routes/destinations with target prices.
+     - Supabase migration `supabase/migrations/006_price_alerts.sql` with Row Level Security policies and performance indexes.
+     - Added price alert store state and methods in `src/lib/smarttrip-store.ts`.
+     - Protected cron endpoint `/api/cron/price-fluctuations` in `src/server.ts`, secured by `x-cron-secret` from env (`CRON_SECRET`).
+     - Added GitHub Actions daily workflow `.github/workflows/daily-price-alerts.yml` running daily at 04:00 UTC.
+     - Preserved existing `.github/workflows/keep-alive.yml` intact.
+  4. **Testing & QA**:
+     - Unit tests in `src/server/__tests__/live-data.test.ts` with mocked `fetch` covering:
+       - Open-Meteo forecast parsing, 30-minute caching, failure fallback, and WMO code descriptions.
+       - Frankfurter ECB rates parsing, daily caching, currency conversion, and unsupported currency fallback to INR.
+       - Deterministic fluctuation math, price drop trigger logic, and cron header authorization (401/200).
+     - Verified: all 80 unit tests pass across 8 test suites.
+     - Verified: `npm run lint` (0 errors), `npm run typecheck` (0 errors), and `npm run build` (clean SSR & Nitro production build).
+- **Files Touched**:
+  - `src/server/weather.ts` (created)
+  - `src/server/currency.ts` (created)
+  - `src/server/price-fluctuations.ts` (created)
+  - `src/lib/server/live-data-actions.ts` (created)
+  - `src/components/smarttrip/WeatherForecastCard.tsx` (created)
+  - `src/components/smarttrip/EscapeHills.tsx` (updated)
+  - `src/routes/destination/$id.tsx` (updated)
+  - `src/routes/plan/$id.tsx` (updated)
+  - `src/routes/settings.tsx` (updated)
+  - `src/routes/bookings.tsx` (updated)
+  - `src/lib/smarttrip-store.ts` (updated)
+  - `src/server.ts` (updated)
+  - `supabase/migrations/006_price_alerts.sql` (created)
+  - `.github/workflows/daily-price-alerts.yml` (created)
+  - `.github/workflows/keep-alive.yml` (kept intact)
+  - `.env.example` (updated with CRON_SECRET)
+  - `src/server/__tests__/live-data.test.ts` (created)
+  - `MIGRATION_LOG.md` (updated)
+

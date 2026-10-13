@@ -29,6 +29,8 @@ import { PageHeader } from "@/components/smarttrip/PageHeader";
 import { SupportDock } from "@/components/smarttrip/SupportDock";
 import { useAuth } from "@/lib/auth-context";
 import { updateProfileFn } from "@/lib/server/trip-actions";
+import { getExchangeRatesFn } from "@/lib/server/live-data-actions";
+import type { ExchangeRates } from "@/server/currency";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -89,12 +91,15 @@ const POPULAR_CITIES = [
 ];
 
 const CURRENCIES = [
-  { code: "INR", symbol: "₹", name: "Indian Rupee" },
-  { code: "USD", symbol: "$", name: "US Dollar" },
-  { code: "EUR", symbol: "€", name: "Euro" },
-  { code: "GBP", symbol: "£", name: "British Pound" },
-  { code: "JPY", symbol: "¥", name: "Japanese Yen" },
-  { code: "AED", symbol: "د.إ", name: "UAE Dirham" },
+  { code: "INR", symbol: "₹", name: "Indian Rupee", supported: true },
+  { code: "USD", symbol: "$", name: "US Dollar", supported: true },
+  { code: "EUR", symbol: "€", name: "Euro", supported: true },
+  { code: "GBP", symbol: "£", name: "British Pound", supported: true },
+  { code: "JPY", symbol: "¥", name: "Japanese Yen", supported: true },
+  { code: "AUD", symbol: "A$", name: "Australian Dollar", supported: true },
+  { code: "CAD", symbol: "C$", name: "Canadian Dollar", supported: true },
+  { code: "SGD", symbol: "S$", name: "Singapore Dollar", supported: true },
+  { code: "AED", symbol: "د.إ", name: "UAE Dirham", supported: false },
 ];
 
 function SettingsPage() {
@@ -107,6 +112,13 @@ function SettingsPage() {
   const [homeCity, setHomeCity] = useState<string>("Mumbai");
   const [currency, setCurrency] = useState<string>("INR");
   const [saving, setSaving] = useState(false);
+  const [ratesData, setRatesData] = useState<ExchangeRates | null>(null);
+
+  useEffect(() => {
+    getExchangeRatesFn()
+      .then(setRatesData)
+      .catch((err) => console.warn("Could not load ECB rates:", err));
+  }, []);
 
   // Sync initial state from user metadata
   useEffect(() => {
@@ -422,6 +434,38 @@ function SettingsPage() {
                       ))}
                     </SelectContent>
                   </Select>
+
+                  {/* Live ECB rate status */}
+                  {currency === "INR" ? (
+                    <div className="rounded-xl bg-secondary/50 p-2.5 text-[11px] text-muted-foreground flex items-center justify-between">
+                      <span>Base currency: Indian Rupee (₹)</span>
+                      <span className="font-semibold text-foreground">1 INR = ₹1.00</span>
+                    </div>
+                  ) : ratesData?.rates[currency] ? (
+                    <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-2.5 text-[11px] text-emerald-800 dark:text-emerald-300 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold">Live ECB Rate via Frankfurter:</span>
+                        <span className="font-bold">
+                          1 INR = {ratesData.rates[currency]} {currency}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">
+                        Sample: ₹10,000 = {(10000 * ratesData.rates[currency]).toFixed(2)}{" "}
+                        {currency}. Rates cached daily.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-2.5 text-[11px] text-amber-800 dark:text-amber-300 space-y-0.5">
+                      <div className="flex items-center gap-1.5 font-bold">
+                        <span>Unsupported by ECB rates</span>
+                      </div>
+                      <p className="text-[10px]">
+                        {currency} is not tracked by the European Central Bank. Showing in INR only
+                        (₹).
+                      </p>
+                    </div>
+                  )}
+
                   <p className="text-[11px] text-muted-foreground">
                     All budget estimations and trip calculations will be presented in your preferred
                     currency.

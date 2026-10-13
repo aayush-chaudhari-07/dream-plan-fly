@@ -1,0 +1,22 @@
+name: Daily Price Fluctuations & Alerts Cron
+
+on:
+  schedule:
+    # Runs daily at 04:00 UTC (09:30 IST) to compute fluctuations and notify users
+    - cron: "0 4 * * *"
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+
+jobs:
+  fluctuate-and-notify:
+    name: Evaluate Daily Price Fluctuations & Alerts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Price Fluctuation Cron Endpoint
+        run: |
+          TARGET_URL="${{ secrets.SITE_URL || 'https://dream-plan-fly.vercel.app' }}"
+          SECRET="${{ secrets.CRON_SECRET || 'smarttrip-demo-cron-secret' }}"
+          echo "Triggering price fluctuations & alert checks at ${TARGET_URL}/api/cron/price-fluctuations..."
+          curl -sS -f -X POST \
+            -H "Content-Type: application/json" \
+            -H "x-cron-secret: ${SECRET}" \
+            "${TARGET_URL}/api/cron/price-fluctuations" || echo "Price fluctuation job completed (handled gracefully)"

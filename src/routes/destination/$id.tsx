@@ -15,6 +15,7 @@ import { Footer } from "@/components/smarttrip/Footer";
 import { Navbar } from "@/components/smarttrip/Navbar";
 import { SupportDock } from "@/components/smarttrip/SupportDock";
 import { InteractiveMap } from "@/components/smarttrip/InteractiveMap";
+import { WeatherForecastCard } from "@/components/smarttrip/WeatherForecastCard";
 import { destinations, inr } from "@/data/travel";
 
 export const Route = createFileRoute("/destination/$id")({
@@ -121,56 +122,14 @@ function DestinationDetailPage() {
 
         {/* Content Body */}
         <div className="container-page mt-8 space-y-12">
-          {/* Key Facts Cards (Weather & Best Time) */}
-          <div className="grid gap-5 md:grid-cols-2">
-            {/* Weather Card */}
-            <div className="surface-card p-6 rounded-3xl border border-border shadow-soft">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="size-11 rounded-2xl bg-sky-500/10 text-sky-500 flex items-center justify-center">
-                  <CloudSun className="size-6" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Current Season & Weather
-                  </p>
-                  <h3 className="font-display font-bold text-lg text-foreground">
-                    {destination.weather.temp} · {destination.weather.condition}
-                  </h3>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {destination.weather.summary}
-              </p>
-              <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
-                <span>Climate Cycle: {destination.weather.season}</span>
-                <span className="font-medium text-foreground">Live Season Advice</span>
-              </div>
-            </div>
-
-            {/* Best Time to Visit Card */}
-            <div className="surface-card p-6 rounded-3xl border border-border shadow-soft">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="size-11 rounded-2xl bg-sunset/10 text-sunset flex items-center justify-center">
-                  <CalendarDays className="size-6" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Optimal Travel Window
-                  </p>
-                  <h3 className="font-display font-bold text-lg text-foreground">
-                    Best Time to Visit
-                  </h3>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {destination.bestTimeToVisit}
-              </p>
-              <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
-                <span>Recommended Stay: 4–7 Days</span>
-                <span className="font-medium text-foreground">High Season Window</span>
-              </div>
-            </div>
-          </div>
+          {/* Live Open-Meteo Weather & 7-Day Forecast */}
+          <WeatherForecastCard
+            lat={destination.lat}
+            lng={destination.lng}
+            destinationName={destination.name}
+            bestTimeToVisit={destination.bestTimeToVisit}
+            basePrice={destination.price}
+          />
 
           {/* Destination Overview & Highlights */}
           <div className="surface-card p-6 sm:p-8 rounded-3xl border border-border shadow-soft">

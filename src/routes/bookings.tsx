@@ -16,7 +16,9 @@ import {
   Leaf,
   ShieldCheck,
   RotateCcw,
+  BellRing,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Footer } from "@/components/smarttrip/Footer";
@@ -25,6 +27,8 @@ import { PageHeader } from "@/components/smarttrip/PageHeader";
 import { SupportDock } from "@/components/smarttrip/SupportDock";
 import { AirportCombobox } from "@/components/smarttrip/booking/AirportCombobox";
 import { inr } from "@/data/travel";
+import { smartTrip } from "@/lib/smarttrip-store";
+import { createPriceAlertFn } from "@/lib/server/live-data-actions";
 import { getAirportByIata } from "@/data/airports";
 import { generateFlights, type FlightOption, type CabinClass } from "@/data/flight-generator";
 import {
@@ -99,6 +103,68 @@ function BookingsPage() {
 
   const originAirport = getAirportByIata(originIata);
   const destAirport = getAirportByIata(destinationIata);
+
+  // Price Alert Modal State
+  const [priceAlertModal, setPriceAlertModal] = useState<{
+    isOpen: boolean;
+    itemType: "flight" | "stay" | "package";
+    itemId: string;
+    title: string;
+    basePrice: number;
+    targetPrice: number;
+  }>({
+    isOpen: false,
+    itemType: "flight",
+    itemId: "",
+    title: "",
+    basePrice: 0,
+    targetPrice: 0,
+  });
+
+  const handleOpenPriceAlertModal = (
+    itemType: "flight" | "stay" | "package",
+    itemId: string,
+    title: string,
+    basePrice: number,
+  ) => {
+    setPriceAlertModal({
+      isOpen: true,
+      itemType,
+      itemId,
+      title,
+      basePrice,
+      targetPrice: Math.round(basePrice * 0.9),
+    });
+  };
+
+  const handleSavePriceAlert = async () => {
+    try {
+      smartTrip.addPriceAlert({
+        itemType: priceAlertModal.itemType,
+        itemId: priceAlertModal.itemId,
+        title: priceAlertModal.title,
+        targetPrice: priceAlertModal.targetPrice,
+        basePrice: priceAlertModal.basePrice,
+      });
+
+      await createPriceAlertFn({
+        data: {
+          itemType: priceAlertModal.itemType,
+          itemId: priceAlertModal.itemId,
+          title: priceAlertModal.title,
+          targetPrice: priceAlertModal.targetPrice,
+          basePrice: priceAlertModal.basePrice,
+        },
+      });
+
+      setPriceAlertModal((prev) => ({ ...prev, isOpen: false }));
+      toast.success("Price Alert Created!", {
+        description: `We will notify you when ${priceAlertModal.title} drops below ₹${priceAlertModal.targetPrice.toLocaleString("en-IN")}.`,
+      });
+    } catch {
+      toast.error("Failed to activate price alert.");
+    }
+  };
 
   // 1. Generate Deterministic Flights
   const generatedFlights = useMemo(() => {
@@ -639,23 +705,46 @@ function BookingsPage() {
 
                       <div className="flex md:flex-col items-center md:items-end justify-between w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-border">
                         <div className="text-left md:text-right">
-                          <span className="font-display text-2xl font-black text-primary">
-                            {inr(flight.price)}
-                          </span>
+                          <div className="flex items-center gap-1.5 justify-start md:justify-end">
+                            <span className="font-display text-2xl font-black text-primary">
+                              {inr(flight.price)}
+                            </span>
+                            <span className="text-[10px] font-semibold text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                              Demo pricing
+                            </span>
+                          </div>
                           <p className="text-[10px] text-muted-foreground">
                             Total for {travelers} traveler(s)
                           </p>
                         </div>
-                        <Button
-                          type="button"
-                          variant="hero"
-                          size="sm"
-                          className="rounded-full px-5 mt-2 gap-1.5 shadow-soft"
-                          onClick={() => handleBookFlight(flight)}
-                          data-testid="book-flight-btn"
-                        >
-                          Book Flight <ArrowRight className="size-3.5" />
-                        </Button>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="rounded-full h-8 text-xs gap-1"
+                            onClick={() =>
+                              handleOpenPriceAlertModal(
+                                "flight",
+                                `${flight.originIata}-${flight.destinationIata}`,
+                                `Flight: ${flight.originIata} → ${flight.destinationIata}`,
+                                flight.price,
+                              )
+                            }
+                          >
+                            <BellRing className="size-3 text-primary" /> Watch
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="hero"
+                            size="sm"
+                            className="rounded-full px-5 gap-1.5 shadow-soft"
+                            onClick={() => handleBookFlight(flight)}
+                            data-testid="book-flight-btn"
+                          >
+                            Book Flight <ArrowRight className="size-3.5" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -700,20 +789,43 @@ function BookingsPage() {
 
                     <div className="p-4 pt-0 border-t border-border/60 flex items-center justify-between">
                       <div>
-                        <span className="font-display text-lg font-bold text-primary">
-                          {inr(stay.price)}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-display text-lg font-bold text-primary">
+                            {inr(stay.price)}
+                          </span>
+                          <span className="text-[10px] font-semibold text-amber-600 bg-amber-500/10 px-1.5 py-0.5 rounded-full border border-amber-500/20">
+                            Demo pricing
+                          </span>
+                        </div>
                         <span className="text-[10px] text-muted-foreground"> / night</span>
                       </div>
-                      <Button
-                        type="button"
-                        variant="hero"
-                        size="sm"
-                        className="rounded-full"
-                        onClick={() => handleBookStay(stay)}
-                      >
-                        Reserve
-                      </Button>
+                      <div className="flex items-center gap-1.5">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="rounded-full h-8 px-2.5 text-xs gap-1"
+                          onClick={() =>
+                            handleOpenPriceAlertModal(
+                              "stay",
+                              stay.id,
+                              `${stay.name} (${stay.location})`,
+                              stay.price,
+                            )
+                          }
+                        >
+                          <BellRing className="size-3 text-primary" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="hero"
+                          size="sm"
+                          className="rounded-full"
+                          onClick={() => handleBookStay(stay)}
+                        >
+                          Reserve
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -872,6 +984,70 @@ function BookingsPage() {
           </section>
         </div>
       </main>
+
+      {/* Price Alert Dialog */}
+      {priceAlertModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-elevated space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                <BellRing className="size-5" />
+              </div>
+              <div>
+                <h4 className="font-display font-bold text-base text-foreground">
+                  Set Price Alert
+                </h4>
+                <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                  {priceAlertModal.title}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">Target Price (INR)</label>
+              <Input
+                type="number"
+                value={priceAlertModal.targetPrice}
+                onChange={(e) =>
+                  setPriceAlertModal((prev) => ({
+                    ...prev,
+                    targetPrice: Number(e.target.value) || 0,
+                  }))
+                }
+                className="rounded-xl h-10 text-sm font-semibold"
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Base price: ₹{priceAlertModal.basePrice.toLocaleString("en-IN")}. We will notify you
+                when catalog fares fluctuate below your target.
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-2.5 text-[11px] text-amber-700 dark:text-amber-300">
+              <span className="font-bold">Demo pricing:</span> Simulated deterministic fluctuations
+              run daily via GitHub Actions cron.
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPriceAlertModal((prev) => ({ ...prev, isOpen: false }))}
+                className="rounded-full"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="hero"
+                size="sm"
+                onClick={handleSavePriceAlert}
+                className="rounded-full"
+              >
+                Activate Alert
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
       <SupportDock />
