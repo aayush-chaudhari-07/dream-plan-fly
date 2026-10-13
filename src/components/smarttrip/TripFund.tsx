@@ -1,8 +1,18 @@
 import { useState } from "react";
-import { Coins, PiggyBank, Plus, Target, Trash2, TrendingUp } from "lucide-react";
+import {
+  AlertCircle,
+  Coins,
+  PiggyBank,
+  Plus,
+  RefreshCw,
+  Target,
+  Trash2,
+  TrendingUp,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { inr, type FutureTrip } from "@/data/travel";
 import { smartTrip, useSmartTrip } from "@/lib/smarttrip-store";
 import { Reveal, SectionHeading } from "./Reveal";
@@ -123,7 +133,7 @@ function FundCard({ trip }: { trip: FutureTrip }) {
 }
 
 export function TripFund() {
-  const { funds } = useSmartTrip();
+  const { funds, isLoading, isError, refetch } = useSmartTrip();
   const [name, setName] = useState("");
   const [target, setTarget] = useState("");
 
@@ -151,6 +161,24 @@ export function TripFund() {
         title="Make Your Dream Trip Real"
         subtitle="Dream trackers, not bank statements. Watch your savings grow and see when you'll be ready to go."
       />
+
+      {isError && (
+        <div className="mt-8 rounded-3xl border border-destructive/20 bg-destructive/10 p-6 text-center">
+          <AlertCircle className="size-8 text-destructive mx-auto mb-2" />
+          <p className="font-display font-semibold text-foreground">Could not load trip funds</p>
+          <p className="text-xs text-muted-foreground mt-1 mb-4">
+            Failed to fetch your saved trip funds from the server.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch?.()}
+            className="rounded-full gap-2"
+          >
+            <RefreshCw className="size-3.5" /> Retry
+          </Button>
+        </div>
+      )}
 
       <div className="mt-10 grid gap-6 lg:grid-cols-3">
         <Reveal className="surface-card p-6 lg:col-span-1">
@@ -218,7 +246,18 @@ export function TripFund() {
         </Reveal>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:col-span-2">
-          {funds.length === 0 ? (
+          {isLoading ? (
+            [1, 2, 3, 4].map((i) => (
+              <div key={i} className="surface-card overflow-hidden rounded-3xl">
+                <Skeleton className="h-44 w-full rounded-none" />
+                <div className="p-5 space-y-3">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
+              </div>
+            ))
+          ) : funds.length === 0 ? (
             <div className="col-span-full rounded-3xl bg-secondary/50 py-16 text-center text-sm text-muted-foreground">
               No trip funds yet — create your first dream on the left.
             </div>

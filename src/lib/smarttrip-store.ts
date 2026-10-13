@@ -1,7 +1,23 @@
 import { useEffect, useSyncExternalStore } from "react";
+import { useQuery } from "@tanstack/react-query";
+import type { User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 import { images, initialFutureTrips, myTrips, type FutureTrip } from "@/data/travel";
 import type { GeneratedPlan } from "@/lib/trip-plan";
+import { queryClient } from "@/lib/query-client";
+import {
+  fetchUserDataFn,
+  savePlanFn,
+  moveTripFn,
+  removeTripFn,
+  addBookingFn,
+  cancelBookingFn,
+  addFundFn,
+  contributeFundFn,
+  removeFundFn,
+  toggleWishFn,
+} from "@/lib/server/trip-actions";
 
 export type TripBucket = "Upcoming" | "Past" | "Saved";
 
@@ -32,6 +48,10 @@ export type SmartTripState = {
   bookings: StoredBooking[];
   funds: FutureTrip[];
   wishlist: string[];
+  isLoading?: boolean;
+  isError?: boolean;
+  isAuthenticated?: boolean;
+  refetch?: () => void;
 };
 
 const STORAGE_KEY = "smarttrip.state.v1";
@@ -54,11 +74,19 @@ const SEED: SmartTripState = {
   bookings: [],
   funds: initialFutureTrips,
   wishlist: [],
+  isLoading: false,
+  isError: false,
+  isAuthenticated: false,
 };
 
-let state: SmartTripState = SEED;
+let localState: SmartTripState = SEED;
 let hydrated = false;
+let currentAuthUser: User | null = null;
 const listeners = new Set<() => void>();
+
+export function setStoreAuthUser(user: User | null) {
+  currentAuthUser = user;
+}
 
 function emit() {
   for (const l of listeners) l();
@@ -66,9 +94,9 @@ function emit() {
 
 function persist() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(localState));
   } catch {
-    /* storage unavailable — keep in-memory state */
+    /* storage unavailable — keep in-memory */
   }
 }
 
@@ -79,11 +107,14 @@ function hydrate() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<SmartTripState>;
-      state = {
+      localState = {
         trips: parsed.trips ?? SEED.trips,
         bookings: parsed.bookings ?? [],
         funds: parsed.funds ?? SEED.funds,
         wishlist: parsed.wishlist ?? [],
+        isLoading: false,
+        isError: false,
+        isAuthenticated: false,
       };
       emit();
     }
@@ -93,7 +124,7 @@ function hydrate() {
 }
 
 function update(patch: Partial<SmartTripState>) {
-  state = { ...state, ...patch };
+  localState = { ...localState, ...patch };
   persist();
   emit();
 }
@@ -103,14 +134,78 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
-/** Reactive access to the persisted SmartTrip state (safe for SSR). */
+/**
+ * Access SmartTrip state.
+ * If user is authenticated, reads and caches via TanStack Query and Supabase.
+ * If user is a guest, reads and writes locally via localStorage.
+ */
 export function useSmartTrip(): SmartTripState {
   useEffect(hydrate, []);
-  return useSyncExternalStore(
+
+  const local = useSyncExternalStore(
     subscribe,
-    () => state,
+    () => localState,
     () => SEED,
   );
+
+  const isAuth = Boolean(currentAuthUser);
+
+  const query = useQuery({
+    queryKey: ["smarttrip-data", currentAuthUser?.id],
+    queryFn: async () => {
+      const res = await fetchUserDataFn();
+      return res;
+    },
+    enabled: isAuth,
+  });
+
+  if (isAuth) {
+    if (query.isLoading) {
+      return {
+        trips: local.trips,
+        bookings: local.bookings,
+        funds: local.funds,
+        wishlist: local.wishlist,
+        isLoading: true,
+        isError: false,
+        isAuthenticated: true,
+        refetch: () => query.refetch(),
+      };
+    }
+
+    if (query.isError) {
+      return {
+        trips: local.trips,
+        bookings: local.bookings,
+        funds: local.funds,
+        wishlist: local.wishlist,
+        isLoading: false,
+        isError: true,
+        isAuthenticated: true,
+        refetch: () => query.refetch(),
+      };
+    }
+
+    if (query.data && query.data.authenticated) {
+      return {
+        trips: query.data.trips,
+        bookings: query.data.bookings,
+        funds: query.data.funds,
+        wishlist: query.data.wishlist,
+        isLoading: false,
+        isError: false,
+        isAuthenticated: true,
+        refetch: () => query.refetch(),
+      };
+    }
+  }
+
+  return {
+    ...local,
+    isLoading: false,
+    isError: false,
+    isAuthenticated: false,
+  };
 }
 
 const id = (prefix: string) =>
@@ -138,13 +233,36 @@ export const smartTrip = {
       bucket: "Saved",
       plan,
     };
-    update({ trips: [trip, ...state.trips] });
+
+    // Optimistic local update
+    update({ trips: [trip, ...localState.trips] });
+
+    // Authenticated server update
+    if (currentAuthUser) {
+      queryClient.setQueryData(
+        ["smarttrip-data", currentAuthUser.id],
+        (old: { trips?: StoredTrip[]; [key: string]: unknown } | undefined) => ({
+          ...old,
+          trips: [trip, ...(old?.trips || [])],
+        }),
+      );
+
+      savePlanFn({ data: plan })
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ["smarttrip-data"] });
+        })
+        .catch((err) => {
+          console.error("Failed to sync plan to server:", err);
+          toast.error("Could not sync plan to cloud. Stored locally.");
+        });
+    }
+
     return trip;
   },
 
   moveTrip(tripId: string, bucket: TripBucket) {
-    update({
-      trips: state.trips.map((t) =>
+    const patchTrips = (trips: StoredTrip[]) =>
+      trips.map((t) =>
         t.id === tripId
           ? {
               ...t,
@@ -157,12 +275,47 @@ export const smartTrip = {
                     : t.status,
             }
           : t,
-      ),
-    });
+      );
+
+    update({ trips: patchTrips(localState.trips) });
+
+    if (currentAuthUser) {
+      queryClient.setQueryData(
+        ["smarttrip-data", currentAuthUser.id],
+        (old: { trips?: StoredTrip[]; [key: string]: unknown } | undefined) => ({
+          ...old,
+          trips: patchTrips(old?.trips || []),
+        }),
+      );
+
+      moveTripFn({ data: { tripId, bucket } })
+        .then(() => queryClient.invalidateQueries({ queryKey: ["smarttrip-data"] }))
+        .catch((err) => {
+          console.error("Failed to move trip on server:", err);
+          toast.error("Could not sync trip update to cloud.");
+        });
+    }
   },
 
   removeTrip(tripId: string) {
-    update({ trips: state.trips.filter((t) => t.id !== tripId) });
+    update({ trips: localState.trips.filter((t) => t.id !== tripId) });
+
+    if (currentAuthUser) {
+      queryClient.setQueryData(
+        ["smarttrip-data", currentAuthUser.id],
+        (old: { trips?: StoredTrip[]; [key: string]: unknown } | undefined) => ({
+          ...old,
+          trips: (old?.trips || []).filter((t) => t.id !== tripId),
+        }),
+      );
+
+      removeTripFn({ data: { tripId } })
+        .then(() => queryClient.invalidateQueries({ queryKey: ["smarttrip-data"] }))
+        .catch((err) => {
+          console.error("Failed to remove trip on server:", err);
+          toast.error("Could not remove trip from cloud.");
+        });
+    }
   },
 
   /* ---------- bookings ---------- */
@@ -193,18 +346,68 @@ export const smartTrip = {
       bucket: "Upcoming",
     };
 
-    update({ bookings: [booking, ...state.bookings], trips: [trip, ...state.trips] });
+    update({
+      bookings: [booking, ...localState.bookings],
+      trips: [trip, ...localState.trips],
+    });
+
+    if (currentAuthUser) {
+      queryClient.setQueryData(
+        ["smarttrip-data", currentAuthUser.id],
+        (
+          old:
+            | { bookings?: StoredBooking[]; trips?: StoredTrip[]; [key: string]: unknown }
+            | undefined,
+        ) => ({
+          ...old,
+          bookings: [booking, ...(old?.bookings || [])],
+          trips: [trip, ...(old?.trips || [])],
+        }),
+      );
+
+      addBookingFn({ data: input })
+        .then(() => queryClient.invalidateQueries({ queryKey: ["smarttrip-data"] }))
+        .catch((err) => {
+          console.error("Failed to sync booking to server:", err);
+          toast.error("Booking saved locally; cloud sync failed.");
+        });
+    }
+
     return booking;
   },
 
   cancelBooking(bookingId: string) {
-    const booking = state.bookings.find((b) => b.id === bookingId);
+    const booking = localState.bookings.find((b) => b.id === bookingId);
     update({
-      bookings: state.bookings.filter((b) => b.id !== bookingId),
+      bookings: localState.bookings.filter((b) => b.id !== bookingId),
       trips: booking
-        ? state.trips.filter((t) => !t.status.some((s) => s.includes(booking.reference)))
-        : state.trips,
+        ? localState.trips.filter((t) => !t.status.some((s) => s.includes(booking.reference)))
+        : localState.trips,
     });
+
+    if (currentAuthUser) {
+      queryClient.setQueryData(
+        ["smarttrip-data", currentAuthUser.id],
+        (
+          old:
+            | { bookings?: StoredBooking[]; trips?: StoredTrip[]; [key: string]: unknown }
+            | undefined,
+        ) => ({
+          ...old,
+          bookings: (old?.bookings || []).filter((b) => b.id !== bookingId),
+          trips: booking
+            ? (old?.trips || []).filter((t) => !t.status.some((s) => s.includes(booking.reference)))
+            : old?.trips || [],
+        }),
+      );
+
+      cancelBookingFn({ data: { bookingId } })
+        .then(() => queryClient.invalidateQueries({ queryKey: ["smarttrip-data"] }))
+        .catch((err) => {
+          console.error("Failed to cancel booking on server:", err);
+          toast.error("Could not cancel booking in cloud.");
+        });
+    }
   },
 
   /* ---------- trip funds ---------- */
@@ -220,30 +423,102 @@ export const smartTrip = {
       travelers: input.travelers ?? 2,
       image: imageFor(input.name),
     };
-    update({ funds: [fund, ...state.funds] });
+
+    update({ funds: [fund, ...localState.funds] });
+
+    if (currentAuthUser) {
+      queryClient.setQueryData(
+        ["smarttrip-data", currentAuthUser.id],
+        (old: { funds?: FutureTrip[]; [key: string]: unknown } | undefined) => ({
+          ...old,
+          funds: [fund, ...(old?.funds || [])],
+        }),
+      );
+
+      addFundFn({ data: input })
+        .then(() => queryClient.invalidateQueries({ queryKey: ["smarttrip-data"] }))
+        .catch((err) => {
+          console.error("Failed to add fund on server:", err);
+          toast.error("Could not save fund goal to cloud.");
+        });
+    }
+
     return fund;
   },
 
   contribute(fundId: string, amount: number) {
-    update({
-      funds: state.funds.map((f) =>
+    const patchFunds = (funds: FutureTrip[]) =>
+      funds.map((f) =>
         f.id === fundId ? { ...f, saved: Math.min(f.target, f.saved + amount) } : f,
-      ),
-    });
+      );
+
+    update({ funds: patchFunds(localState.funds) });
+
+    if (currentAuthUser) {
+      queryClient.setQueryData(
+        ["smarttrip-data", currentAuthUser.id],
+        (old: { funds?: FutureTrip[]; [key: string]: unknown } | undefined) => ({
+          ...old,
+          funds: patchFunds(old?.funds || []),
+        }),
+      );
+
+      contributeFundFn({ data: { fundId, amount } })
+        .then(() => queryClient.invalidateQueries({ queryKey: ["smarttrip-data"] }))
+        .catch((err) => {
+          console.error("Failed to contribute to fund on server:", err);
+          toast.error("Could not record contribution in cloud.");
+        });
+    }
   },
 
   removeFund(fundId: string) {
-    update({ funds: state.funds.filter((f) => f.id !== fundId) });
+    update({ funds: localState.funds.filter((f) => f.id !== fundId) });
+
+    if (currentAuthUser) {
+      queryClient.setQueryData(
+        ["smarttrip-data", currentAuthUser.id],
+        (old: { funds?: FutureTrip[]; [key: string]: unknown } | undefined) => ({
+          ...old,
+          funds: (old?.funds || []).filter((f) => f.id !== fundId),
+        }),
+      );
+
+      removeFundFn({ data: { fundId } })
+        .then(() => queryClient.invalidateQueries({ queryKey: ["smarttrip-data"] }))
+        .catch((err) => {
+          console.error("Failed to remove fund on server:", err);
+          toast.error("Could not delete fund goal from cloud.");
+        });
+    }
   },
 
   /* ---------- wishlist ---------- */
   toggleWish(destinationId: string) {
-    const has = state.wishlist.includes(destinationId);
-    update({
-      wishlist: has
-        ? state.wishlist.filter((x) => x !== destinationId)
-        : [...state.wishlist, destinationId],
-    });
+    const has = localState.wishlist.includes(destinationId);
+    const newWish = has
+      ? localState.wishlist.filter((x) => x !== destinationId)
+      : [...localState.wishlist, destinationId];
+
+    update({ wishlist: newWish });
+
+    if (currentAuthUser) {
+      queryClient.setQueryData(
+        ["smarttrip-data", currentAuthUser.id],
+        (old: { wishlist?: string[]; [key: string]: unknown } | undefined) => ({
+          ...old,
+          wishlist: newWish,
+        }),
+      );
+
+      toggleWishFn({ data: { destinationId } })
+        .then(() => queryClient.invalidateQueries({ queryKey: ["smarttrip-data"] }))
+        .catch((err) => {
+          console.error("Failed to toggle wish on server:", err);
+          toast.error("Could not update wishlist in cloud.");
+        });
+    }
+
     return !has;
   },
 

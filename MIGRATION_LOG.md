@@ -51,6 +51,7 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
 ---
 
 ## Task 2: Foundation Cleanup, Testing & Hardening
+
 - **Date**: 2026-10-13
 - **Branch**: `production-ready`
 - **Actions Taken**:
@@ -84,3 +85,44 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `src/components/ui/badge.tsx` (exported const badgeVariants inline)
   - `MIGRATION_LOG.md` (updated)
 
+---
+
+## Task 3: Supabase Backend, Auth & TanStack Query Integration
+- **Date**: 2026-10-13
+- **Branch**: `production-ready`
+- **Actions Taken**:
+  - Installed `@supabase/supabase-js` (v2.117.3) and `@supabase/ssr` (v0.12.7).
+  - Designed the comprehensive relational database schema in `supabase/migrations/001_init.sql` covering `profiles`, `trips` (with `trip_bucket` enum `Upcoming` / `Past` / `Saved` and JSONB `plan`), `bookings`, `funds`, `fund_contributions`, `wishlist`, and `notifications`. Enabled Row Level Security (RLS) on all tables with strict user isolation policies (`auth.uid() = user_id`) and automatic profile provisioning via trigger on `auth.users`.
+  - Created client-side Supabase client (`src/lib/supabase/client.ts`) and server-side Supabase client (`src/lib/supabase/server.ts`) integrated with TanStack Start cookie handlers (`getCookies()`, `setCookie()`).
+  - Implemented typed, Zod-validated server functions (`createServerFn`) in `src/lib/server/trip-actions.ts` for all persistence operations: `getUserFn`, `fetchUserDataFn`, `savePlanFn`, `moveTripFn`, `removeTripFn`, `addBookingFn`, `cancelBookingFn`, `addFundFn`, `contributeFundFn`, `removeFundFn`, `toggleWishFn`, and `migrateGuestDataFn`.
+  - Refactored `smarttrip-store.ts` to support both signed-in users (via TanStack Query caching and optimistic mutations) and guests (via localStorage fallback). Added one-time automated guest data migration upon account creation.
+  - Built polished, responsive authentication pages matching the design system: `/login` (`src/routes/login.tsx`), `/signup` (`src/routes/signup.tsx`), and OAuth callback handler (`src/routes/auth/callback.tsx`).
+  - Added route protection for `/my-trips`, `/save`, and booking checkout on `/bookings`, with return redirects (`?redirect=...`) after login.
+  - Updated `Navbar.tsx` with user account dropdown, initials avatar, profile details, and logout action.
+  - Added loading skeletons and error states with retry capabilities in `my-trips.tsx` and `TripFund.tsx`.
+  - Updated `.env.example` with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, and documented Supabase setup, migrations, and auth configuration in `README.md`.
+  - Verified `npm run lint` (0 errors, 0 warnings), `npm run typecheck` (0 errors), `npm run test` (20/20 passed), and `npm run build` (clean Nitro & SSR build).
+- **Files Touched**:
+  - `package.json` (installed @supabase/supabase-js, @supabase/ssr)
+  - `package-lock.json`
+  - `supabase/migrations/001_init.sql` (created)
+  - `src/lib/supabase/client.ts` (created)
+  - `src/lib/supabase/server.ts` (created)
+  - `src/lib/server/trip-actions.ts` (created)
+  - `src/lib/auth-context.tsx` (created)
+  - `src/lib/query-client.ts` (created)
+  - `src/lib/smarttrip-store.ts` (refactored with TanStack Query and server functions)
+  - `src/router.tsx` (connected shared queryClient)
+  - `src/routes/__root.tsx` (wrapped in AuthProvider)
+  - `src/routes/login.tsx` (created)
+  - `src/routes/signup.tsx` (created)
+  - `src/routes/auth/callback.tsx` (created)
+  - `src/routes/my-trips.tsx` (added auth guard, skeletons, and error handling)
+  - `src/routes/save.tsx` (added auth guard)
+  - `src/routes/bookings.tsx` (added checkout auth guard)
+  - `src/components/smarttrip/Navbar.tsx` (added auth state and profile dropdown)
+  - `src/components/smarttrip/TripFund.tsx` (added skeletons and error handling)
+  - `eslint.config.js` (added auth-context override)
+  - `.env.example` (added Supabase env vars)
+  - `README.md` (added Supabase setup guide)
+  - `MIGRATION_LOG.md` (updated)

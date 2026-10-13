@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Bus, Car, Hotel, Luggage, Plane, Star, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/smarttrip/PageHeader";
 import { SupportDock } from "@/components/smarttrip/SupportDock";
 import { flights, hotels, rentals, railBus, packages, inr } from "@/data/travel";
 import { smartTrip } from "@/lib/smarttrip-store";
+import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 
 type TabKey = "flights" | "stay" | "rental" | "rail" | "packages";
@@ -27,7 +28,18 @@ const tabs: {
 ];
 
 function ResultCard({ item, tab }: { item: unknown; tab: TabKey }) {
+  const { user, isConfigured } = useAuth();
+  const navigate = useNavigate();
+
   const book = () => {
+    if (isConfigured && !user) {
+      toast.info("Please sign in to complete checkout", {
+        description: "You'll be returned here right after signing in.",
+      });
+      navigate({ to: "/login", search: { redirect: "/bookings" } });
+      return;
+    }
+
     const i = item as {
       airline?: string;
       operator?: string;
@@ -52,10 +64,10 @@ function ResultCard({ item, tab }: { item: unknown; tab: TabKey }) {
     const b = smartTrip.addBooking({
       kind,
       title: i.name ?? `${i.airline ?? i.operator} · ${i.dep} → ${i.arr}`,
-      subtitle: i.location ?? i.region ?? i.type ?? "Demo booking",
+      subtitle: i.location ?? i.region ?? i.type ?? "Booking reservation",
       price: i.price,
     });
-    toast.success("Booked (demo)", { description: `Ref ${b.reference} · see My Trips` });
+    toast.success("Booking confirmed!", { description: `Ref ${b.reference} · see My Trips` });
   };
 
   if (tab === "flights" || tab === "rail") {
