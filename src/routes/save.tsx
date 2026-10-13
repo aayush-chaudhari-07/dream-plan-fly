@@ -9,9 +9,17 @@ export const Route = createFileRoute("/save")({
   head: () => ({
     meta: [
       { title: "Save for Your Trip — SmartTrip" },
-      { name: "description", content: "Start a trip fund, track savings and get AI-powered reminders to make your dream vacation happen." },
+      {
+        name: "description",
+        content:
+          "Start a trip fund, track savings and get AI-powered reminders to make your dream vacation happen.",
+      },
       { property: "og:title", content: "Save for Your Trip — SmartTrip" },
-      { property: "og:description", content: "Start a trip fund, track savings and get AI-powered reminders to make your dream vacation happen." },
+      {
+        property: "og:description",
+        content:
+          "Start a trip fund, track savings and get AI-powered reminders to make your dream vacation happen.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

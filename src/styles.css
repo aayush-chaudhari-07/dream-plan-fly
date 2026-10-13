@@ -136,7 +136,12 @@
   --sidebar-ring: oklch(0.62 0.11 245);
 
   --gradient-brand: linear-gradient(135deg, oklch(0.42 0.14 260), oklch(0.62 0.14 232));
-  --gradient-sky: linear-gradient(140deg, oklch(0.94 0.045 226), oklch(0.96 0.03 190) 55%, oklch(0.98 0.02 150));
+  --gradient-sky: linear-gradient(
+    140deg,
+    oklch(0.94 0.045 226),
+    oklch(0.96 0.03 190) 55%,
+    oklch(0.98 0.02 150)
+  );
   --gradient-sunrise: linear-gradient(120deg, oklch(0.82 0.12 62), oklch(0.74 0.13 32));
   --gradient-glass: linear-gradient(
     140deg,
@@ -144,7 +149,8 @@
     color-mix(in oklab, white 42%, transparent)
   );
 
-  --shadow-soft: 0 2px 6px -2px oklch(0.42 0.14 260 / 0.08), 0 12px 28px -12px oklch(0.42 0.14 260 / 0.18);
+  --shadow-soft:
+    0 2px 6px -2px oklch(0.42 0.14 260 / 0.08), 0 12px 28px -12px oklch(0.42 0.14 260 / 0.18);
   --shadow-lift: 0 18px 50px -18px oklch(0.42 0.14 260 / 0.35);
   --shadow-glass: 0 20px 60px -20px oklch(0.24 0.08 255 / 0.45);
 

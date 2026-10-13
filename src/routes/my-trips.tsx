@@ -212,7 +212,9 @@ function MyTripsPage() {
                     <p className="mt-1 text-xs text-muted-foreground">Ref {b.reference}</p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="font-display text-lg font-bold text-primary">{inr(b.price)}</span>
+                    <span className="font-display text-lg font-bold text-primary">
+                      {inr(b.price)}
+                    </span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -273,7 +275,12 @@ function MyTripsPage() {
               wished.map((d) => (
                 <Reveal key={d.id}>
                   <div className="surface-card overflow-hidden">
-                    <img src={d.image} alt={d.name} loading="lazy" className="h-32 w-full object-cover" />
+                    <img
+                      src={d.image}
+                      alt={d.name}
+                      loading="lazy"
+                      className="h-32 w-full object-cover"
+                    />
                     <div className="p-4">
                       <p className="font-display font-bold">{d.name}</p>
                       <p className="text-xs text-muted-foreground">{d.region}</p>

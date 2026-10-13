@@ -1401,25 +1401,28 @@ The final website should look polished enough for a college hackathon demo and r
 
 Make it look human-designed, premium, creative and practical — NOT AI-generated.
 
-This project was built with [Lovable](https://lovable.dev).
+**Live app**: https://your-domain.com
 
-**Live app**: https://dream-plan-fly.lovable.app
+## Standalone Development
 
-## Build with Lovable
+SmartTrip is built with TanStack Start, React 19, Vite, and Tailwind CSS.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/8b5525ae-697f-49d0-bec2-441537132cbf).
+### Prerequisites
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+Node.js (v20+ recommended) and npm.
 
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+### Getting Started
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+# Install dependencies
+npm install
+
+# Start local development server
 npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```

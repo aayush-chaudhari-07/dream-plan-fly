@@ -34,7 +34,12 @@ export function DestinationCard({
           onClick={() => onWish?.(d.id)}
           className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-card/85 backdrop-blur transition-transform hover:scale-110"
         >
-          <Heart className={cn("size-4", wished ? "fill-destructive text-destructive" : "text-foreground/70")} />
+          <Heart
+            className={cn(
+              "size-4",
+              wished ? "fill-destructive text-destructive" : "text-foreground/70",
+            )}
+          />
         </button>
         <div className="absolute bottom-3 left-4 text-primary-foreground">
           <p className="font-display text-lg font-bold">{d.name}</p>

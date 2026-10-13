@@ -23,8 +23,13 @@ export function buildPlan(prompt: string, opts: PlanOptions = {}): GeneratedPlan
   const p = prompt.toLowerCase();
   const budgetMatch = p.replace(/[, ]/g, "").match(/(\d{4,7})/);
   const budget = opts.budget ?? (budgetMatch ? Number(budgetMatch[1]) : 35000);
-  const trav = opts.travelers ?? Number(p.match(/(\d+)\s*(people|persons|travell?ers|friends|adults)/)?.[1] ?? 2);
-  const dayCount = Math.min(10, Math.max(2, opts.days ?? Number(p.match(/(\d+)\s*-?\s*day/)?.[1] ?? 5)));
+  const trav =
+    opts.travelers ??
+    Number(p.match(/(\d+)\s*(people|persons|travell?ers|friends|adults)/)?.[1] ?? 2);
+  const dayCount = Math.min(
+    10,
+    Math.max(2, opts.days ?? Number(p.match(/(\d+)\s*-?\s*day/)?.[1] ?? 5)),
+  );
   const beach = /goa|beach|maldives|coast/.test(p);
   const intl = /japan|dubai|europe|international|bali|thailand/.test(p);
   const place = intl
@@ -102,10 +107,18 @@ export function buildPlan(prompt: string, opts: PlanOptions = {}): GeneratedPlan
       "Carry ₹2,000 cash for remote stretches",
     ],
   };
-  const extra = ["🌄 Offbeat day trip nearby", "🧘 Slow day: spa, café hopping", "📸 Photo walk & hidden viewpoints"];
+  const extra = [
+    "🌄 Offbeat day trip nearby",
+    "🧘 Slow day: spa, café hopping",
+    "📸 Photo walk & hidden viewpoints",
+  ];
   let days = base.days.slice(0, dayCount - 1);
   while (days.length < dayCount - 1) {
-    days.push({ day: "", title: "Bonus exploration", items: [extra[days.length % extra.length]!, "🍽 Try a new local kitchen"] });
+    days.push({
+      day: "",
+      title: "Bonus exploration",
+      items: [extra[days.length % extra.length]!, "🍽 Try a new local kitchen"],
+    });
   }
   days = [...days, base.days[base.days.length - 1]!].map((d, i) => ({ ...d, day: `Day ${i + 1}` }));
   const pct = (n: number) => Math.round(budget * n);

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-export function useInView<T extends HTMLElement>(threshold = 0.15) {
+function useInView<T extends HTMLElement>(threshold = 0.15) {
   const ref = useRef<T | null>(null);
   const [inView, setInView] = useState(false);
 

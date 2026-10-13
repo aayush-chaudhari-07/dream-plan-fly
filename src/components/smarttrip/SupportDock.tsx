@@ -34,7 +34,9 @@ export function SupportDock() {
               size="lg"
               className="justify-start"
               onClick={() =>
-                toast.success("Support requested", { description: "An agent will call you in 5 min." })
+                toast.success("Support requested", {
+                  description: "An agent will call you in 5 min.",
+                })
               }
             >
               <MessageSquare /> Contact Support

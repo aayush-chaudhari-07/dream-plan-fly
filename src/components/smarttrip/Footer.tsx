@@ -86,12 +86,16 @@ export function Footer() {
               toast.error("Please enter a valid email");
               return;
             }
-            toast.success("You're subscribed!", { description: "Travel inspiration is on its way." });
+            toast.success("You're subscribed!", {
+              description: "Travel inspiration is on its way.",
+            });
             setEmail("");
           }}
         >
           <div>
-            <p className="font-display text-base font-semibold">Get travel inspiration in your inbox.</p>
+            <p className="font-display text-base font-semibold">
+              Get travel inspiration in your inbox.
+            </p>
             <p className="text-sm text-muted-foreground">One thoughtful email a week. No spam.</p>
           </div>
           <div className="flex w-full max-w-md gap-2">
@@ -109,7 +113,8 @@ export function Footer() {
           </div>
         </form>
         <p className="mt-8 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} SmartTrip. Built for travellers who plan less and travel more.{" "}
+          © {new Date().getFullYear()} SmartTrip. Built for travellers who plan less and travel
+          more.{" "}
           <Link to="/save" className="text-primary hover:underline">
             Start a trip fund
           </Link>

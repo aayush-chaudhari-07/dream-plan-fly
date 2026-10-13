@@ -5,25 +5,29 @@ const steps = [
   {
     icon: Bot,
     title: "Ask AI",
-    description: "Tell SmartTrip where you want to go, your budget and your vibe. AI builds a plan in seconds.",
+    description:
+      "Tell SmartTrip where you want to go, your budget and your vibe. AI builds a plan in seconds.",
     color: "bg-primary text-primary-foreground",
   },
   {
     icon: MapPin,
     title: "Explore",
-    description: "Browse hand-picked destinations, compare real prices and save places you love to a wishlist.",
+    description:
+      "Browse hand-picked destinations, compare real prices and save places you love to a wishlist.",
     color: "bg-teal text-teal-foreground",
   },
   {
     icon: Wallet,
     title: "Save",
-    description: "Start a trip fund, track your progress and get reminders so your dream trip actually happens.",
+    description:
+      "Start a trip fund, track your progress and get reminders so your dream trip actually happens.",
     color: "bg-sunset text-sunset-foreground",
   },
   {
     icon: Plane,
     title: "Book & Go",
-    description: "Book flights, stays, rentals and packages — then manage everything in one smart itinerary.",
+    description:
+      "Book flights, stays, rentals and packages — then manage everything in one smart itinerary.",
     color: "bg-leaf text-leaf-foreground",
   },
 ];
