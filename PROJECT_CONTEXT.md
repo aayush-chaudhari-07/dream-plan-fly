@@ -7,9 +7,9 @@
 ## 1. PROJECT OVERVIEW
 
 ### 1.1 Project Identity & Purpose
-- **Project Name**: SmartTrip (Repository: `dream-plan-fly`, Package name: `tanstack_start_ts`)
-- **Live Deployment**: `https://dream-plan-fly.lovable.app`
-- **Connected Platform**: [Lovable](https://lovable.dev) (Project ID: `8b5525ae-697f-49d0-bec2-441537132cbf`)
+- **Project Name**: SmartTrip (Repository: `dream-plan-fly`, Package name: `smarttrip`)
+- **Live Deployment**: `https://your-domain.com`
+- **Platform**: Standalone TanStack Start web application
 - **Tagline**: *"Plan Less. Travel More."* / *"Travel smarter. Explore more."*
 - **Core Concept**: `Dream → Ask AI → Plan → Save → Book → Travel`
 - **Problem Solved**: Traditional travel planning is disjointed and stressful. Travelers juggle multiple tabs for inspiration, itinerary builders, price comparisons, savings calculators, and booking platforms. SmartTrip unifies destination discovery, rule-based/AI trip planning, future trip savings tracking, and end-to-end demo bookings into a cohesive, travel-tech product with modern aesthetics.
@@ -53,7 +53,7 @@
 #### Build Tools & Bundler
 - **Build Tool**: Vite (`vite: 8.1.5`, `@vitejs/plugin-react: ^5.2.0`)
 - **SSR Server Engine**: Nitro (`nitro: 3.0.260603-beta`)
-- **Configuration Preset**: `@lovable.dev/vite-tanstack-config: 2.23.1`
+- **Configuration**: Standalone Vite + Nitro configuration
 - **Path Resolution**: `vite-tsconfig-paths: ^6.0.2`
 - **Overrides**: `rolldown: 1.2.1`
 
@@ -107,7 +107,6 @@
 - **APIs**: None currently connected. Data is local and statically seeded (`src/data/travel.ts`).
 - **External Web Services**:
   - Google Fonts CDN (`https://fonts.googleapis.com` for Manrope and Sora).
-  - Lovable runtime integration (`@lovable.dev/vite-tanstack-config` and `window.__lovableEvents` / `window.__lovableReportRuntimeError`).
 
 ### 2.3 Installation & Run Commands
 ```bash
@@ -142,14 +141,9 @@ npm run format
 ```
 dream-plan-fly/
 ├── .gitignore                      # Git ignore file (excludes build outputs, node_modules, logs)
-├── .lovable/
-│   └── project.json                # Lovable project metadata and template revision pointer
 ├── .prettierignore                 # Prettier ignore rules
 ├── .prettierrc                     # Prettier formatting configuration
-├── AGENTS.md                       # Project instructions for AI agents regarding Lovable commit sync
 ├── README.md                       # Product specification, design guidelines, and feature requirements
-├── bun.lock                        # Bun lockfile for reproducible package installation
-├── bunfig.toml                     # Bun configuration (supply chain security 24h release age guard)
 ├── components.json                 # Shadcn-UI configuration file (New York style, slate color base)
 ├── eslint.config.js                # ESLint configuration supporting React Hooks, Refresh, and Prettier
 ├── package.json                    # Dependencies, build scripts, engine overrides
@@ -234,7 +228,7 @@ dream-plan-fly/
 │   ├── lib/
 │   │   ├── error-capture.ts        # Out-of-band error recorder for SSR unhandled exceptions in h3
 │   │   ├── error-page.ts           # Pure HTML/CSS fallback page rendered when catastrophic SSR fails
-│   │   ├── lovable-error-reporting.ts # Telemetry hook forwarding React Error Boundary errors to Lovable
+│   │   ├── error-report.ts         # Application error reporting utility (ready for Sentry integration)
 │   │   ├── smarttrip-store.ts      # Reactive external store with localStorage sync for trips, bookings, funds
 │   │   ├── trip-plan.ts            # Heuristic algorithm for parsing travel prompts and building itineraries
 │   │   └── utils.ts                # Tailwind class merge helper (`cn()`)
@@ -253,7 +247,7 @@ dream-plan-fly/
 │   ├── start.ts                    # TanStack Start application setup with CSRF and error middlewares
 │   └── styles.css                  # Tailwind v4 theme, OKLCH semantic tokens, and custom keyframe animations
 ├── tsconfig.json                   # TypeScript compiler options, path alias `@/* -> ./src/*`
-└── vite.config.ts                  # Vite configuration utilizing `@lovable.dev/vite-tanstack-config`
+└── vite.config.ts                  # Standalone Vite configuration using official plugins
 ```
 
 ---
@@ -365,7 +359,7 @@ export default {
 - **Key Elements**:
   - Sets up `QueryClient` and scroll restoration.
   - Injects global HTML `<head>` tags (meta descriptions, OG tags, Google Fonts stylesheets).
-  - Contains `NotFoundComponent` (404 UI) and `ErrorComponent` (React Error Boundary catching client route failures and calling `reportLovableError`).
+  - Contains `NotFoundComponent` (404 UI) and `ErrorComponent` (React Error Boundary catching client route failures and calling `reportError`).
   - Wraps children in `<QueryClientProvider>` and mounts `<Toaster position="bottom-right" richColors />`.
 
 ### 5.4 `src/lib/smarttrip-store.ts`
@@ -547,7 +541,7 @@ export type MapPlace = {
 
 ### 6.3 Environment Variables
 - **Status**: No `.env` or required secrets exist in the codebase.
-- The project config (`@lovable.dev/vite-tanstack-config`) is pre-configured to inject any variables prefixed with `VITE_*` into the client build.
+- Standard Vite `VITE_*` environment variable injection is supported.
 
 ---
 
@@ -600,7 +594,7 @@ export type MapPlace = {
 ### 8.3 Error Handling Approach
 1. **Catastrophic SSR Error Capture**: `src/lib/error-capture.ts` intercepts and retains unhandled server errors out-of-band so `src/server.ts` can recover the stack before serving a 500 response.
 2. **SSR Fallback Page**: `src/lib/error-page.ts` returns lightweight HTML with "Try again" and "Go home" actions when rendering fails entirely.
-3. **Client Route Error Boundary**: `ErrorComponent` in `src/routes/__root.tsx` renders a graceful recovery UI and forwards telemetry to `reportLovableError` in `src/lib/lovable-error-reporting.ts`.
+3. **Client Route Error Boundary**: `ErrorComponent` in `src/routes/__root.tsx` renders a graceful recovery UI and forwards telemetry to `reportError` in `src/lib/error-report.ts`.
 
 ---
 
