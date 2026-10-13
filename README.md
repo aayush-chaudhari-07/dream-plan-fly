@@ -1438,11 +1438,13 @@ npm run preview
 SmartTrip uses Supabase (PostgreSQL + Auth) for persistent user accounts, cloud-synced trips, bookings, dream funds, and wishlist storage with strict Row Level Security (RLS). Guests continue using localStorage seamlessly until they create an account, at which point local data is automatically migrated into their account.
 
 ### 1. Create a Supabase Project
+
 1. Go to [supabase.com](https://supabase.com) and create an account or sign in.
 2. Click **New project** and configure your project name and database password.
 3. Once provisioned, navigate to **Project Settings > API** to find your **Project URL** and **anon/public API key**.
 
 ### 2. Run Database Migrations
+
 1. In your Supabase dashboard, navigate to the **SQL Editor** in the left sidebar.
 2. Open the migration file in this repository: [`supabase/migrations/001_init.sql`](file:///c:/Users/Ayush/Desktop/Mini%20Project/dream-plan-fly/supabase/migrations/001_init.sql).
 3. Copy its entire content into the SQL Editor and click **Run**.
@@ -1457,6 +1459,7 @@ SmartTrip uses Supabase (PostgreSQL + Auth) for persistent user accounts, cloud-
    - Strict Row Level Security (RLS) policies ensuring users can only read, insert, update, and delete their own data.
 
 ### 3. Configure Authentication Providers
+
 1. In the Supabase dashboard, go to **Authentication > Providers**.
 2. **Email**: Ensure Email is enabled. (For development, you can disable "Confirm email" if you want instant test logins).
 3. **Google OAuth (Optional)**:
@@ -1465,6 +1468,7 @@ SmartTrip uses Supabase (PostgreSQL + Auth) for persistent user accounts, cloud-
    - Add your Redirect URL: `https://<your-project-ref>.supabase.co/auth/v1/callback` and `http://localhost:3000/auth/callback` to Google's authorized redirect URIs.
 
 ### 4. Configure Environment Variables
+
 Copy `.env.example` to `.env` and fill in your Supabase credentials:
 
 ```sh
@@ -1472,5 +1476,16 @@ cp .env.example .env
 ```
 
 Set the following variables:
+
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
+- `GEMINI_API_KEY` (Server-side Google Gemini API key for AI Trip Planner; kept private on server)
+
+### 5. Google Gemini AI Trip Planner Setup
+
+To enable real-time generative itineraries powered by Gemini:
+
+1. Obtain an API key from [Google AI Studio](https://aistudio.google.com/).
+2. Add `GEMINI_API_KEY=your_gemini_api_key` to your `.env` file (server-only, never prefixed with `VITE_` to prevent leaking to the client).
+3. If no key is provided, the planner automatically falls back to the deterministic SmartTrip rule-based engine.
+4. To enable shared public links (`/plan/$id`), also run [`supabase/migrations/002_shared_plans.sql`](file:///c:/Users/Ayush/Desktop/Mini%20Project/dream-plan-fly/supabase/migrations/002_shared_plans.sql) in your Supabase SQL editor.

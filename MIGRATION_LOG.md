@@ -88,6 +88,7 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
 ---
 
 ## Task 3: Supabase Backend, Auth & TanStack Query Integration
+
 - **Date**: 2026-10-13
 - **Branch**: `production-ready`
 - **Actions Taken**:
@@ -125,4 +126,50 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `eslint.config.js` (added auth-context override)
   - `.env.example` (added Supabase env vars)
   - `README.md` (added Supabase setup guide)
+  - `MIGRATION_LOG.md` (updated)
+
+## [Task 5] - AI Trip Planner Real LLM Integration (Google Gemini Flash) with Fallback Engine
+
+- **Goal**: Connect the AI Trip Planner to Google Gemini (`@google/genai` Flash model) via a secure server function, with structured JSON validation, 1-retry logic, rule-based fallback to `buildPlan()`, rate limiting, public plan sharing at `/plan/$id`, quick refinements, and comprehensive unit tests.
+- **Changes**:
+  1. **Google Gemini LLM Integration (`@google/genai`)**:
+     - Installed `@google/genai` (v2.29.1).
+     - Created `src/server/generate-plan.ts` with `generatePlan` server function calling `gemini-2.5-flash`.
+     - Read `GEMINI_API_KEY` exclusively from `process.env['GEMINI_API_KEY']` on the server, never exposing secrets to the client.
+     - Structured JSON output validated using Zod against `generatedPlanSchema`.
+     - Implemented automatic retry: if validation fails, retries once with the LLM; if both attempts fail or if `GEMINI_API_KEY` is not configured, transparently falls back to `buildPlan()`.
+     - Built comprehensive prompt with destination, duration, travelers, budget in INR, interests, budget sum rule, realistic INR pricing, real attractions, local food, and weather/packing advice.
+     - Implemented `normalizePlan()` to guarantee that budget breakdown amounts sum exactly to the total budget.
+  2. **Rate Limiting & Input Protection (`src/server/rate-limiter.ts`)**:
+     - Implemented in-memory sliding-window rate limiting per user ID or client IP for guests (25 requests per 10-minute window).
+     - Added input length bounds via Zod schema (`prompt` up to 1000 chars, `destination` up to 100 chars, `instruction` up to 500 chars).
+  3. **Public Shared Plan Route (`/plan/$id`)**:
+     - Created `supabase/migrations/002_shared_plans.sql` with public read/write RLS policies.
+     - Added server functions `savePublicPlanFn` and `getPublicPlanFn` with in-memory store and Supabase database fallback.
+     - Created public read-only page `src/routes/plan/$id.tsx` rendering the full itinerary, timeline, budget breakdown, and action buttons ("Save to My Trips", "Copy Link", "Print / PDF", "Customize with AI").
+  4. **Updated `AiPlanner.tsx`**:
+     - Replaced local timeout with server function `generatePlan`.
+     - Added rich progressive loading state cycling through status feedback messages.
+     - Added error banner with retry and offline fallback.
+     - Connected share URL button to `savePublicPlanFn`, generating shareable `/plan/$id` links.
+     - Added 3 quick-refine buttons:
+       - **Regenerate**: requests fresh alternative route & attractions.
+       - **Make it cheaper**: scales budget down ~20% and optimizes for hostels, public transit, and free sights.
+       - **Add more adventure**: optimizes for high-adrenaline outdoor sports, hikes, and thrills.
+     - Added source badges ("Gemini 2.5 Flash" vs "SmartTrip Engine").
+     - Kept "Save to My Trips", print/PDF, and direct booking intact.
+  5. **Unit Tests (`src/server/__tests__/generate-plan.test.ts`)**:
+     - 14 tests covering: valid LLM generation, schema validation retry, fallback on failure, fallback on missing API key, network error fallback, schema edge cases, budget breakdown sum normalization, and rate limiting.
+- **Files Touched**:
+  - `package.json` (added `@google/genai`)
+  - `.env.example` (documented `GEMINI_API_KEY`)
+  - `src/lib/trip-plan.ts` (updated `PlanOptions` type)
+  - `src/server/generate-plan.ts` (created)
+  - `src/server/rate-limiter.ts` (created)
+  - `src/server/index.ts` (created)
+  - `src/routes/plan/$id.tsx` (created)
+  - `src/routeTree.gen.ts` (regenerated)
+  - `src/components/smarttrip/AiPlanner.tsx` (updated)
+  - `src/server/__tests__/generate-plan.test.ts` (created)
+  - `supabase/migrations/002_shared_plans.sql` (created)
   - `MIGRATION_LOG.md` (updated)
