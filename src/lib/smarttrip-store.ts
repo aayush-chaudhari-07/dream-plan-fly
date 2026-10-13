@@ -36,6 +36,8 @@ export type StoredTrip = {
 
 export type BookingKind = "flight" | "stay" | "rental" | "rail" | "package";
 
+export type BookingStatus = "pending" | "confirmed" | "cancelled" | "failed";
+
 export type StoredBooking = {
   id: string;
   kind: BookingKind;
@@ -44,6 +46,46 @@ export type StoredBooking = {
   price: number;
   reference: string;
   createdAt: number;
+  status?: BookingStatus | undefined;
+  idempotencyKey?: string | undefined;
+  travelerDetails?:
+    | {
+        fullName: string;
+        email: string;
+        phone: string;
+        gender?: string | undefined;
+        age?: number | undefined;
+        seatPreference?: string | undefined;
+        notes?: string | undefined;
+      }
+    | undefined;
+  paymentDetails?:
+    | {
+        method: string;
+        transactionRef: string;
+        paymentId?: string | undefined;
+        orderId?: string | undefined;
+        paidAt?: number | undefined;
+        maskedInstrument?: string | undefined;
+        amount?: number | undefined;
+      }
+    | undefined;
+  fareBreakdown?:
+    | {
+        baseFare: number;
+        taxesAndFees: number;
+        convenienceFee: number;
+        discount: number;
+        total: number;
+      }
+    | undefined;
+  origin?: string | undefined;
+  destination?: string | undefined;
+  startDate?: string | undefined;
+  endDate?: string | undefined;
+  inventoryId?: string | undefined;
+  passengersCount?: number | undefined;
+  cabinClass?: string | undefined;
 };
 
 export type FundContribution = {
@@ -462,11 +504,32 @@ export const smartTrip = {
   },
 
   /* ---------- bookings ---------- */
-  addBooking(input: { kind: BookingKind; title: string; subtitle: string; price: number }) {
+  addBooking(input: {
+    kind: BookingKind;
+    title: string;
+    subtitle: string;
+    price: number;
+    reference?: string | undefined;
+    status?: BookingStatus | undefined;
+    idempotencyKey?: string | undefined;
+    travelerDetails?: StoredBooking["travelerDetails"];
+    paymentDetails?: StoredBooking["paymentDetails"];
+    fareBreakdown?: StoredBooking["fareBreakdown"];
+    origin?: string | undefined;
+    destination?: string | undefined;
+    startDate?: string | undefined;
+    endDate?: string | undefined;
+    inventoryId?: string | undefined;
+    passengersCount?: number | undefined;
+    cabinClass?: string | undefined;
+  }) {
+    const reference =
+      input.reference || "ST" + Math.random().toString(36).slice(2, 8).toUpperCase();
     const booking: StoredBooking = {
       ...input,
       id: id("bkg"),
-      reference: "ST" + Math.random().toString(36).slice(2, 8).toUpperCase(),
+      reference,
+      status: input.status || "confirmed",
       createdAt: Date.now(),
     };
     const label =
@@ -496,7 +559,7 @@ export const smartTrip = {
       read: false,
       type: "booking",
       createdAt: Date.now(),
-      link: "/bookings",
+      link: `/booking-confirmation/${booking.reference}`,
     };
 
     update({

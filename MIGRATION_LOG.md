@@ -407,3 +407,72 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `docs/FREE_STACK.md` (created)
   - `src/server/__tests__/generate-plan.test.ts` (updated)
   - `MIGRATION_LOG.md` (updated)
+
+---
+
+## [Task 9] - Complete Free-Tool Demo Booking Engine, Payment Adapter, Checkout & E-Ticket
+
+- **Goal**: Build the complete end-to-end booking experience using 100% free tools and databases, functioning as a clearly labeled, production-grade DEMO:
+  1. **Data Layer (No Paid APIs)**:
+     - Programmatic flight generator (`src/data/flight-generator.ts`) generating 6–10 realistic options/day for any airport pair using deterministic seeded randomness (Mulberry32 PRNG). Returns consistent results for identical dates and routes with real airline fleets, flight schedules, stops, and dynamic fares.
+     - Curated OpenFlights airports dataset (`src/data/airports.ts`) with zero runtime external API calls.
+     - Indian inventory datasets (`src/data/inventory-data.ts`) with realistic stays, rentals, Vande Bharat/transit, and holiday packages.
+     - Database migration (`supabase/migrations/005_booking_system.sql`) and seed script (`supabase/seed.sql`).
+  2. **Search UX & Booking Discovery**:
+     - Upgraded `QuickBooking.tsx` and `/bookings` route (`src/routes/bookings.tsx`) with `AirportCombobox` autocomplete, date pickers, passenger counter, and cabin class selector.
+     - Multi-criteria filter sidebar: price slider, stops filter, departure time-of-day filters, and star ratings.
+     - Sorting controls (cheapest, fastest, earliest departure, rating) and empty/loading feedback states.
+  3. **Payment Adapter & Security**:
+     - Provider interface (`PaymentProvider`) in `src/server/payments/payment-types.ts`.
+     - Built-in `DemoPayProvider` (`src/server/payments/demo-provider.ts`) with signed HMAC-SHA256 server verification (`DEMO_PAY_SECRET`), test cards (`DEMO_TEST_CARDS`), simulated outcomes, and simulated refunds.
+     - Strict card security validator (`src/server/payments/card-validator.ts`): rejects real credit cards with an explicit safety message; never stores or logs card data.
+     - Optional `RazorpayTestProvider` (`src/server/payments/razorpay-provider.ts`): activated only when test keys exist in env; disabled by default.
+     - Realistic payment modal (`src/components/smarttrip/booking/DemoPaymentModal.tsx`) with Card, UPI, and Net Banking tabs.
+  4. **Checkout Experience (`/checkout`)**:
+     - `/checkout` route (`src/routes/checkout.tsx`) with React Hook Form + Zod traveler validation.
+     - Complete fare breakdown summary with 18% GST taxes, airport fees, convenience fees, and promo discounts.
+     - Prominent amber banner: "Demo booking, no real ticket or charge".
+     - Idempotency key generation preventing duplicate bookings on double clicks.
+  5. **Booking Lifecycle & State Management**:
+     - Statuses: `pending`, `confirmed`, `cancelled`, `failed`.
+     - Deterministic booking reference generator (`STFL...`, `STHT...`, etc.).
+     - Typed server functions in `src/lib/server/booking-actions.ts`.
+     - Automatic creation of linked `Upcoming` trip, booking notification, and confirmation redirect.
+  6. **Client-Side E-Ticket Voucher**:
+     - `ETicketView.tsx` (`src/components/smarttrip/booking/ETicketView.tsx`) with client-side QR code generator (`qrcode`), traveler manifest, print stylesheet (`@media print`), and diagonal "DEMO TICKET - NOT VALID FOR TRAVEL" watermark.
+     - Confirmation page at `/booking-confirmation/$id` (`src/routes/booking-confirmation/$id.tsx`) and e-ticket buttons on `/my-trips`.
+  7. **Cancellation & 100% Refund Simulation**:
+     - Cancellation modal with refund policy explanation, automated status update (`cancelled`), linked trip removal, and refund notification.
+  8. **Testing & QA**:
+     - Vitest unit tests in `src/server/payments/__tests__/demo-provider.test.ts`, `src/data/__tests__/flight-generator.test.ts`, and `src/lib/server/__tests__/booking-lifecycle.test.ts`.
+     - Playwright-ready `data-testid` attributes across checkout inputs and booking cards.
+     - Verified lint (0 errors), typecheck (0 errors), tests (67 passed), and build (clean SSR/Nitro bundle).
+- **Files Touched**:
+  - `package.json` (installed qrcode, @types/qrcode)
+  - `src/data/airports.ts` (created)
+  - `src/data/flight-generator.ts` (created)
+  - `src/data/inventory-data.ts` (created)
+  - `supabase/migrations/005_booking_system.sql` (created)
+  - `supabase/seed.sql` (created)
+  - `src/server/payments/payment-types.ts` (created)
+  - `src/server/payments/card-validator.ts` (created)
+  - `src/server/payments/demo-provider.ts` (created)
+  - `src/server/payments/razorpay-provider.ts` (created)
+  - `src/server/payments/index.ts` (created)
+  - `src/lib/server/booking-actions.ts` (created)
+  - `src/lib/smarttrip-store.ts` (updated)
+  - `src/components/ui/label.tsx` (created)
+  - `src/components/smarttrip/booking/AirportCombobox.tsx` (created)
+  - `src/components/smarttrip/booking/DemoPaymentModal.tsx` (created)
+  - `src/components/smarttrip/booking/ETicketView.tsx` (created)
+  - `src/components/smarttrip/QuickBooking.tsx` (updated)
+  - `src/routes/bookings.tsx` (updated)
+  - `src/routes/checkout.tsx` (created)
+  - `src/routes/booking-confirmation/$id.tsx` (created)
+  - `src/routes/my-trips.tsx` (updated)
+  - `src/routeTree.gen.ts` (regenerated)
+  - `src/server/payments/__tests__/demo-provider.test.ts` (created)
+  - `src/data/__tests__/flight-generator.test.ts` (created)
+  - `src/lib/server/__tests__/booking-lifecycle.test.ts` (created)
+  - `.env.example` (updated)
+  - `MIGRATION_LOG.md` (updated)
