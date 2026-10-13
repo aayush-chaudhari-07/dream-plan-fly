@@ -16,6 +16,7 @@ import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MyTripsRouteImport } from './routes/my-trips'
 import { Route as SaveRouteImport } from './routes/save'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as DestinationIdRouteImport } from './routes/destination/$id'
@@ -56,6 +57,11 @@ const SaveRoute = SaveRouteImport.update({
   path: '/save',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/my-trips': typeof MyTripsRoute
   '/save': typeof SaveRoute
+  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/destination/$id': typeof DestinationIdRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/my-trips': typeof MyTripsRoute
   '/save': typeof SaveRoute
+  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/destination/$id': typeof DestinationIdRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/my-trips': typeof MyTripsRoute
   '/save': typeof SaveRoute
+  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/destination/$id': typeof DestinationIdRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/my-trips'
     | '/save'
+    | '/settings'
     | '/signup'
     | '/auth/callback'
     | '/destination/$id'
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/my-trips'
     | '/save'
+    | '/settings'
     | '/signup'
     | '/auth/callback'
     | '/destination/$id'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/my-trips'
     | '/save'
+    | '/settings'
     | '/signup'
     | '/auth/callback'
     | '/destination/$id'
@@ -167,6 +179,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MyTripsRoute: typeof MyTripsRoute
   SaveRoute: typeof SaveRoute
+  SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   DestinationIdRoute: typeof DestinationIdRoute
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SaveRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -263,6 +283,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MyTripsRoute: MyTripsRoute,
   SaveRoute: SaveRoute,
+  SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   DestinationIdRoute: DestinationIdRoute,

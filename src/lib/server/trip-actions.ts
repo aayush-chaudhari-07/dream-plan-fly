@@ -153,12 +153,13 @@ export const fetchUserDataFn = createServerFn({ method: "GET" }).handler(async (
       bookings: [],
       funds: [],
       wishlist: [],
+      notifications: [],
     };
   }
 
   const supabase = getSupabaseServerClient();
 
-  const [tripsRes, bookingsRes, fundsRes, wishRes] = await Promise.all([
+  const [tripsRes, bookingsRes, fundsRes, wishRes, notifRes] = await Promise.all([
     supabase
       .from("trips")
       .select("*")
@@ -175,7 +176,50 @@ export const fetchUserDataFn = createServerFn({ method: "GET" }).handler(async (
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
     supabase.from("wishlist").select("destination_id").eq("user_id", user.id),
+    supabase
+      .from("notifications")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false }),
   ]);
+
+  let notifications = notifRes.data || [];
+  if (notifications.length === 0) {
+    const seedRows = [
+      {
+        user_id: user.id,
+        title: "Booking Confirmed",
+        message: "IndiGo 6E-247 (DEL → GOI) is confirmed. Reference: #ST-89241.",
+        read: false,
+        type: "booking",
+        link: "/bookings",
+      },
+      {
+        user_id: user.id,
+        title: "Trip Fund Milestone",
+        message: "Tokyo Cherry Blossom dream fund reached 65% of your target savings!",
+        read: false,
+        type: "milestone",
+        link: "/save",
+      },
+      {
+        user_id: user.id,
+        title: "Price Drop Alert",
+        message: "Fares to Bali dropped 18% for upcoming festive dates. Explore deals now.",
+        read: false,
+        type: "price_drop",
+        link: "/destination/bali",
+      },
+    ];
+    try {
+      const { data: inserted } = await supabase.from("notifications").insert(seedRows).select();
+      if (inserted && inserted.length > 0) {
+        notifications = inserted;
+      }
+    } catch {
+      // Fallback in case of mock/demo Supabase
+    }
+  }
 
   return {
     authenticated: true,
@@ -209,6 +253,15 @@ export const fetchUserDataFn = createServerFn({ method: "GET" }).handler(async (
       image: f.image,
     })),
     wishlist: (wishRes.data || []).map((w) => w.destination_id),
+    notifications: notifications.map((n) => ({
+      id: n.id,
+      title: n.title,
+      message: n.message,
+      read: Boolean(n.read),
+      type: (n.type || "info") as "booking" | "milestone" | "price_drop" | "info",
+      createdAt: new Date(n.created_at).getTime(),
+      link: (n.link as string | null) || undefined,
+    })),
   };
 });
 
@@ -570,6 +623,74 @@ export const migrateGuestDataFn = createServerFn({ method: "POST" })
           .select()
           .maybeSingle();
       }
+    }
+
+    return { success: true };
+  });
+
+const updateProfileSchema = z.object({
+  fullName: z.string().min(1).max(100).optional(),
+  avatarUrl: z.string().max(1000).optional(),
+  homeCity: z.string().max(100).optional(),
+  currency: z.string().max(10).optional(),
+});
+
+const markNotificationReadSchema = z.object({
+  notificationId: z.string().min(1),
+});
+
+/**
+ * Mark all notifications as read for current user.
+ */
+export const markAllNotificationsReadFn = createServerFn({ method: "POST" }).handler(async () => {
+  const user = await getServerUser();
+  if (!user) return { success: true };
+
+  const supabase = getSupabaseServerClient();
+  await supabase.from("notifications").update({ read: true }).eq("user_id", user.id);
+  return { success: true };
+});
+
+/**
+ * Mark a single notification as read.
+ */
+export const markNotificationReadFn = createServerFn({ method: "POST" })
+  .validator((data: unknown) => markNotificationReadSchema.parse(data))
+  .handler(async ({ data: { notificationId } }) => {
+    const user = await getServerUser();
+    if (!user) return { success: true };
+
+    const supabase = getSupabaseServerClient();
+    await supabase
+      .from("notifications")
+      .update({ read: true })
+      .eq("id", notificationId)
+      .eq("user_id", user.id);
+    return { success: true };
+  });
+
+/**
+ * Update user profile (name, avatar, home city, currency).
+ */
+export const updateProfileFn = createServerFn({ method: "POST" })
+  .validator((data: unknown) => updateProfileSchema.parse(data))
+  .handler(async ({ data }) => {
+    const user = await getServerUser();
+    if (!user) throw new Error("Unauthorized: Please sign in to update profile.");
+
+    const supabase = getSupabaseServerClient();
+
+    const updates: Record<string, string> = {
+      updated_at: new Date().toISOString(),
+    };
+    if (data.fullName !== undefined) updates["full_name"] = data.fullName;
+    if (data.avatarUrl !== undefined) updates["avatar_url"] = data.avatarUrl;
+    if (data.homeCity !== undefined) updates["home_city"] = data.homeCity;
+    if (data.currency !== undefined) updates["currency"] = data.currency;
+
+    const { error } = await supabase.from("profiles").update(updates).eq("id", user.id);
+    if (error) {
+      console.warn("Failed to update public.profiles table:", error.message);
     }
 
     return { success: true };

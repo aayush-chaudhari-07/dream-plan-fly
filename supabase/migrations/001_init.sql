@@ -13,6 +13,8 @@ create table if not exists public.profiles (
   email text,
   full_name text,
   avatar_url text,
+  home_city text default 'Mumbai',
+  currency text default 'INR',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -24,17 +26,21 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.profiles (id, email, full_name, avatar_url)
+  insert into public.profiles (id, email, full_name, avatar_url, home_city, currency)
   values (
     new.id,
     new.email,
     coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', ''),
-    coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', '')
+    coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', ''),
+    coalesce(new.raw_user_meta_data->>'home_city', 'Mumbai'),
+    coalesce(new.raw_user_meta_data->>'currency', 'INR')
   )
   on conflict (id) do update set
     email = excluded.email,
     full_name = coalesce(excluded.full_name, public.profiles.full_name),
     avatar_url = coalesce(excluded.avatar_url, public.profiles.avatar_url),
+    home_city = coalesce(excluded.home_city, public.profiles.home_city),
+    currency = coalesce(excluded.currency, public.profiles.currency),
     updated_at = now();
   return new;
 end;
@@ -127,6 +133,7 @@ create table if not exists public.notifications (
   message text not null,
   read boolean not null default false,
   type text not null default 'info',
+  link text,
   created_at timestamptz not null default now()
 );
 
@@ -231,6 +238,10 @@ create policy "Users can remove from their wishlist"
 create policy "Users can view their own notifications"
   on public.notifications for select
   using (auth.uid() = user_id);
+
+create policy "Users can create their own notifications"
+  on public.notifications for insert
+  with check (auth.uid() = user_id);
 
 create policy "Users can update their own notifications"
   on public.notifications for update

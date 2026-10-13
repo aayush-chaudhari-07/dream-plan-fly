@@ -17,6 +17,8 @@ import {
   contributeFundFn,
   removeFundFn,
   toggleWishFn,
+  markAllNotificationsReadFn,
+  markNotificationReadFn,
 } from "@/lib/server/trip-actions";
 
 export type TripBucket = "Upcoming" | "Past" | "Saved";
@@ -43,11 +45,24 @@ export type StoredBooking = {
   createdAt: number;
 };
 
+export type NotificationType = "booking" | "milestone" | "price_drop" | "info";
+
+export type StoredNotification = {
+  id: string;
+  title: string;
+  message: string;
+  read: boolean;
+  type: NotificationType;
+  createdAt: number;
+  link?: string | undefined;
+};
+
 export type SmartTripState = {
   trips: StoredTrip[];
   bookings: StoredBooking[];
   funds: FutureTrip[];
   wishlist: string[];
+  notifications: StoredNotification[];
   isLoading?: boolean;
   isError?: boolean;
   isAuthenticated?: boolean;
@@ -69,11 +84,43 @@ function seedTrips(): StoredTrip[] {
   );
 }
 
+const SEED_NOTIFICATIONS: StoredNotification[] = [
+  {
+    id: "notif-seed-1",
+    title: "Booking Confirmed",
+    message: "IndiGo 6E-247 (DEL → GOI) is confirmed. Reference: #ST89241.",
+    read: false,
+    type: "booking",
+    createdAt: Date.now() - 1000 * 60 * 35,
+    link: "/bookings",
+  },
+  {
+    id: "notif-seed-2",
+    title: "Dream Fund Milestone",
+    message:
+      "Tokyo Cherry Blossom dream fund reached 65% of your target! You are ₹65,000 closer to Japan.",
+    read: false,
+    type: "milestone",
+    createdAt: Date.now() - 1000 * 60 * 60 * 4,
+    link: "/save",
+  },
+  {
+    id: "notif-seed-3",
+    title: "Price Drop Alert",
+    message: "Direct flights to Bali dropped 18% for upcoming festive dates. Explore deals now!",
+    read: false,
+    type: "price_drop",
+    createdAt: Date.now() - 1000 * 60 * 60 * 24,
+    link: "/destination/bali",
+  },
+];
+
 const SEED: SmartTripState = {
   trips: seedTrips(),
   bookings: [],
   funds: initialFutureTrips,
   wishlist: [],
+  notifications: SEED_NOTIFICATIONS,
   isLoading: false,
   isError: false,
   isAuthenticated: false,
@@ -112,6 +159,7 @@ function hydrate() {
         bookings: parsed.bookings ?? [],
         funds: parsed.funds ?? SEED.funds,
         wishlist: parsed.wishlist ?? [],
+        notifications: parsed.notifications ?? SEED_NOTIFICATIONS,
         isLoading: false,
         isError: false,
         isAuthenticated: false,
@@ -166,6 +214,7 @@ export function useSmartTrip(): SmartTripState {
         bookings: local.bookings,
         funds: local.funds,
         wishlist: local.wishlist,
+        notifications: local.notifications,
         isLoading: true,
         isError: false,
         isAuthenticated: true,
@@ -179,6 +228,7 @@ export function useSmartTrip(): SmartTripState {
         bookings: local.bookings,
         funds: local.funds,
         wishlist: local.wishlist,
+        notifications: local.notifications,
         isLoading: false,
         isError: true,
         isAuthenticated: true,
@@ -192,6 +242,7 @@ export function useSmartTrip(): SmartTripState {
         bookings: query.data.bookings,
         funds: query.data.funds,
         wishlist: query.data.wishlist,
+        notifications: query.data.notifications || local.notifications,
         isLoading: false,
         isError: false,
         isAuthenticated: true,
@@ -408,9 +459,20 @@ export const smartTrip = {
       bucket: "Upcoming",
     };
 
+    const bookingNotif: StoredNotification = {
+      id: id("notif"),
+      title: "Booking Confirmed",
+      message: `${input.title} booked successfully (Ref: ${booking.reference}).`,
+      read: false,
+      type: "booking",
+      createdAt: Date.now(),
+      link: "/bookings",
+    };
+
     update({
       bookings: [booking, ...localState.bookings],
       trips: [trip, ...localState.trips],
+      notifications: [bookingNotif, ...localState.notifications],
     });
 
     if (currentAuthUser) {
@@ -584,7 +646,54 @@ export const smartTrip = {
     return !has;
   },
 
+  /* ---------- notifications ---------- */
+  markAllNotificationsRead() {
+    const updated = localState.notifications.map((n) => ({ ...n, read: true }));
+    update({ notifications: updated });
+
+    if (currentAuthUser) {
+      queryClient.setQueryData(
+        ["smarttrip-data", currentAuthUser.id],
+        (old: { notifications?: StoredNotification[]; [key: string]: unknown } | undefined) => ({
+          ...old,
+          notifications: (old?.notifications || []).map((n) => ({ ...n, read: true })),
+        }),
+      );
+
+      markAllNotificationsReadFn().catch((err) => {
+        console.error("Failed to mark all notifications read:", err);
+      });
+    }
+  },
+
+  markNotificationRead(notificationId: string) {
+    const updated = localState.notifications.map((n) =>
+      n.id === notificationId ? { ...n, read: true } : n,
+    );
+    update({ notifications: updated });
+
+    if (currentAuthUser) {
+      queryClient.setQueryData(
+        ["smarttrip-data", currentAuthUser.id],
+        (old: { notifications?: StoredNotification[]; [key: string]: unknown } | undefined) => ({
+          ...old,
+          notifications: (old?.notifications || []).map((n) =>
+            n.id === notificationId ? { ...n, read: true } : n,
+          ),
+        }),
+      );
+
+      markNotificationReadFn({ data: { notificationId } }).catch((err) => {
+        console.error("Failed to mark notification read:", err);
+      });
+    }
+  },
+
+  getState(): SmartTripState {
+    return localState;
+  },
+
   reset() {
-    update({ ...SEED, trips: seedTrips() });
+    update({ ...SEED, trips: seedTrips(), notifications: SEED_NOTIFICATIONS });
   },
 };

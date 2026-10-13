@@ -17,6 +17,12 @@ type AuthContextType = {
   }) => Promise<{ error?: string; user?: User | null }>;
   signInWithGoogle: () => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
+  updateProfile: (data: {
+    fullName?: string;
+    avatarUrl?: string;
+    homeCity?: string;
+    currency?: string;
+  }) => Promise<{ error?: string }>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -159,6 +165,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setStoreAuthUser(null);
   };
 
+  const updateProfile = async (data: {
+    fullName?: string;
+    avatarUrl?: string;
+    homeCity?: string;
+    currency?: string;
+  }) => {
+    if (!user) {
+      return { error: "Please sign in to update your profile." };
+    }
+
+    const currentMeta = (user.user_metadata || {}) as Record<string, unknown>;
+    const updatedMeta: Record<string, unknown> = { ...currentMeta };
+    if (data.fullName !== undefined) updatedMeta["full_name"] = data.fullName;
+    if (data.avatarUrl !== undefined) updatedMeta["avatar_url"] = data.avatarUrl;
+    if (data.homeCity !== undefined) updatedMeta["home_city"] = data.homeCity;
+    if (data.currency !== undefined) updatedMeta["currency"] = data.currency;
+
+    if (!isConfigured) {
+      // Local optimistic update in offline/mock mode
+      const updatedUser: User = {
+        ...user,
+        user_metadata: updatedMeta,
+      };
+      setUser(updatedUser);
+      return {};
+    }
+
+    const supabase = getSupabaseBrowserClient();
+    const { data: res, error } = await supabase.auth.updateUser({
+      data: updatedMeta,
+    });
+    if (error) return { error: error.message };
+    if (res.user) {
+      setUser(res.user);
+    }
+    return {};
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -170,6 +214,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUpWithPassword,
         signInWithGoogle,
         signOut,
+        updateProfile,
       }}
     >
       {children}
