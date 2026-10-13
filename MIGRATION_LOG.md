@@ -5,6 +5,7 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
 ---
 
 ## Task 0: Repository Baseline & Setup
+
 - **Date**: 2026-10-13
 - **Branch**: `production-ready`
 - **Actions Taken**:
@@ -19,6 +20,7 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
 ---
 
 ## Task 1: Complete Decoupling from Lovable
+
 - **Date**: 2026-10-13
 - **Branch**: `production-ready`
 - **Actions Taken**:
@@ -44,5 +46,41 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `bunfig.toml` (deleted)
   - `README.md` (updated)
   - `PROJECT_CONTEXT.md` (updated)
+  - `MIGRATION_LOG.md` (updated)
+
+---
+
+## Task 2: Foundation Cleanup, Testing & Hardening
+- **Date**: 2026-10-13
+- **Branch**: `production-ready`
+- **Actions Taken**:
+  - Pruned 27 unused Shadcn UI components from `src/components/ui/` while retaining imported components and designated future-use primitives (`accordion`, `badge`, `button`, `calendar`, `card`, `command`, `dialog`, `drawer`, `dropdown-menu`, `input`, `popover`, `progress`, `select`, `sheet`, `skeleton`, `sonner`, `tabs`, `textarea`, `tooltip`).
+  - Installed Vitest, `@testing-library/react`, `@testing-library/jest-dom`, and `jsdom`.
+  - Added `vitest.config.ts` and `src/test/setup.ts`.
+  - Added `test`, `test:watch`, and `typecheck` scripts to `package.json`.
+  - Created unit test suite in `src/lib/__tests__/trip-plan.test.ts` testing `buildPlan()` (budget parsing, traveler parsing, day parsing, clamping 2-10 days, budget breakdown sum verification, category recognition, and carbon calculations).
+  - Created unit test suite in `src/lib/__tests__/smarttrip-store.test.ts` testing all store actions (savePlan, moveTrip, removeTrip, addBooking, cancelBooking, addFund, contribute, removeFund, toggleWish, reset).
+  - Added `.env.example` with standard environment variables.
+  - Added GitHub Actions CI workflow in `.github/workflows/ci.yml` running install, lint, typecheck, test, and build on push/PR to `main` and `production-ready`.
+  - Fixed all React Refresh warnings in `AiPlanner.tsx` and `Reveal.tsx`, and updated `eslint.config.js` with UI component override for CVA variants.
+  - Set `.prettierrc` `endOfLine: "auto"` to eliminate cross-platform CRLF lint errors.
+  - Verified `npm run lint` (0 errors, 0 warnings), `npm run typecheck` (clean), `npm run test` (20/20 passed), and `npm run build` (successful Nitro/SSR build).
+  - Tested development server (`npm run dev`) and production server (`npm run preview`), confirming all 6 routes (`/`, `/ai-planner`, `/bookings`, `/explore`, `/my-trips`, `/save`) respond with HTTP 200 and zero console errors.
+- **Files Touched**:
+  - `src/components/ui/` (pruned 27 unused components)
+  - `vitest.config.ts` (created)
+  - `src/test/setup.ts` (created)
+  - `src/lib/__tests__/trip-plan.test.ts` (created)
+  - `src/lib/__tests__/smarttrip-store.test.ts` (created)
+  - `.env.example` (created)
+  - `.github/workflows/ci.yml` (created)
+  - `package.json` (added test, test:watch, typecheck scripts, updated preview script)
+  - `tsconfig.json` (added vitest.config.ts and vitest/globals)
+  - `eslint.config.js` (added UI component CVA variant override)
+  - `.prettierrc` (added endOfLine: auto)
+  - `src/components/smarttrip/AiPlanner.tsx` (removed non-component re-exports)
+  - `src/components/smarttrip/Reveal.tsx` (made useInView internal)
+  - `src/components/ui/button.tsx` (exported const buttonVariants inline)
+  - `src/components/ui/badge.tsx` (exported const badgeVariants inline)
   - `MIGRATION_LOG.md` (updated)
 

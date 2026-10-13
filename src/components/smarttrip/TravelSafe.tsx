@@ -5,22 +5,26 @@ const items = [
   {
     icon: Shield,
     title: "Verified stays & transport",
-    description: "We only list partners with real reviews, valid licenses and 24/7 customer support.",
+    description:
+      "We only list partners with real reviews, valid licenses and 24/7 customer support.",
   },
   {
     icon: MapPinned,
     title: "Live location sharing",
-    description: "Share your itinerary and live location with family so someone always knows where you are.",
+    description:
+      "Share your itinerary and live location with family so someone always knows where you are.",
   },
   {
     icon: Siren,
     title: "Emergency support",
-    description: "One-tap emergency contacts, local helplines and nearby hospitals in every destination.",
+    description:
+      "One-tap emergency contacts, local helplines and nearby hospitals in every destination.",
   },
   {
     icon: Stethoscope,
     title: "Travel health tips",
-    description: "Vaccination reminders, altitude advice and first-aid checklists tailored to your route.",
+    description:
+      "Vaccination reminders, altitude advice and first-aid checklists tailored to your route.",
   },
 ];
 
@@ -55,7 +59,8 @@ export function TravelSafe() {
           <div>
             <p className="font-display font-bold">SmartTrip Safety Promise</p>
             <p className="text-sm text-muted-foreground">
-              Every booking includes transparent cancellation, customer support and safety information for your destination.
+              Every booking includes transparent cancellation, customer support and safety
+              information for your destination.
             </p>
           </div>
         </div>

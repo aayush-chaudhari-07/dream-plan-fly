@@ -13,7 +13,12 @@ import { cn } from "@/lib/utils";
 
 type TabKey = "flights" | "stay" | "rental" | "rail" | "packages";
 
-const tabs: { key: TabKey; label: string; icon: React.ComponentType<{ className?: string }>; items: unknown[] }[] = [
+const tabs: {
+  key: TabKey;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  items: unknown[];
+}[] = [
   { key: "flights", label: "Flights", icon: Plane, items: flights },
   { key: "stay", label: "Hotels", icon: Hotel, items: hotels },
   { key: "rental", label: "Rentals", icon: Car, items: rentals },
@@ -23,8 +28,27 @@ const tabs: { key: TabKey; label: string; icon: React.ComponentType<{ className?
 
 function ResultCard({ item, tab }: { item: unknown; tab: TabKey }) {
   const book = () => {
-    const i = item as { airline?: string; operator?: string; name?: string; dep?: string; arr?: string; location?: string; region?: string; type?: string; price: number };
-    const kind = tab === "flights" ? "flight" : tab === "stay" ? "stay" : tab === "rental" ? "rental" : tab === "rail" ? "rail" : "package";
+    const i = item as {
+      airline?: string;
+      operator?: string;
+      name?: string;
+      dep?: string;
+      arr?: string;
+      location?: string;
+      region?: string;
+      type?: string;
+      price: number;
+    };
+    const kind =
+      tab === "flights"
+        ? "flight"
+        : tab === "stay"
+          ? "stay"
+          : tab === "rental"
+            ? "rental"
+            : tab === "rail"
+              ? "rail"
+              : "package";
     const b = smartTrip.addBooking({
       kind,
       title: i.name ?? `${i.airline ?? i.operator} · ${i.dep} → ${i.arr}`,
@@ -35,7 +59,15 @@ function ResultCard({ item, tab }: { item: unknown; tab: TabKey }) {
   };
 
   if (tab === "flights" || tab === "rail") {
-    const i = item as { airline?: string; operator?: string; dep: string; arr: string; duration: string; stops?: string; price: number };
+    const i = item as {
+      airline?: string;
+      operator?: string;
+      dep: string;
+      arr: string;
+      duration: string;
+      stops?: string;
+      price: number;
+    };
     return (
       <div className="surface-card flex flex-col justify-between p-5 sm:flex-row sm:items-center">
         <div>
@@ -55,7 +87,14 @@ function ResultCard({ item, tab }: { item: unknown; tab: TabKey }) {
   }
 
   if (tab === "stay") {
-    const h = item as { name: string; location: string; rating: number; amenities: string[]; price: number; image: string };
+    const h = item as {
+      name: string;
+      location: string;
+      rating: number;
+      amenities: string[];
+      price: number;
+      image: string;
+    };
     return (
       <div className="surface-card overflow-hidden">
         <div className="relative h-48">
@@ -75,7 +114,9 @@ function ResultCard({ item, tab }: { item: unknown; tab: TabKey }) {
             ))}
           </div>
           <div className="mt-4 flex items-center justify-between">
-            <span className="font-display text-lg font-bold text-primary">{inr(h.price)}/night</span>
+            <span className="font-display text-lg font-bold text-primary">
+              {inr(h.price)}/night
+            </span>
             <Button variant="hero" size="sm" className="rounded-full" onClick={book}>
               Book Now
             </Button>
@@ -104,17 +145,28 @@ function ResultCard({ item, tab }: { item: unknown; tab: TabKey }) {
   }
 
   if (tab === "packages") {
-    const k = item as { name: string; region: string; nights: number; includes: string[]; price: number; image: string };
+    const k = item as {
+      name: string;
+      region: string;
+      nights: number;
+      includes: string[];
+      price: number;
+      image: string;
+    };
     return (
       <div className="surface-card overflow-hidden">
         <img src={k.image} alt={k.name} loading="lazy" className="h-44 w-full object-cover" />
         <div className="p-4">
           <p className="font-display font-bold">{k.name}</p>
-          <p className="text-sm text-muted-foreground">{k.region} · {k.nights} nights</p>
+          <p className="text-sm text-muted-foreground">
+            {k.region} · {k.nights} nights
+          </p>
           <p className="mt-2 text-xs text-muted-foreground">{k.includes.join(" · ")}</p>
           <div className="mt-4 flex items-center justify-between">
             <span className="font-display text-lg font-bold text-primary">{inr(k.price)}</span>
-            <Button variant="hero" size="sm" className="rounded-full" onClick={book}>Book</Button>
+            <Button variant="hero" size="sm" className="rounded-full" onClick={book}>
+              Book
+            </Button>
           </div>
         </div>
       </div>
@@ -128,9 +180,17 @@ export const Route = createFileRoute("/bookings")({
   head: () => ({
     meta: [
       { title: "Bookings — SmartTrip" },
-      { name: "description", content: "Book flights, hotels, car rentals, trains and curated travel packages on SmartTrip." },
+      {
+        name: "description",
+        content:
+          "Book flights, hotels, car rentals, trains and curated travel packages on SmartTrip.",
+      },
       { property: "og:title", content: "Bookings — SmartTrip" },
-      { property: "og:description", content: "Book flights, hotels, car rentals, trains and curated travel packages on SmartTrip." },
+      {
+        property: "og:description",
+        content:
+          "Book flights, hotels, car rentals, trains and curated travel packages on SmartTrip.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

@@ -12,7 +12,10 @@ const QUICK_ADD = [500, 1000, 2500];
 function FundCard({ trip }: { trip: FutureTrip }) {
   const [amount, setAmount] = useState("");
   const progress = Math.min(100, Math.round((trip.saved / trip.target) * 100));
-  const monthly = Math.max(0, Math.round((trip.target - trip.saved) / Math.max(1, trip.monthsLeft)));
+  const monthly = Math.max(
+    0,
+    Math.round((trip.target - trip.saved) / Math.max(1, trip.monthsLeft)),
+  );
   const done = trip.saved >= trip.target;
 
   const contribute = (value: number) => {
@@ -23,7 +26,9 @@ function FundCard({ trip }: { trip: FutureTrip }) {
     smartTrip.contribute(trip.id, value);
     setAmount("");
     toast.success(`${inr(value)} added to ${trip.name}`, {
-      description: done ? "Goal already reached!" : `${inr(Math.max(0, trip.target - trip.saved - value))} to go.`,
+      description: done
+        ? "Goal already reached!"
+        : `${inr(Math.max(0, trip.target - trip.saved - value))} to go.`,
     });
   };
 
@@ -103,7 +108,12 @@ function FundCard({ trip }: { trip: FutureTrip }) {
             aria-label={`Add money to ${trip.name}`}
             onChange={(e) => setAmount(e.target.value)}
           />
-          <Button variant="soft" size="icon" aria-label="Add money" onClick={() => contribute(Number(amount))}>
+          <Button
+            variant="soft"
+            size="icon"
+            aria-label="Add money"
+            onClick={() => contribute(Number(amount))}
+          >
             <Plus />
           </Button>
         </div>
@@ -129,7 +139,9 @@ export function TripFund() {
     smartTrip.addFund({ name: name.trim(), target: amount });
     setName("");
     setTarget("");
-    toast.success("Trip fund created", { description: "Start saving and we'll keep you on track." });
+    toast.success("Trip fund created", {
+      description: "Start saving and we'll keep you on track.",
+    });
   };
 
   return (
@@ -153,7 +165,10 @@ export function TripFund() {
           </div>
 
           <div className="mt-5 space-y-3">
-            <label className="block text-xs font-semibold text-muted-foreground uppercase" htmlFor="fund-name">
+            <label
+              className="block text-xs font-semibold text-muted-foreground uppercase"
+              htmlFor="fund-name"
+            >
               Trip name
             </label>
             <Input
@@ -162,7 +177,10 @@ export function TripFund() {
               onChange={(e) => setName(e.target.value)}
               placeholder="Santorini 2027"
             />
-            <label className="block text-xs font-semibold text-muted-foreground uppercase" htmlFor="fund-target">
+            <label
+              className="block text-xs font-semibold text-muted-foreground uppercase"
+              htmlFor="fund-target"
+            >
               Target amount (₹)
             </label>
             <Input
@@ -193,7 +211,8 @@ export function TripFund() {
               <TrendingUp className="size-4" /> AI saving tip
             </p>
             <p className="mt-1">
-              Save 20% of your monthly travel budget and you'll hit most domestic targets in under 6 months.
+              Save 20% of your monthly travel budget and you'll hit most domestic targets in under 6
+              months.
             </p>
           </div>
         </Reveal>

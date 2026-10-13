@@ -219,15 +219,57 @@ export const quickPrompts = [
 ];
 
 export const flights = [
-  { airline: "IndiGo 6E-247", dep: "06:10 DEL", arr: "08:25 GOI", duration: "2h 15m", stops: "Non-stop", price: 4899 },
-  { airline: "Air India AI-882", dep: "09:40 DEL", arr: "12:20 GOI", duration: "2h 40m", stops: "Non-stop", price: 5640 },
-  { airline: "Vistara UK-863", dep: "14:05 DEL", arr: "18:35 GOI", duration: "4h 30m", stops: "1 stop", price: 4320 },
+  {
+    airline: "IndiGo 6E-247",
+    dep: "06:10 DEL",
+    arr: "08:25 GOI",
+    duration: "2h 15m",
+    stops: "Non-stop",
+    price: 4899,
+  },
+  {
+    airline: "Air India AI-882",
+    dep: "09:40 DEL",
+    arr: "12:20 GOI",
+    duration: "2h 40m",
+    stops: "Non-stop",
+    price: 5640,
+  },
+  {
+    airline: "Vistara UK-863",
+    dep: "14:05 DEL",
+    arr: "18:35 GOI",
+    duration: "4h 30m",
+    stops: "1 stop",
+    price: 4320,
+  },
 ];
 
 export const hotels = [
-  { name: "Coco Sands Resort", rating: 4.7, location: "Candolim, Goa", amenities: ["Pool", "Breakfast", "Beachfront"], price: 3200, image: goa },
-  { name: "Pine Ridge Cottages", rating: 4.6, location: "Old Manali", amenities: ["Fireplace", "Valley view", "Café"], price: 2450, image: manali },
-  { name: "Lake House Srinagar", rating: 4.8, location: "Dal Lake", amenities: ["Houseboat", "Kitchen", "Shikara"], price: 3800, image: kashmir },
+  {
+    name: "Coco Sands Resort",
+    rating: 4.7,
+    location: "Candolim, Goa",
+    amenities: ["Pool", "Breakfast", "Beachfront"],
+    price: 3200,
+    image: goa,
+  },
+  {
+    name: "Pine Ridge Cottages",
+    rating: 4.6,
+    location: "Old Manali",
+    amenities: ["Fireplace", "Valley view", "Café"],
+    price: 2450,
+    image: manali,
+  },
+  {
+    name: "Lake House Srinagar",
+    rating: 4.8,
+    location: "Dal Lake",
+    amenities: ["Houseboat", "Kitchen", "Shikara"],
+    price: 3800,
+    image: kashmir,
+  },
 ];
 
 export const rentals = [
@@ -237,9 +279,27 @@ export const rentals = [
 ];
 
 export const railBus = [
-  { operator: "Rajdhani Express", dep: "16:55 NDLS", arr: "08:05 MAO", duration: "15h 10m", price: 2140 },
-  { operator: "VRL Volvo Sleeper", dep: "20:30 Pune", arr: "06:15 Goa", duration: "9h 45m", price: 1290 },
-  { operator: "Shatabdi Express", dep: "07:20 NDLS", arr: "12:45 CDG", duration: "5h 25m", price: 980 },
+  {
+    operator: "Rajdhani Express",
+    dep: "16:55 NDLS",
+    arr: "08:05 MAO",
+    duration: "15h 10m",
+    price: 2140,
+  },
+  {
+    operator: "VRL Volvo Sleeper",
+    dep: "20:30 Pune",
+    arr: "06:15 Goa",
+    duration: "9h 45m",
+    price: 1290,
+  },
+  {
+    operator: "Shatabdi Express",
+    dep: "07:20 NDLS",
+    arr: "12:45 CDG",
+    duration: "5h 25m",
+    price: 980,
+  },
 ];
 
 export type FutureTrip = {

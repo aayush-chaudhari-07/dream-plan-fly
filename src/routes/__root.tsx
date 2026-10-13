@@ -79,10 +79,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "SmartTrip — AI Travel Planner & Booking" },
-      { name: "description", content: "Plan less, travel more. SmartTrip is your AI-powered companion for discovering destinations, building itineraries, saving for trips and booking travel." },
+      {
+        name: "description",
+        content:
+          "Plan less, travel more. SmartTrip is your AI-powered companion for discovering destinations, building itineraries, saving for trips and booking travel.",
+      },
       { name: "author", content: "SmartTrip" },
       { property: "og:title", content: "SmartTrip — AI Travel Planner & Booking" },
-      { property: "og:description", content: "Plan less, travel more. SmartTrip is your AI-powered companion for discovering destinations, building itineraries, saving for trips and booking travel." },
+      {
+        property: "og:description",
+        content:
+          "Plan less, travel more. SmartTrip is your AI-powered companion for discovering destinations, building itineraries, saving for trips and booking travel.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@smarttrip" },

@@ -11,10 +11,6 @@ import { buildPlan, type GeneratedPlan, type PlanOptions } from "@/lib/trip-plan
 import { cn } from "@/lib/utils";
 import { Reveal, SectionHeading } from "./Reveal";
 
-export { buildPlan };
-export type { GeneratedPlan };
-
-
 export function AiPlanner({ compact = false }: { compact?: boolean }) {
   const [input, setInput] = useState(
     "I want a 5-day trip to Himachal Pradesh for 3 people under ₹35,000.",
@@ -26,7 +22,12 @@ export function AiPlanner({ compact = false }: { compact?: boolean }) {
   const [typing, setTyping] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get("q");
     if (q) {
@@ -95,13 +96,23 @@ export function AiPlanner({ compact = false }: { compact?: boolean }) {
             ))}
           </div>
 
-          <Button variant="hero" size="xl" className="mt-5 w-full" onClick={() => run()} disabled={typing}>
+          <Button
+            variant="hero"
+            size="xl"
+            className="mt-5 w-full"
+            onClick={() => run()}
+            disabled={typing}
+          >
             <Wand2 /> {typing ? "Generating…" : "Generate My Trip"}
           </Button>
         </Reveal>
 
         <Reveal delay={80} className="surface-card p-6 sm:p-7">
-          {typing ? <PlanSkeleton /> : <PlanView plan={plan} sample={isSample} prompt={input} onReplan={run} />}
+          {typing ? (
+            <PlanSkeleton />
+          ) : (
+            <PlanView plan={plan} sample={isSample} prompt={input} onReplan={run} />
+          )}
         </Reveal>
       </div>
     </section>
@@ -226,7 +237,9 @@ function PlanView({
             <Leaf className="size-3.5" /> Carbon estimate
           </p>
           <p className="mt-2 text-sm">~{plan.carbonKg} kg CO2e per person, round trip</p>
-          <p className="text-xs text-muted-foreground">Rough estimate by distance & transport mode</p>
+          <p className="text-xs text-muted-foreground">
+            Rough estimate by distance & transport mode
+          </p>
         </div>
       </div>
 

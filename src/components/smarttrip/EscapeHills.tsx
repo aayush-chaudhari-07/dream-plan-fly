@@ -10,10 +10,20 @@ export function EscapeHills() {
         <div className="animate-drift absolute top-32 left-0 h-14 w-40 rounded-full bg-card/50 blur-2xl" />
         <div className="animate-bird absolute top-24 left-0 flex gap-3 text-primary/40">
           <svg width="20" height="10" viewBox="0 0 18 10" fill="none">
-            <path d="M1 6c2.5 0 3.8-4 4.8-4S8 6 9 6s2.2-4 3.2-4S15 6 17 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+            <path
+              d="M1 6c2.5 0 3.8-4 4.8-4S8 6 9 6s2.2-4 3.2-4S15 6 17 6"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+            />
           </svg>
           <svg width="14" height="8" viewBox="0 0 18 10" fill="none" className="translate-y-3">
-            <path d="M1 6c2.5 0 3.8-4 4.8-4S8 6 9 6s2.2-4 3.2-4S15 6 17 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            <path
+              d="M1 6c2.5 0 3.8-4 4.8-4S8 6 9 6s2.2-4 3.2-4S15 6 17 6"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
           </svg>
         </div>
       </div>

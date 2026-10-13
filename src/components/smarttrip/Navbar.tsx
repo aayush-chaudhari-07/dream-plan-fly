@@ -29,7 +29,9 @@ export function Navbar() {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
-        scrolled ? "bg-card/70 shadow-soft backdrop-blur-xl backdrop-saturate-150" : "bg-transparent",
+        scrolled
+          ? "bg-card/70 shadow-soft backdrop-blur-xl backdrop-saturate-150"
+          : "bg-transparent",
       )}
     >
       <nav className="container-page flex h-18 items-center justify-between gap-4 py-3">

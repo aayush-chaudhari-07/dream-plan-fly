@@ -113,7 +113,8 @@ export function useSmartTrip(): SmartTripState {
   );
 }
 
-const id = (prefix: string) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+const id = (prefix: string) =>
+  `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 
 function imageFor(text: string): string {
   const t = text.toLowerCase();

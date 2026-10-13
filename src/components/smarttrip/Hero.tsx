@@ -133,9 +133,7 @@ export function Hero() {
                 <Sparkles /> Ask AI to Plan My Trip
               </Link>
             </Button>
-            <span className="text-xs text-ink/70">
-              Popular now: Manali · Goa · Kashmir · Kyoto
-            </span>
+            <span className="text-xs text-ink/70">Popular now: Manali · Goa · Kashmir · Kyoto</span>
           </div>
         </div>
       </div>

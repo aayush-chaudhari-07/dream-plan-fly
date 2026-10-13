@@ -9,9 +9,17 @@ export const Route = createFileRoute("/explore")({
   head: () => ({
     meta: [
       { title: "Explore Destinations — SmartTrip" },
-      { name: "description", content: "Discover hand-picked destinations across India and the world. Filter by category, compare prices and save your favorites." },
+      {
+        name: "description",
+        content:
+          "Discover hand-picked destinations across India and the world. Filter by category, compare prices and save your favorites.",
+      },
       { property: "og:title", content: "Explore Destinations — SmartTrip" },
-      { property: "og:description", content: "Discover hand-picked destinations across India and the world. Filter by category, compare prices and save your favorites." },
+      {
+        property: "og:description",
+        content:
+          "Discover hand-picked destinations across India and the world. Filter by category, compare prices and save your favorites.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

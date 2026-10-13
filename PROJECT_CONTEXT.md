@@ -7,20 +7,23 @@
 ## 1. PROJECT OVERVIEW
 
 ### 1.1 Project Identity & Purpose
+
 - **Project Name**: SmartTrip (Repository: `dream-plan-fly`, Package name: `smarttrip`)
 - **Live Deployment**: `https://your-domain.com`
 - **Platform**: Standalone TanStack Start web application
-- **Tagline**: *"Plan Less. Travel More."* / *"Travel smarter. Explore more."*
+- **Tagline**: _"Plan Less. Travel More."_ / _"Travel smarter. Explore more."_
 - **Core Concept**: `Dream → Ask AI → Plan → Save → Book → Travel`
 - **Problem Solved**: Traditional travel planning is disjointed and stressful. Travelers juggle multiple tabs for inspiration, itinerary builders, price comparisons, savings calculators, and booking platforms. SmartTrip unifies destination discovery, rule-based/AI trip planning, future trip savings tracking, and end-to-end demo bookings into a cohesive, travel-tech product with modern aesthetics.
 
 ### 1.2 Target Users
+
 - Leisure travelers looking for curated destinations and quick itinerary inspiration.
 - Group and family vacationers coordinating multi-day itineraries and budgets.
 - Future trip planners wanting to create savings targets and track progress over months/years (e.g., Japan 2027, Kashmir Winter).
 - Travelers looking for categorized options across Hill Stations, Beaches, Heritage, and Adventure spots.
 
 ### 1.3 Main Features
+
 1. **Interactive Hero & Search**: Destination search form with fields for Destination, Travel Dates, Travelers, and Budget, styled over an animated sky canvas (clouds, flying birds, and transiting aircraft via CSS animations).
 2. **Quick Booking Panel**: Dynamic multi-tab booking search interface for Flights, Hotels/Stays, Car/Bike Rentals, Train/Bus, and Packages.
 3. **Explore Destinations**: Categorized destination catalog (Hill Stations, Beaches, Adventure, Heritage, Nature, International, Weekend Getaways) with real pricing in INR (₹), ratings, blurbs, and instant wishlist toggling.
@@ -31,6 +34,7 @@
 8. **Travel Safety & Support Dock**: Safety guidance checklist and floating 24/7 support trigger with quick access to the AI planner, help center, and support hotline simulation.
 
 ### 1.4 Current Status
+
 - **Current Status**: **Working Prototype / In Progress**
 - **Working**: All UI pages, client-side routing, responsive layouts, animated hero layers, heuristic AI itinerary generation, reactive `localStorage` persistence, booking creation/cancellation, savings fund contributions, and wishlisting are functional.
 - **Partially Working / Mocked**: All flight, hotel, rental, rail, and package inventory is backed by static demo data in `src/data/travel.ts`. Bookings generate simulated reference numbers without payment gateways or external GDS/OTA APIs. AI generation uses a client-side regex and template builder rather than an external LLM.
@@ -41,9 +45,11 @@
 ## 2. TECH STACK
 
 ### 2.1 Languages, Frameworks & Libraries
-*(Exact versions extracted from `package.json`)*
+
+_(Exact versions extracted from `package.json`)_
 
 #### Core & Runtime
+
 - **Language**: TypeScript (`^5.8.3`), Node.js (tested on Node v24.20.0 / npm 11.19.0; bun configuration present)
 - **UI Library**: React 19 (`react: ^19.2.0`, `react-dom: ^19.2.0`)
 - **SSR & Fullstack Framework**: TanStack Start (`@tanstack/react-start: 1.168.32`)
@@ -51,6 +57,7 @@
 - **Async State Management**: TanStack Query (`@tanstack/react-query: ^5.101.1`)
 
 #### Build Tools & Bundler
+
 - **Build Tool**: Vite (`vite: 8.1.5`, `@vitejs/plugin-react: ^5.2.0`)
 - **SSR Server Engine**: Nitro (`nitro: 3.0.260603-beta`)
 - **Configuration**: Standalone Vite + Nitro configuration
@@ -58,6 +65,7 @@
 - **Overrides**: `rolldown: 1.2.1`
 
 #### Styling & Design System
+
 - **CSS Engine**: Tailwind CSS v4 (`tailwindcss: ^4.2.1`, `@tailwindcss/vite: ^4.2.1`)
 - **Animations**: `tw-animate-css: ^1.3.4` + custom keyframes in `src/styles.css`
 - **Class Utilities**: `clsx: ^2.1.1`, `tailwind-merge: ^3.5.0`, `class-variance-authority: ^0.7.1`
@@ -65,6 +73,7 @@
 - **Fonts**: Manrope (Body sans-serif), Sora (Headings display) from Google Fonts
 
 #### UI Component Primitives & Utilities
+
 - **Radix UI Primitives**:
   - `@radix-ui/react-accordion: ^1.2.12`
   - `@radix-ui/react-alert-dialog: ^1.1.15`
@@ -99,16 +108,19 @@
 - **Charts & Drawers & Carousel**: `recharts: ^2.15.4`, `vaul: ^1.1.2`, `embla-carousel-react: ^8.6.0`, `cmdk: ^1.1.1`, `input-otp: ^1.4.2`, `react-resizable-panels: ^4.6.5`
 
 #### Linting & Formatting
+
 - **Linter**: ESLint 9 (`eslint: ^9.32.0`, `@eslint/js: ^9.32.0`, `typescript-eslint: ^8.56.1`, `eslint-plugin-react-hooks: ^5.2.0`, `eslint-plugin-react-refresh: ^0.4.20`)
 - **Formatter**: Prettier 3 (`prettier: ^3.7.3`, `eslint-config-prettier: ^10.1.1`, `eslint-plugin-prettier: ^5.2.6`)
 
 ### 2.2 Database, APIs & External Services
+
 - **Database**: None. State is held in-memory and synced to the browser's `localStorage` via `src/lib/smarttrip-store.ts`.
 - **APIs**: None currently connected. Data is local and statically seeded (`src/data/travel.ts`).
 - **External Web Services**:
   - Google Fonts CDN (`https://fonts.googleapis.com` for Manrope and Sora).
 
 ### 2.3 Installation & Run Commands
+
 ```bash
 # 1. Install dependencies
 npm install
@@ -293,7 +305,9 @@ dream-plan-fly/
 ```
 
 ### 4.2 State Architecture & Client Persistence
+
 The project uses a reactive **External Store** pattern (`src/lib/smarttrip-store.ts`) paired with React's `useSyncExternalStore`:
+
 1. **Initial Seed**: If `localStorage` is empty, state initializes with seed trips from `src/data/travel.ts` (Goa, Manali, Kashmir, Kyoto), initial funds (Japan 2027, Kashmir Winter, Maldives Escape), empty bookings, and empty wishlist.
 2. **Hydration**: On mount, `hydrate()` parses `localStorage.getItem("smarttrip.state.v1")` and emits an update.
 3. **Reactivity**: Mutations (`savePlan`, `moveTrip`, `removeTrip`, `addBooking`, `cancelBooking`, `addFund`, `contribute`, `removeFund`, `toggleWish`, `reset`) update the internal state object, write to `localStorage`, and notify all subscribed components.
@@ -302,25 +316,29 @@ The project uses a reactive **External Store** pattern (`src/lib/smarttrip-store
 ### 4.3 Key User & Data Flows
 
 #### Flow 1: AI Itinerary Creation & Saving
-1. **Input**: User enters a prompt in `Hero.tsx` or `AiPlanner.tsx` (e.g., *"I want a 5-day trip to Himachal Pradesh for 3 people under ₹35,000"*).
+
+1. **Input**: User enters a prompt in `Hero.tsx` or `AiPlanner.tsx` (e.g., _"I want a 5-day trip to Himachal Pradesh for 3 people under ₹35,000"_).
 2. **Parsing**: `buildPlan()` in `src/lib/trip-plan.ts` uses regex to extract the budget (defaults to ₹35,000), passenger count (defaults to 2), duration (between 2 and 10 days, default 5), and destination keywords.
 3. **Synthesis**: The algorithm generates day-by-day itineraries, lodging recommendations, transport guidance, dining trails, weather warnings, packing lists, money-saving tips, budget breakdowns, and an estimated carbon footprint.
 4. **Interaction**: User can adjust budget, days, or traveler counts and trigger `onReplan()`.
-5. **Persistence**: Clicking *"Save to My Trips"* calls `smartTrip.savePlan(plan)`. This generates an ID (`trip-*`), places it into the `"Saved"` bucket, updates `localStorage`, and displays a success toast.
+5. **Persistence**: Clicking _"Save to My Trips"_ calls `smartTrip.savePlan(plan)`. This generates an ID (`trip-*`), places it into the `"Saved"` bucket, updates `localStorage`, and displays a success toast.
 
 #### Flow 2: Booking Flights, Hotels, Rentals, Rails, or Packages
+
 1. **Selection**: User goes to `/bookings` and chooses a tab (Flights, Hotels, Rentals, Train/Bus, Packages).
-2. **Booking Action**: User clicks *"Book"* or *"Reserve"*.
+2. **Booking Action**: User clicks _"Book"_ or _"Reserve"_.
 3. **Execution**: `smartTrip.addBooking(...)` is invoked. It generates a reference code (e.g. `ST4X89K`), adds an item to `state.bookings`, and automatically generates an accompanying `"Upcoming"` trip entry in `state.trips`.
 4. **Notification**: Sonner toast notifies the user that the demo booking was confirmed. The booking immediately appears in `/my-trips`.
 
 #### Flow 3: Trip Fund & Future Savings
-1. **Creation**: User enters a trip name (e.g., *"Santorini 2027"*) and target budget (e.g., `₹80,000`) in `TripFund.tsx`.
+
+1. **Creation**: User enters a trip name (e.g., _"Santorini 2027"_) and target budget (e.g., `₹80,000`) in `TripFund.tsx`.
 2. **Action**: `smartTrip.addFund(...)` stores the goal.
 3. **Contributions**: User clicks quick-add buttons (`+₹500`, `+₹1,000`, `+₹2,500`) or enters a custom sum.
 4. **Calculation**: `smartTrip.contribute(fundId, amount)` increments `saved` (capped at `target`). The UI updates the progress percentage and recalculates the required monthly rate: `(target - saved) / monthsLeft`.
 
 #### Flow 4: Wishlisting Destinations
+
 1. **Trigger**: User clicks the heart icon on any destination card in `ExploreDestinations.tsx`.
 2. **Execution**: `smartTrip.toggleWish(destinationId)` adds or removes the ID in `state.wishlist`.
 3. **Sync**: All wishlisted destinations are aggregated and displayed inside the `"Places You Loved"` section of `/my-trips`.
@@ -330,8 +348,10 @@ The project uses a reactive **External Store** pattern (`src/lib/smarttrip-store
 ## 5. KEY FILES IN DETAIL
 
 ### 5.1 `src/server.ts`
+
 - **Purpose**: Custom SSR entry wrapper for TanStack Start and Nitro builds.
 - **Critical Logic**: h3 (Nitro's underlying HTTP layer) swallows in-handler errors into generic 500 JSON responses (`{"unhandled":true,"message":"HTTPError"}`). `src/server.ts` checks for this condition, pulls the original stack trace via `consumeLastCapturedError()`, logs the details, and returns a clean HTML fallback page using `renderErrorPage()`.
+
 ```typescript
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
@@ -351,10 +371,12 @@ export default {
 ```
 
 ### 5.2 `src/start.ts`
+
 - **Purpose**: Defines TanStack Start instance configuration, error middleware, and CSRF protection.
 - **Critical Logic**: Installs `csrfMiddleware` filtered to `serverFn` handlers to secure server actions from cross-site request attacks.
 
 ### 5.3 `src/router.tsx` & `src/routes/__root.tsx`
+
 - **Purpose**: Defines router context and root application shell.
 - **Key Elements**:
   - Sets up `QueryClient` and scroll restoration.
@@ -363,6 +385,7 @@ export default {
   - Wraps children in `<QueryClientProvider>` and mounts `<Toaster position="bottom-right" richColors />`.
 
 ### 5.4 `src/lib/smarttrip-store.ts`
+
 - **Purpose**: Centralized application state management and `localStorage` synchronization.
 - **Exported API**:
   - `useSmartTrip()`: Hook for components to subscribe to state updates.
@@ -378,6 +401,7 @@ export default {
     - `toggleWish(destinationId: string): boolean`
     - `reset(): void`
 - **State Interface**:
+
 ```typescript
 export type SmartTripState = {
   trips: StoredTrip[];
@@ -388,6 +412,7 @@ export type SmartTripState = {
 ```
 
 ### 5.5 `src/lib/trip-plan.ts`
+
 - **Purpose**: Local deterministic travel planner and budget estimation engine.
 - **Main Function**: `buildPlan(prompt: string, opts: PlanOptions): GeneratedPlan`
   - Parses budget via regex `(\d{4,7})`.
@@ -398,18 +423,20 @@ export type SmartTripState = {
   - Computes approximate carbon footprint (`distKm * 2 * perKm`).
 
 ### 5.6 `src/data/travel.ts`
+
 - **Purpose**: Primary database of static mock items.
 - **Exported Collections**:
   - `destinations`: 9 destinations (Manali, Goa, Kashmir, Kyoto, Maldives, Lonavala, Munnar, Rishikesh, Jaipur).
   - `destinationCategories`: 8 category filters.
   - `hillStations`: 8 hill stations with simulated current temperatures.
-  - `mapPlaces`: 6 points of interest with coordinates and categories (*Note: Defined here, but currently unused in the UI*).
+  - `mapPlaces`: 6 points of interest with coordinates and categories (_Note: Defined here, but currently unused in the UI_).
   - `flights`, `hotels`, `rentals`, `railBus`, `packages`: Booking mock inventory.
   - `initialFutureTrips`: 3 starter savings goals.
   - `myTrips`: Starter trips classified by bucket.
   - `inr(n: number)`: Currency formatter returning `₹XX,XXX`.
 
 ### 5.7 Route Files (`src/routes/*.tsx`)
+
 - `routes/index.tsx`: Main landing page assembling Navbar, Hero, QuickBooking, ExploreDestinations, HowItWorks, EscapeHills, AiPlanner, TripFund, Testimonials, TravelSafe, Footer, and SupportDock.
 - `routes/ai-planner.tsx`: Dedicated full page for the AI Trip Planner with a `PageHeader`.
 - `routes/bookings.tsx`: Booking catalog supporting 5 tabs (flights, stays, rentals, rail, packages) with instant booking triggers.
@@ -418,6 +445,7 @@ export type SmartTripState = {
 - `routes/save.tsx`: Dedicated page for the Future Trip Fund.
 
 ### 5.8 Key UI Components (`src/components/smarttrip/`)
+
 - `Hero.tsx`: Implements the hero visual with `SkyLayer` (CSS-animated clouds, birds, and plane) and responsive search card.
 - `QuickBooking.tsx`: Floating booking widget supporting tab switches with specialized form inputs per tab.
 - `AiPlanner.tsx`: Two-column planning interface featuring prompt input, quick suggestion pills, animated typing skeleton, and rich generated plan view.
@@ -432,6 +460,7 @@ export type SmartTripState = {
 ### 6.1 Data Models (TypeScript Types)
 
 #### Destination
+
 ```typescript
 export type Destination = {
   id: string;
@@ -446,6 +475,7 @@ export type Destination = {
 ```
 
 #### Stored Trip & Trip Buckets
+
 ```typescript
 export type TripBucket = "Upcoming" | "Past" | "Saved";
 
@@ -461,6 +491,7 @@ export type StoredTrip = {
 ```
 
 #### Booking
+
 ```typescript
 export type BookingKind = "flight" | "stay" | "rental" | "rail" | "package";
 
@@ -476,6 +507,7 @@ export type StoredBooking = {
 ```
 
 #### Future Trip (Trip Fund)
+
 ```typescript
 export type FutureTrip = {
   id: string;
@@ -491,6 +523,7 @@ export type FutureTrip = {
 ```
 
 #### Generated AI Plan
+
 ```typescript
 export type GeneratedPlan = {
   title: string;
@@ -511,6 +544,7 @@ export type GeneratedPlan = {
 ```
 
 #### Map Place
+
 ```typescript
 export type MapPlace = {
   id: string;
@@ -527,19 +561,22 @@ export type MapPlace = {
 ### 6.2 Routes and Endpoints
 
 #### File Routes (Client / SSR Web Pages)
-| Route | File Path | Method | Description |
-|---|---|---|---|
-| `/` | `src/routes/index.tsx` | GET | Full SmartTrip homepage |
-| `/ai-planner` | `src/routes/ai-planner.tsx` | GET | AI Trip Planner page |
-| `/bookings` | `src/routes/bookings.tsx` | GET | Booking catalog (flights, hotels, rentals, rail, packages) |
-| `/explore` | `src/routes/explore.tsx` | GET | Destination discovery grid |
-| `/my-trips` | `src/routes/my-trips.tsx` | GET | User trips dashboard, bookings list, and wishlist |
-| `/save` | `src/routes/save.tsx` | GET | Save for Future Trip / Trip Fund page |
+
+| Route         | File Path                   | Method | Description                                                |
+| ------------- | --------------------------- | ------ | ---------------------------------------------------------- |
+| `/`           | `src/routes/index.tsx`      | GET    | Full SmartTrip homepage                                    |
+| `/ai-planner` | `src/routes/ai-planner.tsx` | GET    | AI Trip Planner page                                       |
+| `/bookings`   | `src/routes/bookings.tsx`   | GET    | Booking catalog (flights, hotels, rentals, rail, packages) |
+| `/explore`    | `src/routes/explore.tsx`    | GET    | Destination discovery grid                                 |
+| `/my-trips`   | `src/routes/my-trips.tsx`   | GET    | User trips dashboard, bookings list, and wishlist          |
+| `/save`       | `src/routes/save.tsx`       | GET    | Save for Future Trip / Trip Fund page                      |
 
 #### Backend API Endpoints
+
 - **Not found / None implemented**: There are no custom API route files (e.g. `src/routes/api/*.ts`) or server functions (`createServerFn`) currently defined. All actions are handled client-side via `src/lib/smarttrip-store.ts`.
 
 ### 6.3 Environment Variables
+
 - **Status**: No `.env` or required secrets exist in the codebase.
 - Standard Vite `VITE_*` environment variable injection is supported.
 
@@ -548,6 +585,7 @@ export type MapPlace = {
 ## 7. UI / UX
 
 ### 7.1 Visual Identity & Color Palette
+
 - The interface adheres to an **OKLCH Semantic Color System** defined in `src/styles.css`:
   - **Primary**: Deep travel blue `oklch(0.42 0.14 260)`
   - **Ink (Dark Neutral)**: Deep navy `oklch(0.26 0.08 262)`
@@ -560,12 +598,14 @@ export type MapPlace = {
   - **Dark Mode Support**: Complete dark-theme token override mapping in `.dark`.
 
 ### 7.2 Typography & Spacing
+
 - **Display Typography**: **Sora** (`font-display`), with tight tracking (`-0.02em`) for titles and headers.
 - **Body Typography**: **Manrope** (`font-sans`), an open, geometric sans-serif optimized for legibility.
 - **Card Geometry**: Large rounded radiuses (`--radius-3xl` ~ `2.4rem`, `--radius-4xl` ~ `3.15rem`).
 - **Shadows**: Multi-layered soft shadows (`--shadow-soft`, `--shadow-lift`, `--shadow-glass`).
 
 ### 7.3 Motion & Micro-interactions
+
 - **Keyframe Animations**:
   - `drift` / `drift-slow`: Continuous horizontal translation of clouds across the hero.
   - `fly-across`: Slow 34-second translation of an airplane icon crossing the upper hero.
@@ -581,17 +621,20 @@ export type MapPlace = {
 ## 8. CODING CONVENTIONS
 
 ### 8.1 Naming & Organization
+
 - **Components**: PascalCase filenames (e.g. `AiPlanner.tsx`, `TripFund.tsx`) located in `src/components/smarttrip/` and `src/components/ui/`.
 - **Utilities & State**: kebab-case filenames (e.g. `smarttrip-store.ts`, `trip-plan.ts`, `use-mobile.tsx`) located in `src/lib/` and `src/hooks/`.
 - **Routes**: kebab-case filenames matching URL paths in `src/routes/` (e.g. `ai-planner.tsx` -> `/ai-planner`).
 - **Path Aliases**: `@/*` maps to `./src/*` across all imports via `tsconfig.json`.
 
 ### 8.2 State Management & React Patterns
+
 - Component-level state is handled with standard `useState`, `useRef`, and `useMemo`.
 - Global domain state uses the **External Store** pattern with `useSyncExternalStore` for flicker-free, SSR-safe hydration.
 - User feedback is communicated via `sonner` toasts (`toast.success()`, `toast.error()`, `toast.message()`).
 
 ### 8.3 Error Handling Approach
+
 1. **Catastrophic SSR Error Capture**: `src/lib/error-capture.ts` intercepts and retains unhandled server errors out-of-band so `src/server.ts` can recover the stack before serving a 500 response.
 2. **SSR Fallback Page**: `src/lib/error-page.ts` returns lightweight HTML with "Try again" and "Go home" actions when rendering fails entirely.
 3. **Client Route Error Boundary**: `ErrorComponent` in `src/routes/__root.tsx` renders a graceful recovery UI and forwards telemetry to `reportError` in `src/lib/error-report.ts`.
@@ -601,15 +644,17 @@ export type MapPlace = {
 ## 9. KNOWN ISSUES AND INCOMPLETE WORK
 
 ### 9.1 Incomplete Features & Specification Gaps
+
 1. **Unused Interactive Map Dataset**: `src/data/travel.ts` exports `mapPlaces: MapPlace[]` containing coordinates and attraction data, but there is no interactive map component implemented or mounted on any page. (Requested in `README.md` Section 9: "INTERACTIVE MAP / EXPLORE AROUND YOU").
 2. **Quick Travel Guide**: The 3-stage travel guide section described in `README.md` Section 10 ("Before You Go", "During Your Trip", "Smart Tips") is not yet implemented.
 3. **Simulated AI Planning**: The AI Trip Planner does not call an actual LLM (OpenAI, Gemini, Anthropic); it uses a deterministic regex parsing and string interpolation engine (`src/lib/trip-plan.ts`).
-4. **Header Navigation Placeholders**: The Search, Wishlist, Notifications, and Profile buttons in `Navbar.tsx` only trigger toast notifications saying *"panel coming up next"* rather than opening functional dialogs or drawers.
+4. **Header Navigation Placeholders**: The Search, Wishlist, Notifications, and Profile buttons in `Navbar.tsx` only trigger toast notifications saying _"panel coming up next"_ rather than opening functional dialogs or drawers.
 5. **No Persistent Backend / Authentication**: All user modifications (saved plans, bookings, funds, wishlist) reside strictly in single-browser `localStorage`. There is no multi-user database, session handling, or cross-device synchronization.
 6. **Confetti Animation Unused in Logic**: `@keyframes confetti` is declared in `src/styles.css` (lines 346–355), but is never triggered by `TripFund.tsx` when a savings goal reaches 100%.
 7. **Itinerary Re-ordering**: The AI itinerary view does not support drag-and-drop re-ordering of activities, which was specified in `README.md` Section 19.
 
 ### 9.2 Fragility & Technical Debt
+
 1. **Over-provisioned UI Directory**: `src/components/ui/` contains 46 Shadcn UI component files, of which only `button.tsx`, `input.tsx`, `textarea.tsx`, and `sonner.tsx` are actively imported by application code. The remaining 42 files are unused template scaffolding.
 2. **Missing Test Suite**: There are no automated unit tests, integration tests, or end-to-end tests in the repository (`no test script in package.json`).
 3. **Package Name Mismatch**: `package.json` retains the default template name `"tanstack_start_ts"` instead of `"smarttrip"` or `"dream-plan-fly"`.
@@ -620,9 +665,10 @@ export type MapPlace = {
 ## 10. SUGGESTED IMPROVEMENTS
 
 ### 10.1 High Priority (Immediate Value)
+
 1. **Implement the Interactive Travel Map**:
    - Create `src/components/smarttrip/InteractiveMap.tsx` using the existing `mapPlaces` dataset from `src/data/travel.ts`.
-   - Implement category filters (Attractions, Hotels, Restaurants, Activities) and clickable pins displaying place details and an *"Add to Trip"* button.
+   - Implement category filters (Attractions, Hotels, Restaurants, Activities) and clickable pins displaying place details and an _"Add to Trip"_ button.
 2. **Integrate Real LLM API for Trip Planning**:
    - Replace or supplement `buildPlan()` with a TanStack Start server function (`createServerFn`) that queries an LLM (e.g., Google Gemini 2.5 Flash or OpenAI GPT-4o-mini).
    - Use structured JSON output adhering to the existing `GeneratedPlan` schema.
@@ -630,6 +676,7 @@ export type MapPlace = {
    - Add Supabase or Cloudflare D1/KV to store user accounts, bookings, and savings funds in a persistent remote database.
 
 ### 10.2 Medium Priority (UX Polish & Completeness)
+
 4. **Implement Header Modals**:
    - Replace placeholder toasts in `Navbar.tsx` with functional modals:
      - Search: Connect Shadcn's `command.tsx` (`cmdk`) to search destinations and trips.
@@ -642,6 +689,7 @@ export type MapPlace = {
    - Implement the "Before You Go", "During Your Trip", and "Smart Tips" accordion component specified in `README.md` Section 10.
 
 ### 10.3 Low Priority (Maintenance & Cleanup)
+
 8. **Prune Unused UI Components**:
    - Remove or archive unused component files from `src/components/ui/` to reduce repository bloat.
 9. **Add Unit & Smoke Tests**:
