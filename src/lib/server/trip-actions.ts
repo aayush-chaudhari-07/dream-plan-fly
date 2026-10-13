@@ -695,3 +695,239 @@ export const updateProfileFn = createServerFn({ method: "POST" })
 
     return { success: true };
   });
+
+const editFundSchema = z.object({
+  fundId: z.string().min(1),
+  name: z.string().min(1).max(100).optional(),
+  target: z.number().positive().max(100_000_000).optional(),
+  targetDate: z.string().optional(),
+  monthsLeft: z.number().int().positive().max(120).optional(),
+  travelers: z.number().int().positive().max(50).optional(),
+});
+
+/**
+ * Edit a Trip Fund's name, target, dates, or travelers.
+ */
+export const editFundFn = createServerFn({ method: "POST" })
+  .validator((data: unknown) => editFundSchema.parse(data))
+  .handler(async ({ data }) => {
+    const user = await getServerUser();
+    if (!user) throw new Error("Unauthorized");
+
+    const supabase = getSupabaseServerClient();
+    const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    if (data.name !== undefined) updates["name"] = data.name;
+    if (data.target !== undefined) updates["target"] = data.target;
+    if (data.targetDate !== undefined) updates["target_date"] = data.targetDate;
+    if (data.monthsLeft !== undefined) updates["months_left"] = data.monthsLeft;
+    if (data.travelers !== undefined) updates["travelers"] = data.travelers;
+
+    const { data: updated, error } = await supabase
+      .from("funds")
+      .update(updates)
+      .eq("id", data.fundId)
+      .eq("user_id", user.id)
+      .select()
+      .single();
+
+    if (error) throw new Error(`Failed to edit fund: ${error.message}`);
+    return updated;
+  });
+
+/**
+ * Fetch contribution history for a given fund.
+ */
+export const fetchFundContributionsFn = createServerFn({ method: "GET" })
+  .validator((data: unknown) => z.object({ fundId: z.string() }).parse(data))
+  .handler(async ({ data: { fundId } }) => {
+    const user = await getServerUser();
+    if (!user) return [];
+
+    const supabase = getSupabaseServerClient();
+    const { data: contributions, error } = await supabase
+      .from("fund_contributions")
+      .select("*")
+      .eq("fund_id", fundId)
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) return [];
+    return (contributions || []).map((c) => ({
+      id: c.id,
+      fundId: c.fund_id,
+      amount: Number(c.amount),
+      note: c.note || "Deposit",
+      createdAt: new Date(c.created_at).getTime(),
+    }));
+  });
+
+const submitReviewSchema = z.object({
+  rating: z.number().int().min(1).max(5),
+  destination: z.string().min(1).max(100),
+  title: z.string().min(1).max(200),
+  comment: z.string().min(10).max(2000),
+  tripTitle: z.string().max(200).optional(),
+});
+
+/**
+ * Fetch public verified traveler reviews.
+ */
+export const fetchReviewsFn = createServerFn({ method: "GET" }).handler(async () => {
+  const supabase = getSupabaseServerClient();
+  const { data: reviews, error } = await supabase
+    .from("reviews")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  if (error || !reviews) return [];
+  return reviews.map((r) => ({
+    id: r.id,
+    rating: Number(r.rating),
+    destination: r.destination,
+    title: r.title,
+    comment: r.comment,
+    authorName: r.author_name,
+    authorAvatar: (r.author_avatar as string | null) || undefined,
+    tripTitle: (r.trip_title as string | null) || undefined,
+    verified: Boolean(r.verified ?? true),
+    createdAt: new Date(r.created_at).getTime(),
+  }));
+});
+
+/**
+ * Submit a verified review. User must have an active booking or trip.
+ */
+export const submitReviewFn = createServerFn({ method: "POST" })
+  .validator((data: unknown) => submitReviewSchema.parse(data))
+  .handler(async ({ data: input }) => {
+    const user = await getServerUser();
+    if (!user) throw new Error("Unauthorized: Please sign in to post a review.");
+
+    const supabase = getSupabaseServerClient();
+
+    // Verify user has at least one booking or trip
+    const [bookingsRes, tripsRes] = await Promise.all([
+      supabase.from("bookings").select("id").eq("user_id", user.id).limit(1),
+      supabase.from("trips").select("id").eq("user_id", user.id).limit(1),
+    ]);
+
+    const hasBooking = (bookingsRes.data?.length ?? 0) > 0;
+    const hasTrip = (tripsRes.data?.length ?? 0) > 0;
+
+    if (!hasBooking && !hasTrip) {
+      throw new Error(
+        "Verification required: Only travelers with an active booking or saved trip can post a verified review.",
+      );
+    }
+
+    const authorName =
+      (user.user_metadata?.["full_name"] as string) ||
+      (user.user_metadata?.["name"] as string) ||
+      "Verified Traveler";
+    const authorAvatar =
+      (user.user_metadata?.["avatar_url"] as string) ||
+      (user.user_metadata?.["picture"] as string) ||
+      "";
+
+    const { data: review, error } = await supabase
+      .from("reviews")
+      .insert({
+        user_id: user.id,
+        rating: input.rating,
+        destination: input.destination,
+        title: input.title,
+        comment: input.comment,
+        author_name: authorName,
+        author_avatar: authorAvatar,
+        trip_title: input.tripTitle || `${input.destination} Trip`,
+        verified: true,
+      })
+      .select()
+      .single();
+
+    if (error) throw new Error(`Failed to submit review: ${error.message}`);
+    return review;
+  });
+
+const subscribeNewsletterSchema = z.object({
+  email: z.string().email("Please enter a valid email address").max(254),
+});
+
+/**
+ * Subscribe email to the newsletter with duplicate protection.
+ */
+export const subscribeNewsletterFn = createServerFn({ method: "POST" })
+  .validator((data: unknown) => subscribeNewsletterSchema.parse(data))
+  .handler(async ({ data: { email } }) => {
+    const supabase = getSupabaseServerClient();
+    const normalized = email.trim().toLowerCase();
+
+    // Check if already subscribed
+    const { data: existing } = await supabase
+      .from("newsletter_subscribers")
+      .select("id")
+      .eq("email", normalized)
+      .maybeSingle();
+
+    if (existing) {
+      return {
+        status: "already_subscribed",
+        message: "You're already subscribed to SmartTrip updates!",
+      };
+    }
+
+    const { error } = await supabase.from("newsletter_subscribers").insert({ email: normalized });
+
+    if (error) {
+      if (error.code === "23505") {
+        return {
+          status: "already_subscribed",
+          message: "You're already subscribed to SmartTrip updates!",
+        };
+      }
+      throw new Error(`Subscription failed: ${error.message}`);
+    }
+
+    return {
+      status: "subscribed",
+      message: "Welcome aboard! You're subscribed to weekly travel inspiration.",
+    };
+  });
+
+const supportTicketSchema = z.object({
+  name: z.string().min(1).max(100),
+  email: z.string().email().max(254),
+  category: z.enum(["booking", "modification", "cancellation", "refund", "emergency", "general"]),
+  subject: z.string().min(3).max(200),
+  message: z.string().min(10).max(3000),
+});
+
+/**
+ * Submit a customer support / helpline inquiry ticket.
+ */
+export const submitSupportTicketFn = createServerFn({ method: "POST" })
+  .validator((data: unknown) => supportTicketSchema.parse(data))
+  .handler(async ({ data: input }) => {
+    const user = await getServerUser();
+    const supabase = getSupabaseServerClient();
+    const refId = "ST-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+
+    const { data: ticket, error } = await supabase
+      .from("support_tickets")
+      .insert({
+        user_id: user?.id ?? null,
+        name: input.name,
+        email: input.email,
+        category: input.category,
+        subject: input.subject,
+        message: input.message,
+        status: "open",
+        priority: input.category === "emergency" ? "urgent" : "normal",
+      })
+      .select()
+      .single();
+
+    if (error) throw new Error(`Failed to submit support request: ${error.message}`);
+    return { success: true, reference: refId, ticket };
+  });

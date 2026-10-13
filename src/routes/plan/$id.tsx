@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/smarttrip/Navbar";
 import { Footer } from "@/components/smarttrip/Footer";
+import { QuickTravelGuide } from "@/components/smarttrip/QuickTravelGuide";
 import { inr } from "@/data/travel";
 import { smartTrip } from "@/lib/smarttrip-store";
 import { getPublicPlanFn } from "@/server/generate-plan";
@@ -226,6 +227,11 @@ function PublicPlanPage() {
               </div>
               <span className="text-[11px] text-muted-foreground">ID: {id}</span>
             </div>
+          </div>
+
+          {/* Quick Travel Guide (Before You Go, During Your Trip, Smart Tips) */}
+          <div className="mt-12 pt-8 border-t border-border/60 print:hidden">
+            <QuickTravelGuide compact />
           </div>
         </div>
       </main>

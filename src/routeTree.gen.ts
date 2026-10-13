@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiPlannerRouteImport } from './routes/ai-planner'
 import { Route as BookingsRouteImport } from './routes/bookings'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MyTripsRouteImport } from './routes/my-trips'
 import { Route as SaveRouteImport } from './routes/save'
@@ -40,6 +41,11 @@ const BookingsRoute = BookingsRouteImport.update({
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/ai-planner': typeof AiPlannerRoute
   '/bookings': typeof BookingsRoute
   '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/my-trips': typeof MyTripsRoute
   '/save': typeof SaveRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/ai-planner': typeof AiPlannerRoute
   '/bookings': typeof BookingsRoute
   '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/my-trips': typeof MyTripsRoute
   '/save': typeof SaveRoute
@@ -117,6 +125,7 @@ export interface FileRoutesById {
   '/ai-planner': typeof AiPlannerRoute
   '/bookings': typeof BookingsRoute
   '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/my-trips': typeof MyTripsRoute
   '/save': typeof SaveRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
     | '/ai-planner'
     | '/bookings'
     | '/explore'
+    | '/faq'
     | '/login'
     | '/my-trips'
     | '/save'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/ai-planner'
     | '/bookings'
     | '/explore'
+    | '/faq'
     | '/login'
     | '/my-trips'
     | '/save'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/ai-planner'
     | '/bookings'
     | '/explore'
+    | '/faq'
     | '/login'
     | '/my-trips'
     | '/save'
@@ -176,6 +188,7 @@ export interface RootRouteChildren {
   AiPlannerRoute: typeof AiPlannerRoute
   BookingsRoute: typeof BookingsRoute
   ExploreRoute: typeof ExploreRoute
+  FaqRoute: typeof FaqRoute
   LoginRoute: typeof LoginRoute
   MyTripsRoute: typeof MyTripsRoute
   SaveRoute: typeof SaveRoute
@@ -214,6 +227,13 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -280,6 +300,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiPlannerRoute: AiPlannerRoute,
   BookingsRoute: BookingsRoute,
   ExploreRoute: ExploreRoute,
+  FaqRoute: FaqRoute,
   LoginRoute: LoginRoute,
   MyTripsRoute: MyTripsRoute,
   SaveRoute: SaveRoute,

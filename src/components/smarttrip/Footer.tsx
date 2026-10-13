@@ -1,27 +1,69 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Compass, Instagram, Linkedin, Youtube } from "lucide-react";
+import { Compass, Instagram, Linkedin, Loader2, Youtube } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { subscribeNewsletterFn } from "@/lib/server/trip-actions";
 
 const columns = [
   {
     title: "Explore",
-    items: ["Destinations", "Hotels", "Flights", "Packages"],
+    items: [
+      { label: "Destinations", href: "/#destinations" },
+      { label: "Hotels", href: "/bookings" },
+      { label: "Flights", href: "/bookings" },
+      { label: "Interactive Map", href: "/#map" },
+    ],
   },
   {
     title: "Plan",
-    items: ["AI Trip Planner", "My Trips", "Wishlist", "Save for Trip", "Future Trip Fund"],
+    items: [
+      { label: "AI Trip Planner", href: "/ai-planner" },
+      { label: "My Trips", href: "/my-trips" },
+      { label: "Wishlist", href: "/#destinations" },
+      { label: "Trip Fund", href: "/save" },
+    ],
   },
   {
     title: "Support",
-    items: ["Help Center", "Contact", "Safety", "Terms"],
+    items: [
+      { label: "Help Center & FAQ", href: "/faq" },
+      { label: "Emergency Hotline", href: "/faq" },
+      { label: "Safety Guide", href: "/#guide" },
+      { label: "Terms & Privacy", href: "/faq" },
+    ],
   },
 ];
 
 export function Footer() {
   const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = email.trim();
+    if (!trimmed || !trimmed.includes("@") || !trimmed.includes(".")) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = await subscribeNewsletterFn({ data: { email: trimmed } });
+      if (res.status === "already_subscribed") {
+        toast.info(res.message);
+      } else {
+        toast.success(res.message);
+        setEmail("");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to subscribe. Please try again.";
+      toast.error(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <footer className="mt-24 border-t border-border bg-surface">
@@ -62,14 +104,13 @@ export function Footer() {
             <h3 className="text-sm font-semibold text-foreground">{col.title}</h3>
             <ul className="mt-4 space-y-2.5">
               {col.items.map((item) => (
-                <li key={item}>
-                  <button
-                    type="button"
-                    onClick={() => toast(item, { description: "Section available in the demo." })}
+                <li key={item.label}>
+                  <Link
+                    to={item.href}
                     className="text-sm text-muted-foreground transition-colors hover:text-primary"
                   >
-                    {item}
-                  </button>
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -80,17 +121,7 @@ export function Footer() {
       <div className="container-page border-t border-border py-8">
         <form
           className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!email.includes("@")) {
-              toast.error("Please enter a valid email");
-              return;
-            }
-            toast.success("You're subscribed!", {
-              description: "Travel inspiration is on its way.",
-            });
-            setEmail("");
-          }}
+          onSubmit={handleSubscribe}
         >
           <div>
             <p className="font-display text-base font-semibold">
@@ -102,13 +133,21 @@ export function Footer() {
             <Input
               type="email"
               value={email}
+              disabled={isSubmitting}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               className="h-11 rounded-xl"
               aria-label="Email address"
             />
-            <Button type="submit" variant="hero" size="lg">
-              Subscribe
+            <Button type="submit" variant="hero" size="lg" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="size-4 animate-spin mr-1" />
+                  Subscribing…
+                </>
+              ) : (
+                "Subscribe"
+              )}
             </Button>
           </div>
         </form>

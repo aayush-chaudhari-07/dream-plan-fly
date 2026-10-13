@@ -283,3 +283,78 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `src/routeTree.gen.ts` (regenerated)
   - `MIGRATION_LOG.md` (updated)
 
+---
+
+## [Task 7] - Final Core Features: Quick Travel Guide, Trip Fund Celebration & History, DnD Itinerary Editor, Verified Reviews, Newsletter & FAQ Support System
+
+- **Goal**: Implement all remaining incomplete features from `PROJECT_CONTEXT.md` section 9 and `README.md` section 10:
+  1. Quick Travel Guide: 3-stage accordion ("Before You Go", "During Your Trip", "Smart Tips") with real checklists (documents, health, packing, money, safety, local etiquette). Added to the landing page and plan view.
+  2. Trip Fund: `canvas-confetti` celebration at 100%, deposit contributions stored in `fund_contributions` with history list, edit and delete for funds, amount validation, and notifications at 25%, 50%, 75%, 100%.
+  3. Itinerary Editor: drag-and-drop reordering of activities within and across days in `AiPlanner.tsx` using `@dnd-kit`, with add, edit, delete, Undo toast, and plan persistence.
+  4. Real Reviews: replaced placeholder testimonials with `ReviewsSection.tsx` backed by `reviews` table, restricted to logged-in travelers with confirmed bookings or trips.
+  5. Newsletter Form: footer newsletter form stored in `newsletter_subscribers` table with validation and duplicate protection.
+  6. Support Dock & FAQ: 24/7 Support Dock and comprehensive FAQ page (`/faq`) with searchable categories and ticket submissions stored in `support_tickets` table.
+- **Changes**:
+  1. **Quick Travel Guide (`src/components/smarttrip/QuickTravelGuide.tsx`)**:
+     - 3-stage accordion following README section 10 specifications:
+       - "1. Before You Go" (Pre-Departure): Passports, photo IDs, travel insurance, digital backups, prescription medications, climate/altitude readiness, footwear, universal power adapters.
+       - "2. During Your Trip" (On the Ground): Split card/cash payments, meter negotiation, emergency contacts (112), baggage vigilance, sacred site attire etiquette, photography permission.
+       - "3. Smart Tips & Traveler Hacks" (Pro Secrets): High-turnover local eateries, offline Google Maps, reusable flask refills, sunrise monument timings.
+     - Interactive checkbox state with real-time percentage progress bar, persistent in `localStorage`.
+     - Mounted in `src/routes/index.tsx`, `src/routes/plan/$id.tsx`, and `AiPlanner.tsx`.
+  2. **Trip Fund Enhancements (`src/components/smarttrip/TripFund.tsx` & `src/lib/smarttrip-store.ts`)**:
+     - Integrated `canvas-confetti` celebration burst when fund savings reach 100%.
+     - Deposit history dialog modal displaying all deposits recorded in `fund_contributions`.
+     - Edit Fund dialog to adjust target amount, target date, months left, and traveler count.
+     - Delete Fund confirmation dialog with `smartTrip.removeFund()`.
+     - Validated deposit inputs (₹100 min to ₹1,00,00,000 max; minimum fund target ₹1,000).
+     - Milestone notifications triggered at 25%, 50%, 75%, and 100% saved thresholds.
+  3. **Itinerary Drag-and-Drop Editor (`src/components/smarttrip/ItineraryEditor.tsx` & `AiPlanner.tsx`)**:
+     - Built using `@dnd-kit/core` and `@dnd-kit/sortable` with vertical list strategy, pointer/keyboard sensors, and smooth drag overlay.
+     - Supports dragging activities between days and reordering within the same day.
+     - Inline "+ Add Activity" form for any day.
+     - Inline Edit mode with Save and Cancel for activity descriptions.
+     - Delete activity with immediate Sonner Undo toast (`toast("Activity removed", { action: { label: "Undo", onClick: () => restore() } })`).
+     - Persists edited itineraries to state, `smartTrip`, and `localStorage.setItem("smarttrip.current_plan", ...)`.
+  4. **Verified Traveler Reviews (`src/components/smarttrip/ReviewsSection.tsx`)**:
+     - Created `public.reviews` schema in `supabase/migrations/003_features.sql`.
+     - Server functions `fetchReviewsFn` and `submitReviewFn` in `src/lib/server/trip-actions.ts`.
+     - Server-side verification enforcing that only users with confirmed bookings or saved trips can submit verified reviews.
+     - Star rating picker (1–5), destination input, review headline, detailed comments, and verified badge.
+     - Replaced hardcoded `Testimonials.tsx` on the landing page (`src/routes/index.tsx`).
+  5. **Newsletter Subscription with Duplicate Protection (`src/components/smarttrip/Footer.tsx`)**:
+     - Created `public.newsletter_subscribers` table in `supabase/migrations/003_features.sql`.
+     - Server function `subscribeNewsletterFn` with email normalization and unique constraint duplicate protection.
+     - Connected footer newsletter form with loading state and user feedback.
+  6. **Support Dock & Help Center / FAQ Page (`src/routes/faq.tsx` & `SupportDock.tsx`)**:
+     - Created `public.support_tickets` table in `supabase/migrations/003_features.sql`.
+     - Server function `submitSupportTicketFn` generating unique reference IDs (`#ST-XXXX`).
+     - Help Center & FAQ page at `/faq` with searchable categories (Bookings, AI Planner, Trip Fund, Safety & Emergency, Payments & Refunds).
+     - Direct customer support ticket submission form with reference copy button.
+     - 24/7 Traveler Emergency Hotline banner (+91 1800-762-788).
+     - SupportDock updated with links to `/faq` and emergency contact modal.
+  7. **Verification & Tests**:
+     - 45 passing unit tests across `smarttrip-store.test.ts`, `generate-plan.test.ts`, `trip-plan.test.ts`, and `InteractiveMap.test.ts`.
+     - `tsc --noEmit` typecheck passes with 0 errors.
+     - `eslint .` passes with 0 errors and 0 warnings.
+     - `vite build` passes and compiles server/client production bundles cleanly.
+- **Files Touched**:
+  - `package.json` (installed `canvas-confetti`, `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`, `@types/canvas-confetti`)
+  - `package-lock.json`
+  - `supabase/migrations/003_features.sql` (created)
+  - `src/lib/server/trip-actions.ts` (added reviews, newsletter, and support ticket server functions)
+  - `src/lib/smarttrip-store.ts` (added contributions history, editFund, removeFund, and milestone notifications)
+  - `src/components/smarttrip/QuickTravelGuide.tsx` (created)
+  - `src/components/smarttrip/TripFund.tsx` (added confetti celebration, deposit history, edit and delete dialogs)
+  - `src/components/smarttrip/ItineraryEditor.tsx` (created)
+  - `src/components/smarttrip/AiPlanner.tsx` (integrated ItineraryEditor, plan persistence, and QuickTravelGuide)
+  - `src/components/smarttrip/ReviewsSection.tsx` (created)
+  - `src/routes/index.tsx` (mounted QuickTravelGuide and ReviewsSection)
+  - `src/routes/plan/$id.tsx` (mounted QuickTravelGuide)
+  - `src/components/smarttrip/Footer.tsx` (connected newsletter subscription and FAQ links)
+  - `src/routes/faq.tsx` (created)
+  - `src/components/smarttrip/SupportDock.tsx` (updated with FAQ link and contact modal)
+  - `src/lib/__tests__/smarttrip-store.test.ts` (added milestone and fund management tests)
+  - `src/routeTree.gen.ts` (regenerated)
+  - `MIGRATION_LOG.md` (updated)
+

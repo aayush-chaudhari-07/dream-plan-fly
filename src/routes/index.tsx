@@ -7,7 +7,8 @@ import { EscapeHills } from "@/components/smarttrip/EscapeHills";
 import { AiPlanner } from "@/components/smarttrip/AiPlanner";
 import { InteractiveMap } from "@/components/smarttrip/InteractiveMap";
 import { TripFund } from "@/components/smarttrip/TripFund";
-import { Testimonials } from "@/components/smarttrip/Testimonials";
+import { ReviewsSection } from "@/components/smarttrip/ReviewsSection";
+import { QuickTravelGuide } from "@/components/smarttrip/QuickTravelGuide";
 import { TravelSafe } from "@/components/smarttrip/TravelSafe";
 import { Footer } from "@/components/smarttrip/Footer";
 import { Navbar } from "@/components/smarttrip/Navbar";
@@ -48,7 +49,8 @@ function Index() {
         <AiPlanner />
         <InteractiveMap />
         <TripFund />
-        <Testimonials />
+        <QuickTravelGuide />
+        <ReviewsSection />
         <TravelSafe />
       </main>
       <Footer />

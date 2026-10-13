@@ -25,6 +25,8 @@ import { buildPlan, type GeneratedPlan, type PlanOptions } from "@/lib/trip-plan
 import { cn } from "@/lib/utils";
 import { generatePlan, savePublicPlanFn } from "@/server/generate-plan";
 import { Reveal, SectionHeading } from "./Reveal";
+import { ItineraryEditor } from "./ItineraryEditor";
+import { QuickTravelGuide } from "./QuickTravelGuide";
 
 const LOADING_STEPS = [
   "Analyzing destination & travel dates…",
@@ -37,9 +39,20 @@ export function AiPlanner({ compact = false }: { compact?: boolean }) {
   const [input, setInput] = useState(
     "I want a 5-day trip to Himachal Pradesh for 3 people under ₹35,000.",
   );
-  const [plan, setPlan] = useState<GeneratedPlan>(() =>
-    buildPlan("I want a 5-day trip to Himachal Pradesh for 3 people under ₹35,000."),
-  );
+  const [plan, setPlan] = useState<GeneratedPlan>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("smarttrip.current_plan");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && Array.isArray(parsed.days)) return parsed;
+        }
+      } catch {
+        // ignore
+      }
+    }
+    return buildPlan("I want a 5-day trip to Himachal Pradesh for 3 people under ₹35,000.");
+  });
   const [isSample, setIsSample] = useState(true);
   const [loading, setLoading] = useState(false);
   const [loadingStepIdx, setLoadingStepIdx] = useState(0);
@@ -115,6 +128,15 @@ export function AiPlanner({ compact = false }: { compact?: boolean }) {
     } finally {
       if (stepInterval.current) clearInterval(stepInterval.current);
       setLoading(false);
+    }
+  };
+
+  const handlePlanUpdate = (updated: GeneratedPlan) => {
+    setPlan(updated);
+    try {
+      localStorage.setItem("smarttrip.current_plan", JSON.stringify(updated));
+    } catch {
+      // ignore
     }
   };
 
@@ -232,6 +254,7 @@ export function AiPlanner({ compact = false }: { compact?: boolean }) {
               prompt={input}
               source={source}
               loading={loading}
+              onPlanUpdate={handlePlanUpdate}
               onReplan={(opts) => run(opts)}
               onRefine={(instruction, opts) => run({ ...opts, instruction, currentPlan: plan })}
             />
@@ -274,6 +297,7 @@ function PlanView({
   prompt,
   source,
   loading,
+  onPlanUpdate,
   onReplan,
   onRefine,
 }: {
@@ -282,6 +306,7 @@ function PlanView({
   prompt: string;
   source: "gemini" | "fallback";
   loading: boolean;
+  onPlanUpdate: (updatedPlan: GeneratedPlan) => void;
   onReplan: (o: PlanOptions) => void;
   onRefine: (instruction: string, o?: PlanOptions) => void;
 }) {
@@ -432,22 +457,10 @@ function PlanView({
         </Button>
       </div>
 
-      {/* Daily Timeline */}
-      <ol className="mt-5 space-y-3 border-l border-dashed border-border pl-5">
-        {plan.days.map((d) => (
-          <li key={d.day} className="relative">
-            <span className="absolute top-1.5 -left-[26px] size-2.5 rounded-full bg-gradient-brand" />
-            <p className="text-sm font-semibold">
-              {d.day} — {d.title}
-            </p>
-            <ul className="mt-1 space-y-0.5 text-sm text-muted-foreground">
-              {d.items.map((i) => (
-                <li key={i}>{i}</li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ol>
+      {/* Daily Interactive Timeline (Drag & Drop Reordering, Add, Edit, Delete) */}
+      <div className="mt-5">
+        <ItineraryEditor plan={plan} onPlanChange={onPlanUpdate} />
+      </div>
 
       {/* Details Grid */}
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -496,6 +509,11 @@ function PlanView({
             <Send className="size-4" /> Book this trip
           </Link>
         </Button>
+      </div>
+
+      {/* Embedded Travel Guide Checklist for this Plan */}
+      <div className="mt-10 border-t border-border/50 pt-8 print:hidden">
+        <QuickTravelGuide compact />
       </div>
     </div>
   );
