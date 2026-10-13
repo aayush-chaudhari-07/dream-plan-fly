@@ -18,6 +18,7 @@ create table if not exists public.reviews (
   created_at timestamptz not null default now()
 );
 
+create index if not exists reviews_user_id_idx on public.reviews(user_id);
 create index if not exists reviews_destination_idx on public.reviews(destination);
 create index if not exists reviews_created_at_idx on public.reviews(created_at);
 

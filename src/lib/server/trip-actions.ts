@@ -931,3 +931,27 @@ export const submitSupportTicketFn = createServerFn({ method: "POST" })
     if (error) throw new Error(`Failed to submit support request: ${error.message}`);
     return { success: true, reference: refId, ticket };
   });
+
+/**
+ * Lightweight keep-alive server function for Supabase to reset 7-day inactivity pause.
+ */
+export const pingKeepAliveFn = createServerFn({ method: "GET" }).handler(async () => {
+  const supabase = getSupabaseServerClient();
+  const started = Date.now();
+  let dbStatus = "ok";
+
+  try {
+    const { error } = await supabase.from("profiles").select("id").limit(1);
+    if (error) dbStatus = `error: ${error.message}`;
+  } catch (err) {
+    dbStatus = err instanceof Error ? err.message : "failed";
+  }
+
+  return {
+    status: "ok",
+    database: dbStatus,
+    timestamp: new Date().toISOString(),
+    durationMs: Date.now() - started,
+    message: "SmartTrip Supabase keep-alive ping executed successfully.",
+  };
+});

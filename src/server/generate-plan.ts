@@ -4,7 +4,18 @@ import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { buildPlan, type GeneratedPlan } from "@/lib/trip-plan";
 import { getServerUser, getSupabaseServerClient } from "@/lib/supabase/server";
-import { checkRateLimit } from "@/server/rate-limiter";
+import {
+  checkRateLimit,
+  generatePlanCacheKey,
+  getCachedPlan,
+  setCachedPlan,
+  checkDailyQuota,
+  incrementDailyQuota,
+  isGlobalDailyQuotaNear,
+  incrementGlobalDailyCount,
+  isCircuitBreakerActive,
+  tripCircuitBreaker,
+} from "@/server/rate-limiter";
 
 // ==============================================================================
 // VALIDATION SCHEMAS
@@ -295,11 +306,25 @@ export async function executeGeneratePlan(
     apiKey?: string;
   },
 ) {
-  // 1. Rate limiting
   const identifier = options?.identifier ?? "guest";
+  const isGuest = identifier.startsWith("ip:") || identifier === "guest" || identifier === "anon";
+
+  // 1. Rate limiting (short-term burst protection)
   const rate = checkRateLimit(identifier, 25, 10 * 60 * 1000);
   if (!rate.allowed) {
     throw new Error("Rate limit exceeded. Please wait a few moments before generating more plans.");
+  }
+
+  // 2. Server-side Plan Cache lookup (saves Gemini API calls on identical queries)
+  const cacheKey = generatePlanCacheKey(input);
+  const cachedPlan = getCachedPlan(cacheKey);
+  if (cachedPlan) {
+    return {
+      plan: cachedPlan,
+      source: "gemini" as const,
+      model: "gemini-2.5-flash",
+      note: "Served from server plan cache (0 API quota used).",
+    };
   }
 
   const apiKey =
@@ -307,17 +332,53 @@ export async function executeGeneratePlan(
       ? options.apiKey
       : (typeof process !== "undefined" ? process.env?.["GEMINI_API_KEY"] : undefined) || "";
 
-  // If no Gemini API key configured, use rule-based fallback immediately
-  if (!apiKey) {
-    const fallbackPlan = buildPlan(input.prompt, {
+  const getFallbackPlan = () =>
+    buildPlan(input.prompt, {
       budget: input.budget,
       travelers: input.travelers,
       days: input.days,
     });
+
+  // 3. Fallback if no API key configured
+  if (!apiKey) {
     return {
-      plan: fallbackPlan,
+      plan: getFallbackPlan(),
       source: "fallback" as const,
       note: "Built using offline fallback engine (GEMINI_API_KEY not configured).",
+    };
+  }
+
+  // 4. Global daily safety ceiling check (Free tier gives 1,500 RPD, capped at 1,000)
+  if (isGlobalDailyQuotaNear()) {
+    console.warn(
+      "Global daily Gemini quota safety threshold reached (1000 calls). Falling back to buildPlan().",
+    );
+    return {
+      plan: getFallbackPlan(),
+      source: "fallback" as const,
+      note: "Global daily AI limit approached. Generated instantly via offline SmartTrip engine.",
+    };
+  }
+
+  // 5. Temporary Circuit Breaker check (active if recent HTTP 429 encountered)
+  if (isCircuitBreakerActive()) {
+    console.warn("AI service circuit breaker is active. Falling back to buildPlan().");
+    return {
+      plan: getFallbackPlan(),
+      source: "fallback" as const,
+      note: "AI service temporarily rate limited. Generated using offline SmartTrip engine.",
+    };
+  }
+
+  // 6. User and Guest daily allowance limits
+  const dailyQuota = checkDailyQuota(identifier, isGuest);
+  if (!dailyQuota.allowed) {
+    return {
+      plan: getFallbackPlan(),
+      source: "fallback" as const,
+      note: isGuest
+        ? `Daily guest plan allowance reached (${dailyQuota.limit}/day). Sign in for more generations, or continue using our offline engine.`
+        : `Daily plan generation allowance reached for your account (${dailyQuota.limit}/day). Generated using offline SmartTrip engine.`,
     };
   }
 
@@ -331,10 +392,11 @@ export async function executeGeneratePlan(
     currentPlan: input.currentPlan,
   });
 
-  // 2. Call Gemini with 1 retry on validation/API failure
+  // 7. Call Gemini with 1 retry and 429 graceful handling
   let validatedPlan: GeneratedPlan | null = null;
   let attempts = 0;
   const maxAttempts = 2; // initial + 1 retry
+  let encountered429 = false;
 
   while (attempts < maxAttempts && !validatedPlan) {
     attempts++;
@@ -343,25 +405,43 @@ export async function executeGeneratePlan(
       const parsed = generatedPlanSchema.parse(rawJson);
       validatedPlan = normalizePlan(parsed);
     } catch (err) {
-      console.warn(`Gemini API attempt ${attempts} failed:`, err);
+      const errString = err instanceof Error ? err.message : String(err);
+      console.warn(`Gemini API attempt ${attempts} failed:`, errString);
+
+      // Detect HTTP 429 Too Many Requests / Resource Exhausted
+      if (/429|resource_exhausted|quota|rate limit|too many requests/i.test(errString)) {
+        encountered429 = true;
+        tripCircuitBreaker(60_000); // 60-second backoff
+        break; // Fail fast to offline engine
+      }
+
       if (attempts >= maxAttempts) break;
     }
   }
 
-  // 3. Fallback to buildPlan if all attempts fail
+  if (encountered429) {
+    console.warn("Gemini returned 429 Rate Limit. Seamlessly falling back to buildPlan().");
+    return {
+      plan: getFallbackPlan(),
+      source: "fallback" as const,
+      note: "AI service rate limit reached (HTTP 429). Seamlessly generated using offline SmartTrip engine.",
+    };
+  }
+
+  // 8. Fallback to buildPlan if all attempts fail
   if (!validatedPlan) {
     console.warn("All Gemini generation attempts failed. Falling back to buildPlan().");
-    const fallbackPlan = buildPlan(input.prompt, {
-      budget: input.budget,
-      travelers: input.travelers,
-      days: input.days,
-    });
     return {
-      plan: fallbackPlan,
+      plan: getFallbackPlan(),
       source: "fallback" as const,
       note: "Gemini response validation failed; fallback applied.",
     };
   }
+
+  // 9. Successfully generated: increment counters & store in cache
+  incrementDailyQuota(identifier);
+  incrementGlobalDailyCount();
+  setCachedPlan(cacheKey, validatedPlan);
 
   return {
     plan: validatedPlan,

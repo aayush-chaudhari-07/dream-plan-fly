@@ -256,3 +256,88 @@ describe("rate-limiter", () => {
     expect(checkRateLimit(id, 1, 5000).allowed).toBe(true);
   });
 });
+
+describe("Free-Tier Quota Protection & Caching", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    resetRateLimits();
+  });
+
+  it("serves identical queries from server cache without invoking Gemini API again", async () => {
+    mockGenerateContent.mockResolvedValueOnce({
+      text: JSON.stringify(sampleValidPlan),
+    });
+
+    const input = {
+      prompt: "4 days in Goa for 2 people under 25000",
+      budget: 25000,
+      travelers: 2,
+      days: 4,
+    };
+
+    // First call: hits Gemini
+    const firstResult = await executeGeneratePlan(input, {
+      apiKey: "test-api-key",
+      identifier: "user:cached-user-1",
+    });
+    expect(firstResult.source).toBe("gemini");
+    expect(mockGenerateContent).toHaveBeenCalledTimes(1);
+
+    // Second call with identical input: served from server cache
+    const secondResult = await executeGeneratePlan(input, {
+      apiKey: "test-api-key",
+      identifier: "user:cached-user-2",
+    });
+    expect(secondResult.source).toBe("gemini");
+    expect(secondResult.note).toContain("Served from server plan cache");
+    // Gemini API was NOT called a second time
+    expect(mockGenerateContent).toHaveBeenCalledTimes(1);
+  });
+
+  it("gracefully falls back to offline buildPlan() when Gemini returns 429 Too Many Requests", async () => {
+    mockGenerateContent.mockRejectedValueOnce(
+      new Error("GoogleGenerativeAIError: [429 Too Many Requests] RESOURCE_EXHAUSTED"),
+    );
+
+    const result = await executeGeneratePlan(
+      {
+        prompt: "4-day trip to Goa under 20000",
+        budget: 20000,
+      },
+      {
+        apiKey: "test-api-key",
+        identifier: "user:rate-limit-test",
+      },
+    );
+
+    expect(result.source).toBe("fallback");
+    expect(result.note).toContain("HTTP 429");
+    expect(result.plan).toBeDefined();
+    expect(result.plan.title).toContain("Goa");
+  });
+
+  it("enforces guest daily quota limit and falls back to offline engine", async () => {
+    mockGenerateContent.mockResolvedValue({
+      text: JSON.stringify(sampleValidPlan),
+    });
+
+    const guestId = "ip:192.168.1.100";
+
+    // Exhaust guest limit (5 calls)
+    for (let i = 1; i <= 5; i++) {
+      const res = await executeGeneratePlan(
+        { prompt: `Unique prompt ${i} to bypass cache` },
+        { apiKey: "test-api-key", identifier: guestId },
+      );
+      expect(res.source).toBe("gemini");
+    }
+
+    // 6th call exceeds guest quota: fallback without error
+    const exceeded = await executeGeneratePlan(
+      { prompt: "Unique prompt 6 to bypass cache" },
+      { apiKey: "test-api-key", identifier: guestId },
+    );
+    expect(exceeded.source).toBe("fallback");
+    expect(exceeded.note).toContain("Daily guest plan allowance reached");
+  });
+});

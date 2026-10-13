@@ -358,3 +358,52 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `src/routeTree.gen.ts` (regenerated)
   - `MIGRATION_LOG.md` (updated)
 
+---
+
+## [Task 8] - Free Tier Audit, Quota Protection, Supabase Keep-Alive & Free Stack Documentation
+
+- **Goal**: Ensure the entire application operates strictly on permanent free tiers without paid plans, credit card requirements, or expiring trials:
+  1. Audit dependencies, server actions, `.env.example`, and all external API interactions to ensure 100% free permanent tier compatibility.
+  2. Protect free-tier quotas:
+     - **Gemini**: Server-side cache (normalized prompt & parameters), per-user daily limit (15/day), per-IP limit for guests (5/day), global daily counter (1,000/day safety threshold vs 1,500 hard quota) falling back to rule-based `buildPlan()`, circuit breaker pattern, and graceful HTTP 429 error interception with silent fallback.
+     - **Supabase**: Avoid redundant queries for unauthenticated guests, add foreign key and query performance indexes on all `user_id` columns, implement lightweight `/api/keep-alive` endpoint, and schedule a twice-weekly GitHub Actions cron (`0 6 * * 1,4`) to prevent automatic 7-day inactivity project pausing.
+     - **OpenStreetMap tiles**: Proper legal attribution (`© OpenStreetMap contributors`), client-only lazy loading (zero SSR tiles), aggressive client caching (`updateWhenIdle={true}`, `updateWhenZooming={false}`, `keepBuffer={2}`), and zero speculative tile preloading.
+  3. Create `docs/FREE_STACK.md` providing comprehensive service matrices, verifiable official limits, quota fallback behavior, verification links, and a $0 deployment guide.
+  4. Confirm that running locally and deploying to production requires zero credit card input.
+- **Changes**:
+  1. **Quota Protection & Server Cache (`src/server/rate-limiter.ts` & `src/server/generate-plan.ts`)**:
+     - Built `generatePlanCacheKey()` normalizing destination, days, budget, travelers, and interests.
+     - Added server-side TTL caching (`getCachedPlan`, `setCachedPlan`) so identical planning requests return stored results with zero Gemini API quota consumption.
+     - Added tiered daily rate limits: 15 plans/day for authenticated users, 5 plans/day for guests per IP address.
+     - Added global daily safety counter (`isGlobalDailyQuotaNear`, threshold 1,000 requests/day against Google's 1,500 RPD cap).
+     - Added 60-second circuit breaker (`tripCircuitBreaker`) triggered on API errors or 429 rate limit responses.
+     - Handled HTTP 429 errors gracefully by falling back immediately and seamlessly to the offline rule-based `buildPlan()` engine with `source: "SmartTrip Engine"`.
+  2. **Supabase Inactivity Keep-Alive & Query Optimization**:
+     - Created `/api/keep-alive` lightweight API handler in `src/server.ts` and `src/lib/server/trip-actions.ts` (`pingKeepAliveFn`).
+     - Queries a single profile ID (`/rest/v1/profiles?select=id&limit=1`) to register database activity and reset Supabase's 7-day free inactivity pause timer.
+     - Created GitHub Actions workflow `.github/workflows/keep-alive.yml` running Mondays and Thursdays (`0 6 * * 1,4`).
+     - Added indexes on `user_id` across all application tables in `supabase/migrations/004_free_tier_optimizations.sql` (`shared_plans`, `reviews`, `support_tickets`, and compound indexes `(user_id, created_at desc)` for `trips`, `bookings`, `notifications`).
+  3. **OpenStreetMap Tile Caching & Attribution (`src/components/smarttrip/map/LeafletMapClient.tsx`)**:
+     - Verified OSM tile attribution (`&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`).
+     - Enforced `updateWhenIdle={true}` and `updateWhenZooming={false}` to eliminate tile requests during panning and zooming animations.
+     - Configured `keepBuffer={2}` to reuse rendered tiles without fetching fresh tiles.
+     - Dynamic SSR import guarantees zero tile network requests before client-side view mounting.
+  4. **Documentation (`docs/FREE_STACK.md`)**:
+     - Detailed full stack audit matrix: Google Gemini (Free tier), Supabase (Free tier), OpenStreetMap / Leaflet, Google Fonts / Lucide Icons, Unsplash Free URLs, GitHub Actions (2,000 min/mo free), Vercel / Netlify / Render Free hosting.
+     - Explicit verification URLs and documented behavior when limits are reached.
+     - Verified that zero credit cards are needed for local development, testing, and production deployment.
+  5. **Automated Tests (`src/server/__tests__/generate-plan.test.ts`)**:
+     - Added unit tests for plan cache hits (avoiding Gemini API calls), guest daily limits, and graceful HTTP 429 fallback to `buildPlan()`.
+- **Files Touched**:
+  - `src/server/rate-limiter.ts` (updated)
+  - `src/server/generate-plan.ts` (updated)
+  - `src/server.ts` (updated)
+  - `src/lib/server/trip-actions.ts` (updated)
+  - `src/components/smarttrip/map/LeafletMapClient.tsx` (updated)
+  - `supabase/migrations/002_shared_plans.sql` (updated)
+  - `supabase/migrations/003_features.sql` (updated)
+  - `supabase/migrations/004_free_tier_optimizations.sql` (created)
+  - `.github/workflows/keep-alive.yml` (created)
+  - `docs/FREE_STACK.md` (created)
+  - `src/server/__tests__/generate-plan.test.ts` (updated)
+  - `MIGRATION_LOG.md` (updated)
