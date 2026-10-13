@@ -104,8 +104,13 @@ export default function LeafletMapClient({
         className="size-full min-h-[420px] z-10"
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={19}
+          updateWhenIdle={true}
+          updateWhenZooming={false}
+          keepBuffer={2}
+          crossOrigin="anonymous"
         />
 
         <MapController center={center} zoom={zoom} />

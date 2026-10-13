@@ -19,6 +19,7 @@ import {
   toggleWishFn,
   markAllNotificationsReadFn,
   markNotificationReadFn,
+  editFundFn,
 } from "@/lib/server/trip-actions";
 
 export type TripBucket = "Upcoming" | "Past" | "Saved";
@@ -35,6 +36,8 @@ export type StoredTrip = {
 
 export type BookingKind = "flight" | "stay" | "rental" | "rail" | "package";
 
+export type BookingStatus = "pending" | "confirmed" | "cancelled" | "failed";
+
 export type StoredBooking = {
   id: string;
   kind: BookingKind;
@@ -42,6 +45,54 @@ export type StoredBooking = {
   subtitle: string;
   price: number;
   reference: string;
+  createdAt: number;
+  status?: BookingStatus | undefined;
+  idempotencyKey?: string | undefined;
+  travelerDetails?:
+    | {
+        fullName: string;
+        email: string;
+        phone: string;
+        gender?: string | undefined;
+        age?: number | undefined;
+        seatPreference?: string | undefined;
+        notes?: string | undefined;
+      }
+    | undefined;
+  paymentDetails?:
+    | {
+        method: string;
+        transactionRef: string;
+        paymentId?: string | undefined;
+        orderId?: string | undefined;
+        paidAt?: number | undefined;
+        maskedInstrument?: string | undefined;
+        amount?: number | undefined;
+      }
+    | undefined;
+  fareBreakdown?:
+    | {
+        baseFare: number;
+        taxesAndFees: number;
+        convenienceFee: number;
+        discount: number;
+        total: number;
+      }
+    | undefined;
+  origin?: string | undefined;
+  destination?: string | undefined;
+  startDate?: string | undefined;
+  endDate?: string | undefined;
+  inventoryId?: string | undefined;
+  passengersCount?: number | undefined;
+  cabinClass?: string | undefined;
+};
+
+export type FundContribution = {
+  id: string;
+  fundId: string;
+  amount: number;
+  note?: string | undefined;
   createdAt: number;
 };
 
@@ -61,6 +112,7 @@ export type SmartTripState = {
   trips: StoredTrip[];
   bookings: StoredBooking[];
   funds: FutureTrip[];
+  fundContributions: FundContribution[];
   wishlist: string[];
   notifications: StoredNotification[];
   isLoading?: boolean;
@@ -119,6 +171,22 @@ const SEED: SmartTripState = {
   trips: seedTrips(),
   bookings: [],
   funds: initialFutureTrips,
+  fundContributions: [
+    {
+      id: "seed-contrib-1",
+      fundId: "seed-fund-0",
+      amount: 15000,
+      note: "Initial savings deposit",
+      createdAt: Date.now() - 1000 * 60 * 60 * 24 * 7,
+    },
+    {
+      id: "seed-contrib-2",
+      fundId: "seed-fund-0",
+      amount: 25000,
+      note: "Monthly goal contribution",
+      createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
+    },
+  ],
   wishlist: [],
   notifications: SEED_NOTIFICATIONS,
   isLoading: false,
@@ -158,6 +226,7 @@ function hydrate() {
         trips: parsed.trips ?? SEED.trips,
         bookings: parsed.bookings ?? [],
         funds: parsed.funds ?? SEED.funds,
+        fundContributions: parsed.fundContributions ?? SEED.fundContributions,
         wishlist: parsed.wishlist ?? [],
         notifications: parsed.notifications ?? SEED_NOTIFICATIONS,
         isLoading: false,
@@ -213,6 +282,7 @@ export function useSmartTrip(): SmartTripState {
         trips: local.trips,
         bookings: local.bookings,
         funds: local.funds,
+        fundContributions: local.fundContributions,
         wishlist: local.wishlist,
         notifications: local.notifications,
         isLoading: true,
@@ -227,6 +297,7 @@ export function useSmartTrip(): SmartTripState {
         trips: local.trips,
         bookings: local.bookings,
         funds: local.funds,
+        fundContributions: local.fundContributions,
         wishlist: local.wishlist,
         notifications: local.notifications,
         isLoading: false,
@@ -241,6 +312,7 @@ export function useSmartTrip(): SmartTripState {
         trips: query.data.trips,
         bookings: query.data.bookings,
         funds: query.data.funds,
+        fundContributions: local.fundContributions,
         wishlist: query.data.wishlist,
         notifications: query.data.notifications || local.notifications,
         isLoading: false,
@@ -432,11 +504,32 @@ export const smartTrip = {
   },
 
   /* ---------- bookings ---------- */
-  addBooking(input: { kind: BookingKind; title: string; subtitle: string; price: number }) {
+  addBooking(input: {
+    kind: BookingKind;
+    title: string;
+    subtitle: string;
+    price: number;
+    reference?: string | undefined;
+    status?: BookingStatus | undefined;
+    idempotencyKey?: string | undefined;
+    travelerDetails?: StoredBooking["travelerDetails"];
+    paymentDetails?: StoredBooking["paymentDetails"];
+    fareBreakdown?: StoredBooking["fareBreakdown"];
+    origin?: string | undefined;
+    destination?: string | undefined;
+    startDate?: string | undefined;
+    endDate?: string | undefined;
+    inventoryId?: string | undefined;
+    passengersCount?: number | undefined;
+    cabinClass?: string | undefined;
+  }) {
+    const reference =
+      input.reference || "ST" + Math.random().toString(36).slice(2, 8).toUpperCase();
     const booking: StoredBooking = {
       ...input,
       id: id("bkg"),
-      reference: "ST" + Math.random().toString(36).slice(2, 8).toUpperCase(),
+      reference,
+      status: input.status || "confirmed",
       createdAt: Date.now(),
     };
     const label =
@@ -466,7 +559,7 @@ export const smartTrip = {
       read: false,
       type: "booking",
       createdAt: Date.now(),
-      link: "/bookings",
+      link: `/booking-confirmation/${booking.reference}`,
     };
 
     update({
@@ -570,13 +663,57 @@ export const smartTrip = {
     return fund;
   },
 
-  contribute(fundId: string, amount: number) {
-    const patchFunds = (funds: FutureTrip[]) =>
-      funds.map((f) =>
-        f.id === fundId ? { ...f, saved: Math.min(f.target, f.saved + amount) } : f,
-      );
+  contribute(fundId: string, amount: number, note?: string) {
+    const fund = localState.funds.find((f) => f.id === fundId);
+    if (!fund) return { done: false, newSaved: 0, milestone: null as number | null };
 
-    update({ funds: patchFunds(localState.funds) });
+    const oldSaved = fund.saved;
+    const oldPct = Math.floor((oldSaved / fund.target) * 100);
+    const newSaved = Math.min(fund.target, oldSaved + amount);
+    const newPct = Math.floor((newSaved / fund.target) * 100);
+
+    const contrib: FundContribution = {
+      id: id("contrib"),
+      fundId,
+      amount,
+      note: note || "Deposit",
+      createdAt: Date.now(),
+    };
+
+    // Check milestones at 25%, 50%, 75%, 100%
+    const milestones = [25, 50, 75, 100];
+    const newNotifs: StoredNotification[] = [];
+    let crossedMilestone: number | null = null;
+
+    for (const m of milestones) {
+      if (oldPct < m && newPct >= m) {
+        crossedMilestone = m;
+        newNotifs.push({
+          id: id("notif"),
+          title: m === 100 ? "🎉 Dream Goal Reached!" : `🎯 ${m}% Fund Milestone!`,
+          message:
+            m === 100
+              ? `Congratulations! You've reached 100% of your ${fund.name} savings goal (₹${fund.target.toLocaleString("en-IN")}). Pack your bags!`
+              : `You've reached ${m}% of your goal for ${fund.name}! You're ₹${newSaved.toLocaleString("en-IN")} closer to takeoff.`,
+          read: false,
+          type: "milestone",
+          createdAt: Date.now(),
+          link: "/save",
+        });
+      }
+    }
+
+    const patchFunds = (funds: FutureTrip[]) =>
+      funds.map((f) => (f.id === fundId ? { ...f, saved: newSaved } : f));
+
+    update({
+      funds: patchFunds(localState.funds),
+      fundContributions: [contrib, ...localState.fundContributions],
+      notifications:
+        newNotifs.length > 0
+          ? [...newNotifs, ...localState.notifications]
+          : localState.notifications,
+    });
 
     if (currentAuthUser) {
       queryClient.setQueryData(
@@ -594,6 +731,56 @@ export const smartTrip = {
           toast.error("Could not record contribution in cloud.");
         });
     }
+
+    return { done: newSaved >= fund.target, milestone: crossedMilestone, newSaved };
+  },
+
+  editFund(
+    fundId: string,
+    input: {
+      name?: string | undefined;
+      target?: number | undefined;
+      targetDate?: string | undefined;
+      monthsLeft?: number | undefined;
+      travelers?: number | undefined;
+    },
+  ) {
+    const patchFunds = (funds: FutureTrip[]) =>
+      funds.map((f) =>
+        f.id === fundId
+          ? {
+              ...f,
+              ...(input.name !== undefined ? { name: input.name } : {}),
+              ...(input.target !== undefined ? { target: input.target } : {}),
+              ...(input.targetDate !== undefined ? { targetDate: input.targetDate } : {}),
+              ...(input.monthsLeft !== undefined ? { monthsLeft: input.monthsLeft } : {}),
+              ...(input.travelers !== undefined ? { travelers: input.travelers } : {}),
+            }
+          : f,
+      );
+
+    update({ funds: patchFunds(localState.funds) });
+
+    if (currentAuthUser) {
+      queryClient.setQueryData(
+        ["smarttrip-data", currentAuthUser.id],
+        (old: { funds?: FutureTrip[]; [key: string]: unknown } | undefined) => ({
+          ...old,
+          funds: patchFunds(old?.funds || []),
+        }),
+      );
+
+      editFundFn({ data: { fundId, ...input } })
+        .then(() => queryClient.invalidateQueries({ queryKey: ["smarttrip-data"] }))
+        .catch((err) => {
+          console.error("Failed to edit fund on server:", err);
+          toast.error("Could not update fund goal in cloud.");
+        });
+    }
+  },
+
+  getFundContributions(fundId: string): FundContribution[] {
+    return localState.fundContributions.filter((c) => c.fundId === fundId);
   },
 
   removeFund(fundId: string) {
@@ -694,6 +881,11 @@ export const smartTrip = {
   },
 
   reset() {
-    update({ ...SEED, trips: seedTrips(), notifications: SEED_NOTIFICATIONS });
+    update({
+      ...SEED,
+      trips: seedTrips(),
+      fundContributions: SEED.fundContributions,
+      notifications: SEED_NOTIFICATIONS,
+    });
   },
 };

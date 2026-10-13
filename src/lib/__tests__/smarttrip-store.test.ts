@@ -91,6 +91,76 @@ describe("smarttrip-store - actions", () => {
       smartTrip.contribute(fund.id, 20000); // Exceeds target
     });
 
+    it("records deposit contribution history and retrieves contributions for a fund", () => {
+      const fund = smartTrip.addFund({
+        name: "Tokyo Trip",
+        target: 100000,
+      });
+
+      smartTrip.contribute(fund.id, 2500, "First deposit");
+      smartTrip.contribute(fund.id, 5000, "Bonus deposit");
+
+      const history = smartTrip.getFundContributions(fund.id);
+      expect(history.length).toBe(2);
+      expect(history[0]?.amount).toBe(5000);
+      expect(history[0]?.note).toBe("Bonus deposit");
+      expect(history[1]?.amount).toBe(2500);
+      expect(history[1]?.note).toBe("First deposit");
+    });
+
+    it("triggers milestone notifications at 25%, 50%, 75%, and 100%", () => {
+      const fund = smartTrip.addFund({
+        name: "Ladakh Bike Trip",
+        target: 40000,
+      });
+
+      // Reach 25% (10,000)
+      const res25 = smartTrip.contribute(fund.id, 10000);
+      expect(res25.milestone).toBe(25);
+      expect(res25.done).toBe(false);
+
+      // Reach 50% (20,000)
+      const res50 = smartTrip.contribute(fund.id, 10000);
+      expect(res50.milestone).toBe(50);
+      expect(res50.done).toBe(false);
+
+      // Reach 75% (30,000)
+      const res75 = smartTrip.contribute(fund.id, 10000);
+      expect(res75.milestone).toBe(75);
+      expect(res75.done).toBe(false);
+
+      // Reach 100% (40,000)
+      const res100 = smartTrip.contribute(fund.id, 10000);
+      expect(res100.milestone).toBe(100);
+      expect(res100.done).toBe(true);
+
+      const notifs = smartTrip.getState().notifications;
+      const milestoneNotifs = notifs.filter((n) => n.type === "milestone");
+      expect(milestoneNotifs.length).toBeGreaterThanOrEqual(4);
+    });
+
+    it("edits an existing fund goal details", () => {
+      const fund = smartTrip.addFund({
+        name: "Old Name",
+        target: 30000,
+        travelers: 2,
+        monthsLeft: 6,
+      });
+
+      smartTrip.editFund(fund.id, {
+        name: "Updated Himalayan Trek",
+        target: 45000,
+        travelers: 3,
+        monthsLeft: 8,
+      });
+
+      const updated = smartTrip.getState().funds.find((f) => f.id === fund.id);
+      expect(updated?.name).toBe("Updated Himalayan Trek");
+      expect(updated?.target).toBe(45000);
+      expect(updated?.travelers).toBe(3);
+      expect(updated?.monthsLeft).toBe(8);
+    });
+
     it("removes a trip fund by id", () => {
       const fund = smartTrip.addFund({
         name: "Test Fund",
@@ -98,6 +168,8 @@ describe("smarttrip-store - actions", () => {
       });
 
       smartTrip.removeFund(fund.id);
+      const remaining = smartTrip.getState().funds.find((f) => f.id === fund.id);
+      expect(remaining).toBeUndefined();
     });
   });
 

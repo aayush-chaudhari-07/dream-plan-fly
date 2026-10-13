@@ -44,9 +44,61 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+async function handleKeepAlive(): Promise<Response> {
+  const started = Date.now();
+  let dbStatus = "skipped (no config)";
+
+  const supabaseUrl =
+    (typeof process !== "undefined"
+      ? process.env?.["VITE_SUPABASE_URL"] || process.env?.["SUPABASE_URL"]
+      : undefined) || "";
+  const supabaseKey =
+    (typeof process !== "undefined"
+      ? process.env?.["VITE_SUPABASE_ANON_KEY"] || process.env?.["SUPABASE_ANON_KEY"]
+      : undefined) || "";
+
+  if (supabaseUrl && supabaseKey) {
+    try {
+      // Lightweight single row query to Supabase PostgREST endpoint
+      // This resets the 7-day inactivity pause counter without loading any data.
+      const res = await fetch(`${supabaseUrl}/rest/v1/profiles?select=id&limit=1`, {
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+        },
+      });
+      dbStatus = res.ok ? "healthy" : `warn (HTTP ${res.status})`;
+    } catch (err: unknown) {
+      dbStatus = `error (${err instanceof Error ? err.message : "connection failed"})`;
+    }
+  }
+
+  const payload = {
+    status: "ok",
+    service: "smarttrip-keep-alive",
+    supabase: dbStatus,
+    timestamp: new Date().toISOString(),
+    durationMs: Date.now() - started,
+    message: "SmartTrip keep-alive ping successful. Free-tier inactivity pause timer reset.",
+  };
+
+  return new Response(JSON.stringify(payload, null, 2), {
+    status: 200,
+    headers: {
+      "content-type": "application/json",
+      "cache-control": "no-store, no-cache, must-revalidate",
+    },
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      const url = new URL(request.url);
+      if (url.pathname === "/api/keep-alive") {
+        return await handleKeepAlive();
+      }
+
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);

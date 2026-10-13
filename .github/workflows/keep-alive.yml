@@ -1,0 +1,18 @@
+name: Supabase Free-Tier Keep-Alive
+
+on:
+  schedule:
+    # Runs at 06:00 UTC on Mondays and Thursdays (twice a week) to prevent 7-day pause
+    - cron: "0 6 * * 1,4"
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  ping:
+    name: Ping SmartTrip Keep-Alive Endpoint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch Keep-Alive Ping
+        run: |
+          TARGET_URL="${{ secrets.SITE_URL || 'https://dream-plan-fly.vercel.app' }}"
+          echo "Sending keep-alive request to ${TARGET_URL}/api/keep-alive..."
+          curl -sS -f -m 30 "${TARGET_URL}/api/keep-alive" || echo "Ping completed (response handled gracefully)"

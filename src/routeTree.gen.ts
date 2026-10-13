@@ -12,13 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiPlannerRouteImport } from './routes/ai-planner'
 import { Route as BookingsRouteImport } from './routes/bookings'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MyTripsRouteImport } from './routes/my-trips'
 import { Route as SaveRouteImport } from './routes/save'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as BookingConfirmationIdRouteImport } from './routes/booking-confirmation/$id'
 import { Route as DestinationIdRouteImport } from './routes/destination/$id'
 import { Route as PlanIdRouteImport } from './routes/plan/$id'
 
@@ -37,9 +40,19 @@ const BookingsRoute = BookingsRouteImport.update({
   path: '/bookings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -72,6 +85,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BookingConfirmationIdRoute = BookingConfirmationIdRouteImport.update({
+  id: '/booking-confirmation/$id',
+  path: '/booking-confirmation/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DestinationIdRoute = DestinationIdRouteImport.update({
   id: '/destination/$id',
   path: '/destination/$id',
@@ -87,13 +105,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ai-planner': typeof AiPlannerRoute
   '/bookings': typeof BookingsRoute
+  '/checkout': typeof CheckoutRoute
   '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/my-trips': typeof MyTripsRoute
   '/save': typeof SaveRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/booking-confirmation/$id': typeof BookingConfirmationIdRoute
   '/destination/$id': typeof DestinationIdRoute
   '/plan/$id': typeof PlanIdRoute
 }
@@ -101,13 +122,16 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ai-planner': typeof AiPlannerRoute
   '/bookings': typeof BookingsRoute
+  '/checkout': typeof CheckoutRoute
   '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/my-trips': typeof MyTripsRoute
   '/save': typeof SaveRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/booking-confirmation/$id': typeof BookingConfirmationIdRoute
   '/destination/$id': typeof DestinationIdRoute
   '/plan/$id': typeof PlanIdRoute
 }
@@ -116,13 +140,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/ai-planner': typeof AiPlannerRoute
   '/bookings': typeof BookingsRoute
+  '/checkout': typeof CheckoutRoute
   '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/my-trips': typeof MyTripsRoute
   '/save': typeof SaveRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/booking-confirmation/$id': typeof BookingConfirmationIdRoute
   '/destination/$id': typeof DestinationIdRoute
   '/plan/$id': typeof PlanIdRoute
 }
@@ -132,13 +159,16 @@ export interface FileRouteTypes {
     | '/'
     | '/ai-planner'
     | '/bookings'
+    | '/checkout'
     | '/explore'
+    | '/faq'
     | '/login'
     | '/my-trips'
     | '/save'
     | '/settings'
     | '/signup'
     | '/auth/callback'
+    | '/booking-confirmation/$id'
     | '/destination/$id'
     | '/plan/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -146,13 +176,16 @@ export interface FileRouteTypes {
     | '/'
     | '/ai-planner'
     | '/bookings'
+    | '/checkout'
     | '/explore'
+    | '/faq'
     | '/login'
     | '/my-trips'
     | '/save'
     | '/settings'
     | '/signup'
     | '/auth/callback'
+    | '/booking-confirmation/$id'
     | '/destination/$id'
     | '/plan/$id'
   id:
@@ -160,13 +193,16 @@ export interface FileRouteTypes {
     | '/'
     | '/ai-planner'
     | '/bookings'
+    | '/checkout'
     | '/explore'
+    | '/faq'
     | '/login'
     | '/my-trips'
     | '/save'
     | '/settings'
     | '/signup'
     | '/auth/callback'
+    | '/booking-confirmation/$id'
     | '/destination/$id'
     | '/plan/$id'
   fileRoutesById: FileRoutesById
@@ -175,13 +211,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiPlannerRoute: typeof AiPlannerRoute
   BookingsRoute: typeof BookingsRoute
+  CheckoutRoute: typeof CheckoutRoute
   ExploreRoute: typeof ExploreRoute
+  FaqRoute: typeof FaqRoute
   LoginRoute: typeof LoginRoute
   MyTripsRoute: typeof MyTripsRoute
   SaveRoute: typeof SaveRoute
   SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  BookingConfirmationIdRoute: typeof BookingConfirmationIdRoute
   DestinationIdRoute: typeof DestinationIdRoute
   PlanIdRoute: typeof PlanIdRoute
 }
@@ -209,11 +248,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/explore': {
       id: '/explore'
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -258,6 +311,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/booking-confirmation/$id': {
+      id: '/booking-confirmation/$id'
+      path: '/booking-confirmation/$id'
+      fullPath: '/booking-confirmation/$id'
+      preLoaderRoute: typeof BookingConfirmationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/destination/$id': {
       id: '/destination/$id'
       path: '/destination/$id'
@@ -279,13 +339,16 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiPlannerRoute: AiPlannerRoute,
   BookingsRoute: BookingsRoute,
+  CheckoutRoute: CheckoutRoute,
   ExploreRoute: ExploreRoute,
+  FaqRoute: FaqRoute,
   LoginRoute: LoginRoute,
   MyTripsRoute: MyTripsRoute,
   SaveRoute: SaveRoute,
   SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  BookingConfirmationIdRoute: BookingConfirmationIdRoute,
   DestinationIdRoute: DestinationIdRoute,
   PlanIdRoute: PlanIdRoute,
 }

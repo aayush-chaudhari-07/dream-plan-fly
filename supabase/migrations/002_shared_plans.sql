@@ -13,6 +13,7 @@ create table if not exists public.shared_plans (
   created_at timestamptz not null default now()
 );
 
+create index if not exists shared_plans_user_id_idx on public.shared_plans(user_id);
 create index if not exists shared_plans_created_at_idx on public.shared_plans(created_at);
 
 alter table public.shared_plans enable row level security;

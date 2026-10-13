@@ -283,3 +283,196 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `src/routeTree.gen.ts` (regenerated)
   - `MIGRATION_LOG.md` (updated)
 
+---
+
+## [Task 7] - Final Core Features: Quick Travel Guide, Trip Fund Celebration & History, DnD Itinerary Editor, Verified Reviews, Newsletter & FAQ Support System
+
+- **Goal**: Implement all remaining incomplete features from `PROJECT_CONTEXT.md` section 9 and `README.md` section 10:
+  1. Quick Travel Guide: 3-stage accordion ("Before You Go", "During Your Trip", "Smart Tips") with real checklists (documents, health, packing, money, safety, local etiquette). Added to the landing page and plan view.
+  2. Trip Fund: `canvas-confetti` celebration at 100%, deposit contributions stored in `fund_contributions` with history list, edit and delete for funds, amount validation, and notifications at 25%, 50%, 75%, 100%.
+  3. Itinerary Editor: drag-and-drop reordering of activities within and across days in `AiPlanner.tsx` using `@dnd-kit`, with add, edit, delete, Undo toast, and plan persistence.
+  4. Real Reviews: replaced placeholder testimonials with `ReviewsSection.tsx` backed by `reviews` table, restricted to logged-in travelers with confirmed bookings or trips.
+  5. Newsletter Form: footer newsletter form stored in `newsletter_subscribers` table with validation and duplicate protection.
+  6. Support Dock & FAQ: 24/7 Support Dock and comprehensive FAQ page (`/faq`) with searchable categories and ticket submissions stored in `support_tickets` table.
+- **Changes**:
+  1. **Quick Travel Guide (`src/components/smarttrip/QuickTravelGuide.tsx`)**:
+     - 3-stage accordion following README section 10 specifications:
+       - "1. Before You Go" (Pre-Departure): Passports, photo IDs, travel insurance, digital backups, prescription medications, climate/altitude readiness, footwear, universal power adapters.
+       - "2. During Your Trip" (On the Ground): Split card/cash payments, meter negotiation, emergency contacts (112), baggage vigilance, sacred site attire etiquette, photography permission.
+       - "3. Smart Tips & Traveler Hacks" (Pro Secrets): High-turnover local eateries, offline Google Maps, reusable flask refills, sunrise monument timings.
+     - Interactive checkbox state with real-time percentage progress bar, persistent in `localStorage`.
+     - Mounted in `src/routes/index.tsx`, `src/routes/plan/$id.tsx`, and `AiPlanner.tsx`.
+  2. **Trip Fund Enhancements (`src/components/smarttrip/TripFund.tsx` & `src/lib/smarttrip-store.ts`)**:
+     - Integrated `canvas-confetti` celebration burst when fund savings reach 100%.
+     - Deposit history dialog modal displaying all deposits recorded in `fund_contributions`.
+     - Edit Fund dialog to adjust target amount, target date, months left, and traveler count.
+     - Delete Fund confirmation dialog with `smartTrip.removeFund()`.
+     - Validated deposit inputs (₹100 min to ₹1,00,00,000 max; minimum fund target ₹1,000).
+     - Milestone notifications triggered at 25%, 50%, 75%, and 100% saved thresholds.
+  3. **Itinerary Drag-and-Drop Editor (`src/components/smarttrip/ItineraryEditor.tsx` & `AiPlanner.tsx`)**:
+     - Built using `@dnd-kit/core` and `@dnd-kit/sortable` with vertical list strategy, pointer/keyboard sensors, and smooth drag overlay.
+     - Supports dragging activities between days and reordering within the same day.
+     - Inline "+ Add Activity" form for any day.
+     - Inline Edit mode with Save and Cancel for activity descriptions.
+     - Delete activity with immediate Sonner Undo toast (`toast("Activity removed", { action: { label: "Undo", onClick: () => restore() } })`).
+     - Persists edited itineraries to state, `smartTrip`, and `localStorage.setItem("smarttrip.current_plan", ...)`.
+  4. **Verified Traveler Reviews (`src/components/smarttrip/ReviewsSection.tsx`)**:
+     - Created `public.reviews` schema in `supabase/migrations/003_features.sql`.
+     - Server functions `fetchReviewsFn` and `submitReviewFn` in `src/lib/server/trip-actions.ts`.
+     - Server-side verification enforcing that only users with confirmed bookings or saved trips can submit verified reviews.
+     - Star rating picker (1–5), destination input, review headline, detailed comments, and verified badge.
+     - Replaced hardcoded `Testimonials.tsx` on the landing page (`src/routes/index.tsx`).
+  5. **Newsletter Subscription with Duplicate Protection (`src/components/smarttrip/Footer.tsx`)**:
+     - Created `public.newsletter_subscribers` table in `supabase/migrations/003_features.sql`.
+     - Server function `subscribeNewsletterFn` with email normalization and unique constraint duplicate protection.
+     - Connected footer newsletter form with loading state and user feedback.
+  6. **Support Dock & Help Center / FAQ Page (`src/routes/faq.tsx` & `SupportDock.tsx`)**:
+     - Created `public.support_tickets` table in `supabase/migrations/003_features.sql`.
+     - Server function `submitSupportTicketFn` generating unique reference IDs (`#ST-XXXX`).
+     - Help Center & FAQ page at `/faq` with searchable categories (Bookings, AI Planner, Trip Fund, Safety & Emergency, Payments & Refunds).
+     - Direct customer support ticket submission form with reference copy button.
+     - 24/7 Traveler Emergency Hotline banner (+91 1800-762-788).
+     - SupportDock updated with links to `/faq` and emergency contact modal.
+  7. **Verification & Tests**:
+     - 45 passing unit tests across `smarttrip-store.test.ts`, `generate-plan.test.ts`, `trip-plan.test.ts`, and `InteractiveMap.test.ts`.
+     - `tsc --noEmit` typecheck passes with 0 errors.
+     - `eslint .` passes with 0 errors and 0 warnings.
+     - `vite build` passes and compiles server/client production bundles cleanly.
+- **Files Touched**:
+  - `package.json` (installed `canvas-confetti`, `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`, `@types/canvas-confetti`)
+  - `package-lock.json`
+  - `supabase/migrations/003_features.sql` (created)
+  - `src/lib/server/trip-actions.ts` (added reviews, newsletter, and support ticket server functions)
+  - `src/lib/smarttrip-store.ts` (added contributions history, editFund, removeFund, and milestone notifications)
+  - `src/components/smarttrip/QuickTravelGuide.tsx` (created)
+  - `src/components/smarttrip/TripFund.tsx` (added confetti celebration, deposit history, edit and delete dialogs)
+  - `src/components/smarttrip/ItineraryEditor.tsx` (created)
+  - `src/components/smarttrip/AiPlanner.tsx` (integrated ItineraryEditor, plan persistence, and QuickTravelGuide)
+  - `src/components/smarttrip/ReviewsSection.tsx` (created)
+  - `src/routes/index.tsx` (mounted QuickTravelGuide and ReviewsSection)
+  - `src/routes/plan/$id.tsx` (mounted QuickTravelGuide)
+  - `src/components/smarttrip/Footer.tsx` (connected newsletter subscription and FAQ links)
+  - `src/routes/faq.tsx` (created)
+  - `src/components/smarttrip/SupportDock.tsx` (updated with FAQ link and contact modal)
+  - `src/lib/__tests__/smarttrip-store.test.ts` (added milestone and fund management tests)
+  - `src/routeTree.gen.ts` (regenerated)
+  - `MIGRATION_LOG.md` (updated)
+
+---
+
+## [Task 8] - Free Tier Audit, Quota Protection, Supabase Keep-Alive & Free Stack Documentation
+
+- **Goal**: Ensure the entire application operates strictly on permanent free tiers without paid plans, credit card requirements, or expiring trials:
+  1. Audit dependencies, server actions, `.env.example`, and all external API interactions to ensure 100% free permanent tier compatibility.
+  2. Protect free-tier quotas:
+     - **Gemini**: Server-side cache (normalized prompt & parameters), per-user daily limit (15/day), per-IP limit for guests (5/day), global daily counter (1,000/day safety threshold vs 1,500 hard quota) falling back to rule-based `buildPlan()`, circuit breaker pattern, and graceful HTTP 429 error interception with silent fallback.
+     - **Supabase**: Avoid redundant queries for unauthenticated guests, add foreign key and query performance indexes on all `user_id` columns, implement lightweight `/api/keep-alive` endpoint, and schedule a twice-weekly GitHub Actions cron (`0 6 * * 1,4`) to prevent automatic 7-day inactivity project pausing.
+     - **OpenStreetMap tiles**: Proper legal attribution (`© OpenStreetMap contributors`), client-only lazy loading (zero SSR tiles), aggressive client caching (`updateWhenIdle={true}`, `updateWhenZooming={false}`, `keepBuffer={2}`), and zero speculative tile preloading.
+  3. Create `docs/FREE_STACK.md` providing comprehensive service matrices, verifiable official limits, quota fallback behavior, verification links, and a $0 deployment guide.
+  4. Confirm that running locally and deploying to production requires zero credit card input.
+- **Changes**:
+  1. **Quota Protection & Server Cache (`src/server/rate-limiter.ts` & `src/server/generate-plan.ts`)**:
+     - Built `generatePlanCacheKey()` normalizing destination, days, budget, travelers, and interests.
+     - Added server-side TTL caching (`getCachedPlan`, `setCachedPlan`) so identical planning requests return stored results with zero Gemini API quota consumption.
+     - Added tiered daily rate limits: 15 plans/day for authenticated users, 5 plans/day for guests per IP address.
+     - Added global daily safety counter (`isGlobalDailyQuotaNear`, threshold 1,000 requests/day against Google's 1,500 RPD cap).
+     - Added 60-second circuit breaker (`tripCircuitBreaker`) triggered on API errors or 429 rate limit responses.
+     - Handled HTTP 429 errors gracefully by falling back immediately and seamlessly to the offline rule-based `buildPlan()` engine with `source: "SmartTrip Engine"`.
+  2. **Supabase Inactivity Keep-Alive & Query Optimization**:
+     - Created `/api/keep-alive` lightweight API handler in `src/server.ts` and `src/lib/server/trip-actions.ts` (`pingKeepAliveFn`).
+     - Queries a single profile ID (`/rest/v1/profiles?select=id&limit=1`) to register database activity and reset Supabase's 7-day free inactivity pause timer.
+     - Created GitHub Actions workflow `.github/workflows/keep-alive.yml` running Mondays and Thursdays (`0 6 * * 1,4`).
+     - Added indexes on `user_id` across all application tables in `supabase/migrations/004_free_tier_optimizations.sql` (`shared_plans`, `reviews`, `support_tickets`, and compound indexes `(user_id, created_at desc)` for `trips`, `bookings`, `notifications`).
+  3. **OpenStreetMap Tile Caching & Attribution (`src/components/smarttrip/map/LeafletMapClient.tsx`)**:
+     - Verified OSM tile attribution (`&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`).
+     - Enforced `updateWhenIdle={true}` and `updateWhenZooming={false}` to eliminate tile requests during panning and zooming animations.
+     - Configured `keepBuffer={2}` to reuse rendered tiles without fetching fresh tiles.
+     - Dynamic SSR import guarantees zero tile network requests before client-side view mounting.
+  4. **Documentation (`docs/FREE_STACK.md`)**:
+     - Detailed full stack audit matrix: Google Gemini (Free tier), Supabase (Free tier), OpenStreetMap / Leaflet, Google Fonts / Lucide Icons, Unsplash Free URLs, GitHub Actions (2,000 min/mo free), Vercel / Netlify / Render Free hosting.
+     - Explicit verification URLs and documented behavior when limits are reached.
+     - Verified that zero credit cards are needed for local development, testing, and production deployment.
+  5. **Automated Tests (`src/server/__tests__/generate-plan.test.ts`)**:
+     - Added unit tests for plan cache hits (avoiding Gemini API calls), guest daily limits, and graceful HTTP 429 fallback to `buildPlan()`.
+- **Files Touched**:
+  - `src/server/rate-limiter.ts` (updated)
+  - `src/server/generate-plan.ts` (updated)
+  - `src/server.ts` (updated)
+  - `src/lib/server/trip-actions.ts` (updated)
+  - `src/components/smarttrip/map/LeafletMapClient.tsx` (updated)
+  - `supabase/migrations/002_shared_plans.sql` (updated)
+  - `supabase/migrations/003_features.sql` (updated)
+  - `supabase/migrations/004_free_tier_optimizations.sql` (created)
+  - `.github/workflows/keep-alive.yml` (created)
+  - `docs/FREE_STACK.md` (created)
+  - `src/server/__tests__/generate-plan.test.ts` (updated)
+  - `MIGRATION_LOG.md` (updated)
+
+---
+
+## [Task 9] - Complete Free-Tool Demo Booking Engine, Payment Adapter, Checkout & E-Ticket
+
+- **Goal**: Build the complete end-to-end booking experience using 100% free tools and databases, functioning as a clearly labeled, production-grade DEMO:
+  1. **Data Layer (No Paid APIs)**:
+     - Programmatic flight generator (`src/data/flight-generator.ts`) generating 6–10 realistic options/day for any airport pair using deterministic seeded randomness (Mulberry32 PRNG). Returns consistent results for identical dates and routes with real airline fleets, flight schedules, stops, and dynamic fares.
+     - Curated OpenFlights airports dataset (`src/data/airports.ts`) with zero runtime external API calls.
+     - Indian inventory datasets (`src/data/inventory-data.ts`) with realistic stays, rentals, Vande Bharat/transit, and holiday packages.
+     - Database migration (`supabase/migrations/005_booking_system.sql`) and seed script (`supabase/seed.sql`).
+  2. **Search UX & Booking Discovery**:
+     - Upgraded `QuickBooking.tsx` and `/bookings` route (`src/routes/bookings.tsx`) with `AirportCombobox` autocomplete, date pickers, passenger counter, and cabin class selector.
+     - Multi-criteria filter sidebar: price slider, stops filter, departure time-of-day filters, and star ratings.
+     - Sorting controls (cheapest, fastest, earliest departure, rating) and empty/loading feedback states.
+  3. **Payment Adapter & Security**:
+     - Provider interface (`PaymentProvider`) in `src/server/payments/payment-types.ts`.
+     - Built-in `DemoPayProvider` (`src/server/payments/demo-provider.ts`) with signed HMAC-SHA256 server verification (`DEMO_PAY_SECRET`), test cards (`DEMO_TEST_CARDS`), simulated outcomes, and simulated refunds.
+     - Strict card security validator (`src/server/payments/card-validator.ts`): rejects real credit cards with an explicit safety message; never stores or logs card data.
+     - Optional `RazorpayTestProvider` (`src/server/payments/razorpay-provider.ts`): activated only when test keys exist in env; disabled by default.
+     - Realistic payment modal (`src/components/smarttrip/booking/DemoPaymentModal.tsx`) with Card, UPI, and Net Banking tabs.
+  4. **Checkout Experience (`/checkout`)**:
+     - `/checkout` route (`src/routes/checkout.tsx`) with React Hook Form + Zod traveler validation.
+     - Complete fare breakdown summary with 18% GST taxes, airport fees, convenience fees, and promo discounts.
+     - Prominent amber banner: "Demo booking, no real ticket or charge".
+     - Idempotency key generation preventing duplicate bookings on double clicks.
+  5. **Booking Lifecycle & State Management**:
+     - Statuses: `pending`, `confirmed`, `cancelled`, `failed`.
+     - Deterministic booking reference generator (`STFL...`, `STHT...`, etc.).
+     - Typed server functions in `src/lib/server/booking-actions.ts`.
+     - Automatic creation of linked `Upcoming` trip, booking notification, and confirmation redirect.
+  6. **Client-Side E-Ticket Voucher**:
+     - `ETicketView.tsx` (`src/components/smarttrip/booking/ETicketView.tsx`) with client-side QR code generator (`qrcode`), traveler manifest, print stylesheet (`@media print`), and diagonal "DEMO TICKET - NOT VALID FOR TRAVEL" watermark.
+     - Confirmation page at `/booking-confirmation/$id` (`src/routes/booking-confirmation/$id.tsx`) and e-ticket buttons on `/my-trips`.
+  7. **Cancellation & 100% Refund Simulation**:
+     - Cancellation modal with refund policy explanation, automated status update (`cancelled`), linked trip removal, and refund notification.
+  8. **Testing & QA**:
+     - Vitest unit tests in `src/server/payments/__tests__/demo-provider.test.ts`, `src/data/__tests__/flight-generator.test.ts`, and `src/lib/server/__tests__/booking-lifecycle.test.ts`.
+     - Playwright-ready `data-testid` attributes across checkout inputs and booking cards.
+     - Verified lint (0 errors), typecheck (0 errors), tests (67 passed), and build (clean SSR/Nitro bundle).
+- **Files Touched**:
+  - `package.json` (installed qrcode, @types/qrcode)
+  - `src/data/airports.ts` (created)
+  - `src/data/flight-generator.ts` (created)
+  - `src/data/inventory-data.ts` (created)
+  - `supabase/migrations/005_booking_system.sql` (created)
+  - `supabase/seed.sql` (created)
+  - `src/server/payments/payment-types.ts` (created)
+  - `src/server/payments/card-validator.ts` (created)
+  - `src/server/payments/demo-provider.ts` (created)
+  - `src/server/payments/razorpay-provider.ts` (created)
+  - `src/server/payments/index.ts` (created)
+  - `src/lib/server/booking-actions.ts` (created)
+  - `src/lib/smarttrip-store.ts` (updated)
+  - `src/components/ui/label.tsx` (created)
+  - `src/components/smarttrip/booking/AirportCombobox.tsx` (created)
+  - `src/components/smarttrip/booking/DemoPaymentModal.tsx` (created)
+  - `src/components/smarttrip/booking/ETicketView.tsx` (created)
+  - `src/components/smarttrip/QuickBooking.tsx` (updated)
+  - `src/routes/bookings.tsx` (updated)
+  - `src/routes/checkout.tsx` (created)
+  - `src/routes/booking-confirmation/$id.tsx` (created)
+  - `src/routes/my-trips.tsx` (updated)
+  - `src/routeTree.gen.ts` (regenerated)
+  - `src/server/payments/__tests__/demo-provider.test.ts` (created)
+  - `src/data/__tests__/flight-generator.test.ts` (created)
+  - `src/lib/server/__tests__/booking-lifecycle.test.ts` (created)
+  - `.env.example` (updated)
+  - `MIGRATION_LOG.md` (updated)

@@ -298,25 +298,45 @@ function MyTripsPage() {
               {bookings.map((b) => (
                 <div key={b.id} className="flex flex-wrap items-center justify-between gap-3 p-5">
                   <div>
-                    <p className="font-display font-bold">{b.title}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-display font-bold">{b.title}</p>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                          b.status === "cancelled"
+                            ? "bg-destructive/10 text-destructive"
+                            : "bg-emerald-500/10 text-emerald-500"
+                        }`}
+                      >
+                        {b.status === "cancelled" ? "Cancelled" : "Confirmed"}
+                      </span>
+                    </div>
                     <p className="text-sm text-muted-foreground">{b.subtitle}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Ref {b.reference}</p>
+                    <p className="mt-1 text-xs font-mono text-muted-foreground">
+                      Ref #{b.reference}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     <span className="font-display text-lg font-bold text-primary">
                       {inr(b.price)}
                     </span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="rounded-full text-destructive"
-                      onClick={() => {
-                        smartTrip.cancelBooking(b.id);
-                        toast.message("Booking cancelled", { description: b.title });
-                      }}
-                    >
-                      Cancel
+                    <Button variant="outline" size="sm" asChild className="rounded-full text-xs">
+                      <Link to="/booking-confirmation/$id" params={{ id: b.reference }}>
+                        View E-Ticket
+                      </Link>
                     </Button>
+                    {b.status !== "cancelled" && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-full text-destructive text-xs"
+                        onClick={() => {
+                          smartTrip.cancelBooking(b.id);
+                          toast.message("Booking cancelled", { description: b.title });
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
