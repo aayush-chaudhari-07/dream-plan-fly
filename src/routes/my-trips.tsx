@@ -1,10 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
+  AlertCircle,
   CalendarDays,
   CheckCircle2,
   Clock,
   Heart,
   Plane,
+  RefreshCw,
   Sparkles,
   Star,
   Ticket,
@@ -13,6 +16,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/lib/auth-context";
 import { Footer } from "@/components/smarttrip/Footer";
 import { Navbar } from "@/components/smarttrip/Navbar";
 import { PageHeader } from "@/components/smarttrip/PageHeader";
@@ -161,7 +166,16 @@ function EmptyBucket({ bucket }: { bucket: TripBucket }) {
 }
 
 function MyTripsPage() {
-  const { trips, bookings, funds, wishlist } = useSmartTrip();
+  const { user, isLoading: authLoading, isConfigured } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isConfigured && !authLoading && !user) {
+      navigate({ to: "/login", search: { redirect: "/my-trips" } });
+    }
+  }, [isConfigured, authLoading, user, navigate]);
+
+  const { trips, bookings, funds, wishlist, isLoading, isError, refetch } = useSmartTrip();
   const wished = destinations.filter((d) => wishlist.includes(d.id));
   const totalSaved = funds.reduce((s, f) => s + f.saved, 0);
   const bookingTotal = bookings.reduce((s, b) => s + b.price, 0);
@@ -172,6 +186,83 @@ function MyTripsPage() {
     { icon: Wallet, label: "Saved in funds", value: inr(totalSaved) },
     { icon: Heart, label: "Wishlisted", value: String(wished.length) },
   ];
+
+  if (authLoading || (isConfigured && isLoading)) {
+    return (
+      <>
+        <Navbar />
+        <PageHeader
+          title="My Trips"
+          subtitle="Your upcoming adventures, past memories and saved plans — all in one dashboard."
+        />
+        <main className="container-page py-12">
+          {/* Skeleton Stats */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="surface-card flex items-center gap-3 p-5">
+                <Skeleton className="size-11 rounded-2xl" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-6 w-20" />
+                  <Skeleton className="h-3.5 w-28" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Skeleton Trips Section */}
+          <div className="mt-12 space-y-4">
+            <Skeleton className="h-8 w-48 rounded-xl" />
+            <Skeleton className="h-4 w-72 rounded-lg" />
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="surface-card overflow-hidden rounded-3xl">
+                  <Skeleton className="h-48 w-full rounded-none" />
+                  <div className="p-5 space-y-3">
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-4 w-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if (isError) {
+    return (
+      <>
+        <Navbar />
+        <PageHeader
+          title="My Trips"
+          subtitle="Your upcoming adventures, past memories and saved plans — all in one dashboard."
+        />
+        <main className="container-page py-20 text-center">
+          <div className="surface-card max-w-md mx-auto p-8 rounded-3xl shadow-elevated">
+            <AlertCircle className="size-10 text-destructive mx-auto mb-3" />
+            <h2 className="font-display text-xl font-bold text-foreground">
+              Failed to Load Dashboard
+            </h2>
+            <p className="text-sm text-muted-foreground mt-2 mb-6">
+              There was an issue fetching your trips and bookings from the server.
+            </p>
+            <Button
+              variant="hero"
+              size="default"
+              onClick={() => refetch?.()}
+              className="rounded-full gap-2"
+            >
+              <RefreshCw className="size-4" /> Try Again
+            </Button>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>

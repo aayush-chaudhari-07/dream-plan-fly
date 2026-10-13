@@ -17,7 +17,11 @@ export type GeneratedPlan = {
   carbonKg: number;
 };
 
-export type PlanOptions = { budget?: number; travelers?: number; days?: number };
+export type PlanOptions = {
+  budget?: number | undefined;
+  travelers?: number | undefined;
+  days?: number | undefined;
+};
 
 export function buildPlan(prompt: string, opts: PlanOptions = {}): GeneratedPlan {
   const p = prompt.toLowerCase();

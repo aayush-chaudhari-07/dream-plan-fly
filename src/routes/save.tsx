@@ -1,9 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Footer } from "@/components/smarttrip/Footer";
 import { Navbar } from "@/components/smarttrip/Navbar";
 import { PageHeader } from "@/components/smarttrip/PageHeader";
 import { SupportDock } from "@/components/smarttrip/SupportDock";
 import { TripFund } from "@/components/smarttrip/TripFund";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/save")({
   head: () => ({
@@ -28,6 +30,15 @@ export const Route = createFileRoute("/save")({
 });
 
 function SavePage() {
+  const { user, isLoading: authLoading, isConfigured } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isConfigured && !authLoading && !user) {
+      navigate({ to: "/login", search: { redirect: "/save" } });
+    }
+  }, [isConfigured, authLoading, user, navigate]);
+
   return (
     <>
       <Navbar />

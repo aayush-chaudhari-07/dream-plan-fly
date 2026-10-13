@@ -386,3 +386,48 @@
     transform: none;
   }
 }
+
+/* =========================================================================
+   LEAFLET MAP CUSTOM STYLES
+   ========================================================================= */
+.leaflet-container {
+  font-family: inherit;
+  border-radius: 1.5rem;
+  z-index: 10;
+}
+
+.leaflet-popup-content-wrapper {
+  background-color: var(--card);
+  color: var(--card-foreground);
+  border-radius: 1rem;
+  padding: 0.25rem;
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.15),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+}
+
+.leaflet-popup-tip {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+}
+
+.leaflet-popup-content {
+  margin: 0.75rem;
+  line-height: 1.4;
+}
+
+.smarttrip-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+}
+
+.smarttrip-pin:hover {
+  transform: scale(1.18);
+  z-index: 999;
+}

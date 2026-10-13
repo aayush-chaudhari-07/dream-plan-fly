@@ -5,6 +5,7 @@ import { ExploreDestinations } from "@/components/smarttrip/ExploreDestinations"
 import { HowItWorks } from "@/components/smarttrip/HowItWorks";
 import { EscapeHills } from "@/components/smarttrip/EscapeHills";
 import { AiPlanner } from "@/components/smarttrip/AiPlanner";
+import { InteractiveMap } from "@/components/smarttrip/InteractiveMap";
 import { TripFund } from "@/components/smarttrip/TripFund";
 import { Testimonials } from "@/components/smarttrip/Testimonials";
 import { TravelSafe } from "@/components/smarttrip/TravelSafe";
@@ -45,6 +46,7 @@ function Index() {
         <HowItWorks />
         <EscapeHills />
         <AiPlanner />
+        <InteractiveMap />
         <TripFund />
         <Testimonials />
         <TravelSafe />
