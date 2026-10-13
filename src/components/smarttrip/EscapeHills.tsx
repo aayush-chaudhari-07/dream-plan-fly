@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Thermometer } from "lucide-react";
 import { hillStations } from "@/data/travel";
 import { Reveal, SectionHeading } from "./Reveal";
@@ -41,26 +42,28 @@ export function EscapeHills() {
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {hillStations.map((h, i) => (
             <Reveal key={h.name} delay={i * 60}>
-              <article className="group relative h-64 overflow-hidden rounded-3xl shadow-soft transition-transform duration-500 hover:-translate-y-1.5">
-                <img
-                  src={h.image}
-                  alt={`${h.name}, ${h.state}`}
-                  loading="lazy"
-                  width={1024}
-                  height={768}
-                  className="size-full object-cover transition-transform duration-[900ms] group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-transparent" />
-                <div className="absolute inset-x-4 bottom-4 text-primary-foreground">
-                  <p className="font-display text-xl font-bold">{h.name}</p>
-                  <div className="mt-1 flex items-center justify-between text-xs opacity-90">
-                    <span>{h.state}</span>
-                    <span className="flex items-center gap-1">
-                      <Thermometer className="size-3.5" /> {h.temp}
-                    </span>
+              <Link to="/destination/$id" params={{ id: h.id }} className="block">
+                <article className="group relative h-64 overflow-hidden rounded-3xl shadow-soft transition-transform duration-500 hover:-translate-y-1.5 cursor-pointer">
+                  <img
+                    src={h.image}
+                    alt={`${h.name}, ${h.state}`}
+                    loading="lazy"
+                    width={1024}
+                    height={768}
+                    className="size-full object-cover transition-transform duration-[900ms] group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-transparent" />
+                  <div className="absolute inset-x-4 bottom-4 text-primary-foreground">
+                    <p className="font-display text-xl font-bold group-hover:underline">{h.name}</p>
+                    <div className="mt-1 flex items-center justify-between text-xs opacity-90">
+                      <span>{h.state}</span>
+                      <span className="flex items-center gap-1">
+                        <Thermometer className="size-3.5" /> {h.temp}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </article>
+                </article>
+              </Link>
             </Reveal>
           ))}
         </div>

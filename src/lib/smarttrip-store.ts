@@ -3,8 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import type { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
-import { images, initialFutureTrips, myTrips, type FutureTrip } from "@/data/travel";
-import type { GeneratedPlan } from "@/lib/trip-plan";
+import { images, initialFutureTrips, myTrips, type FutureTrip, type MapPlace } from "@/data/travel";
+import { buildPlan, type GeneratedPlan } from "@/lib/trip-plan";
 import { queryClient } from "@/lib/query-client";
 import {
   fetchUserDataFn,
@@ -258,6 +258,68 @@ export const smartTrip = {
     }
 
     return trip;
+  },
+
+  addPlaceToTrip(place: MapPlace): StoredTrip {
+    // 1. Look for matching non-past trip
+    let targetTrip = localState.trips.find(
+      (t) =>
+        t.bucket !== "Past" &&
+        (t.name.toLowerCase().includes(place.destinationId.toLowerCase()) ||
+          (t.plan?.title &&
+            t.plan.title.toLowerCase().includes(place.destinationId.toLowerCase()))),
+    );
+
+    if (!targetTrip) {
+      targetTrip = localState.trips.find((t) => t.bucket !== "Past") || localState.trips[0];
+    }
+
+    if (targetTrip) {
+      const updatedStatus = [...new Set([...targetTrip.status, `📍 Added: ${place.name}`])];
+      let updatedPlan = targetTrip.plan;
+      if (updatedPlan) {
+        if (place.type === "Hotels") {
+          updatedPlan = {
+            ...updatedPlan,
+            stays: [...new Set([...updatedPlan.stays, place.name])],
+          };
+        } else if (place.type === "Restaurants") {
+          updatedPlan = {
+            ...updatedPlan,
+            food: [...new Set([...updatedPlan.food, place.name])],
+          };
+        } else {
+          const firstDay = updatedPlan.days[0];
+          if (firstDay) {
+            firstDay.items = [...new Set([...firstDay.items, `⭐ Visit ${place.name}`])];
+          }
+          updatedPlan = {
+            ...updatedPlan,
+            tips: [...new Set([...updatedPlan.tips, `Recommended: ${place.name}`])],
+          };
+        }
+      }
+
+      const modifiedTrip: StoredTrip = {
+        ...targetTrip,
+        status: updatedStatus,
+        ...(updatedPlan ? { plan: updatedPlan } : {}),
+      };
+
+      const patchTrips = (trips: StoredTrip[]) =>
+        trips.map((t) => (t.id === targetTrip!.id ? modifiedTrip : t));
+
+      update({ trips: patchTrips(localState.trips) });
+
+      if (currentAuthUser && updatedPlan) {
+        savePlanFn({ data: updatedPlan }).catch(() => {});
+      }
+
+      return modifiedTrip;
+    }
+
+    const newPlan = buildPlan(`Trip to ${place.name} in ${place.destinationId}`);
+    return smartTrip.savePlan(newPlan);
   },
 
   moveTrip(tripId: string, bucket: TripBucket) {

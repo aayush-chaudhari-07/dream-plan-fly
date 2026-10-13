@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { ArrowRight, Heart, Star } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,11 @@ export function DestinationCard({
 }) {
   return (
     <article className="card-hover group relative w-[300px] shrink-0 overflow-hidden rounded-3xl border border-border bg-card shadow-soft sm:w-auto">
-      <div className="relative h-52 overflow-hidden">
+      <Link
+        to="/destination/$id"
+        params={{ id: d.id }}
+        className="block relative h-52 overflow-hidden"
+      >
         <img
           src={d.image}
           alt={`${d.name}, ${d.region}`}
@@ -31,8 +36,12 @@ export function DestinationCard({
         <button
           type="button"
           aria-label="Add to wishlist"
-          onClick={() => onWish?.(d.id)}
-          className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-card/85 backdrop-blur transition-transform hover:scale-110"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onWish?.(d.id);
+          }}
+          className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-card/85 backdrop-blur transition-transform hover:scale-110 z-10"
         >
           <Heart
             className={cn(
@@ -42,13 +51,13 @@ export function DestinationCard({
           />
         </button>
         <div className="absolute bottom-3 left-4 text-primary-foreground">
-          <p className="font-display text-lg font-bold">{d.name}</p>
+          <p className="font-display text-lg font-bold group-hover:underline">{d.name}</p>
           <p className="text-xs opacity-85">{d.region}</p>
         </div>
         <span className="absolute right-3 bottom-3 flex items-center gap-1 rounded-full bg-card/90 px-2.5 py-1 text-xs font-semibold">
           <Star className="size-3 fill-sunset text-sunset" /> {d.rating}
         </span>
-      </div>
+      </Link>
       <div className="p-4">
         <p className="min-h-10 text-sm text-muted-foreground">{d.blurb}</p>
         <div className="mt-4 flex items-center justify-between">
@@ -59,10 +68,12 @@ export function DestinationCard({
           <Button
             variant="soft"
             size="sm"
+            asChild
             className="rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100 focus-visible:opacity-100"
-            onClick={() => toast(`${d.name}`, { description: d.blurb })}
           >
-            Explore <ArrowRight />
+            <Link to="/destination/$id" params={{ id: d.id }}>
+              Explore <ArrowRight className="size-3.5" />
+            </Link>
           </Button>
         </div>
       </div>

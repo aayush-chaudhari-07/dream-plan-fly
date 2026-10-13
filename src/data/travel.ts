@@ -16,6 +16,17 @@ export type Destination = {
   rating: number;
   blurb: string;
   image: string;
+  lat: number;
+  lng: number;
+  description: string;
+  weather: {
+    temp: string;
+    condition: string;
+    season: string;
+    summary: string;
+  };
+  bestTimeToVisit: string;
+  highlights: string[];
 };
 
 export const destinations: Destination[] = [
@@ -28,6 +39,23 @@ export const destinations: Destination[] = [
     rating: 4.8,
     blurb: "Snow peaks, pine valleys and riverside cafés in the Kullu valley.",
     image: manali,
+    lat: 32.2432,
+    lng: 77.1892,
+    description:
+      "Perched at 2,050 meters on the banks of the Beas River, Manali is India's beloved mountain haven. Surrounded by cedar forests, roaring rivers, and snow-dusted Himalayan peaks, it offers everything from tranquil apple orchards in Old Manali to high-adrenaline winter sports in Solang and Rohtang.",
+    weather: {
+      temp: "8°C – 18°C",
+      condition: "Crisp Alpine Sunshine",
+      season: "Spring / Early Summer",
+      summary: "Pleasant days with brisk mountain evenings. Carry woolens and windcheaters.",
+    },
+    bestTimeToVisit: "March to June for pleasant weather; December to February for snow sports.",
+    highlights: [
+      "Solang Valley Adventure",
+      "Hadimba Temple",
+      "Old Manali Cafes",
+      "Jogini Waterfalls",
+    ],
   },
   {
     id: "goa",
@@ -38,6 +66,24 @@ export const destinations: Destination[] = [
     rating: 4.7,
     blurb: "Sun-soaked shacks, Portuguese lanes and long slow sunsets.",
     image: goa,
+    lat: 15.4909,
+    lng: 73.8278,
+    description:
+      "A golden strip on the Konkan coast where Portuguese heritage blends effortlessly with bohemian beach culture. Famous for its palm-fringed shorelines, centuries-old cathedrals, vibrant flea markets, beachside shacks, and rich seafood curries.",
+    weather: {
+      temp: "25°C – 32°C",
+      condition: "Sunny Coastal Breeze",
+      season: "Tropical Winter",
+      summary:
+        "Warm sunlit days and balmy coastal evenings. Light cotton clothing and sunscreen are essential.",
+    },
+    bestTimeToVisit: "November to February for beach shacks, clear waters, and open-air nightlife.",
+    highlights: [
+      "Aguada Fort",
+      "Anjuna & Vagator Cliffs",
+      "Grande Island Scuba",
+      "Fontainhas Heritage Quarter",
+    ],
   },
   {
     id: "kashmir",
@@ -48,6 +94,20 @@ export const destinations: Destination[] = [
     rating: 4.9,
     blurb: "Shikara rides on Dal Lake with the Pir Panjal on the horizon.",
     image: kashmir,
+    lat: 34.0837,
+    lng: 74.7973,
+    description:
+      "Revered as 'Paradise on Earth', Kashmir mesmerizes with mirror-like alpine lakes, cedar-lined meadows, and snow-capped Pir Panjal peaks. Experience timeless wooden houseboats on Dal Lake, the alpine flowers of Gulmarg, and the saffron fields of Pampore.",
+    weather: {
+      temp: "6°C – 16°C",
+      condition: "Cool Mountain Air",
+      season: "Spring Bloom / Autumn",
+      summary:
+        "Crisp air with chilled nights. Warm layers, thermals, and pashmina shawls recommended.",
+    },
+    bestTimeToVisit:
+      "April to October for lush flower valleys; December to March for powdery snow in Gulmarg.",
+    highlights: ["Dal Lake Shikara", "Gulmarg Gondola", "Betaab Valley", "Mughal Terraced Gardens"],
   },
   {
     id: "kyoto",
@@ -58,6 +118,25 @@ export const destinations: Destination[] = [
     rating: 4.9,
     blurb: "Temple gardens, sakura streets and impossibly good ramen.",
     image: japan,
+    lat: 35.0116,
+    lng: 135.7681,
+    description:
+      "The cultural soul of Japan, Kyoto boasts over 2,000 Buddhist temples and Shinto shrines. From the vermilion torii gates of Fushimi Inari to the swaying Arashiyama bamboo forest and geisha teahouses of Gion, it is a living masterclass in historic Japanese elegance.",
+    weather: {
+      temp: "12°C – 22°C",
+      condition: "Temperate & Serene",
+      season: "Spring / Autumn",
+      summary:
+        "Comfortable walking weather with occasional spring showers. Comfortable walking shoes needed.",
+    },
+    bestTimeToVisit:
+      "Late March to April for Cherry Blossoms (Sakura); October to November for brilliant Red Maples.",
+    highlights: [
+      "Fushimi Inari Shrine",
+      "Arashiyama Bamboo Grove",
+      "Kinkaku-ji Golden Pavilion",
+      "Gion Teahouse District",
+    ],
   },
   {
     id: "maldives",
@@ -68,6 +147,25 @@ export const destinations: Destination[] = [
     rating: 4.8,
     blurb: "Overwater villas and lagoons in every shade of turquoise.",
     image: maldives,
+    lat: 4.1755,
+    lng: 73.5093,
+    description:
+      "An archipelago of 1,192 coral islands scattered across the equator in the Indian Ocean. Famous for its overwater stilt bungalows, thriving coral atolls, manta ray feeding grounds, and underwater restaurants.",
+    weather: {
+      temp: "27°C – 31°C",
+      condition: "Tropical Sunshine",
+      season: "Dry Season",
+      summary:
+        "Year-round warmth with crystal clear ocean visibility. Swimwear, reef-safe sunscreen and hats recommended.",
+    },
+    bestTimeToVisit:
+      "November to April for calm seas, minimal rainfall, and supreme underwater diving conditions.",
+    highlights: [
+      "Overwater Bungalows",
+      "Manta Ray & Whale Shark Snorkeling",
+      "Undersea Dining",
+      "Bioluminescent Beaches",
+    ],
   },
   {
     id: "lonavala",
@@ -78,6 +176,25 @@ export const destinations: Destination[] = [
     rating: 4.5,
     blurb: "Monsoon waterfalls two hours from the city, perfect for a reset.",
     image: hero,
+    lat: 18.7557,
+    lng: 73.4091,
+    description:
+      "Perched high on the Sahyadri range between Mumbai and Pune, Lonavala is celebrated for its dramatic cliffside viewpoints, historic rock-cut caves, sparkling monsoon waterfalls, and traditional chikki confectionery.",
+    weather: {
+      temp: "19°C – 27°C",
+      condition: "Misty Mountain Breezes",
+      season: "Post-Monsoon / Winter",
+      summary:
+        "Refreshing cool breeze and cloud cover. Light jackets or rainwear depending on season.",
+    },
+    bestTimeToVisit:
+      "July to September for gushing waterfalls and lush green ghats; October to March for cool trekking.",
+    highlights: [
+      "Tiger's Leap Cliff",
+      "Karla & Bhaja Buddhist Caves",
+      "Pawna Lake Camping",
+      "Della Adventure Park",
+    ],
   },
   {
     id: "munnar",
@@ -88,6 +205,25 @@ export const destinations: Destination[] = [
     rating: 4.7,
     blurb: "Endless tea terraces wrapped in morning mist.",
     image: manali,
+    lat: 10.0889,
+    lng: 77.0595,
+    description:
+      "Situated at the confluence of three mountain streams in God's Own Country, Munnar was once the summer resort of the British government in South India. Famous for emerald-green rolling tea gardens, rare Neelakurinji flowers, and the endangered Nilgiri Tahr.",
+    weather: {
+      temp: "14°C – 23°C",
+      condition: "Misty Highlands",
+      season: "Pleasant Summer / Winter",
+      summary:
+        "Crisp mountain air with morning mist. Comfortable layers and light sweaters are best.",
+    },
+    bestTimeToVisit:
+      "September to March for cool pleasant days and spectacular tea harvest scenery.",
+    highlights: [
+      "Eravikulam National Park",
+      "Mattupetty Dam",
+      "Tata Tea Museum",
+      "Top Station Viewpoint",
+    ],
   },
   {
     id: "rishikesh",
@@ -98,6 +234,25 @@ export const destinations: Destination[] = [
     rating: 4.6,
     blurb: "White-water rafting, cliff jumps and Ganga aarti evenings.",
     image: hero,
+    lat: 30.0869,
+    lng: 78.2676,
+    description:
+      "Known worldwide as the Yoga Capital of the World and India's adventure capital. Situated at the foothills of the Himalayas where the holy Ganges emerges into the plains, offering world-class river rafting alongside evening aarti ceremonies.",
+    weather: {
+      temp: "16°C – 28°C",
+      condition: "Himalayan Foothill Breeze",
+      season: "Autumn / Spring",
+      summary:
+        "Sunny daytime rafting conditions with cool riverside evenings. Quick-dry sports gear recommended.",
+    },
+    bestTimeToVisit:
+      "September to November and March to May for optimal grade-III/IV river rafting and pleasant weather.",
+    highlights: [
+      "Shivpuri River Rafting",
+      "Beatles Ashram",
+      "Triveni Ghat Evening Aarti",
+      "Jumpin Heights Bungee",
+    ],
   },
   {
     id: "jaipur",
@@ -108,6 +263,25 @@ export const destinations: Destination[] = [
     rating: 4.6,
     blurb: "Pink city forts, stepwells and rooftop thali dinners.",
     image: goa,
+    lat: 26.9124,
+    lng: 75.7873,
+    description:
+      "The legendary 'Pink City' and capital of Rajasthan, founded in 1727 by Maharaja Sawai Jai Singh II. Home to magnificent hilltop bastions like Amer Fort, the astronomical wonders of Jantar Mantar, and the intricate honeycomb facade of Hawa Mahal.",
+    weather: {
+      temp: "18°C – 30°C",
+      condition: "Dry Royal Sunshine",
+      season: "Pleasant Winter",
+      summary:
+        "Comfortably warm days and breezy, cool evenings. Breathable cottons and a light evening jacket.",
+    },
+    bestTimeToVisit:
+      "October to March for cool daytime fort explorations, palace walks, and royal cultural festivals.",
+    highlights: [
+      "Amber Fort & Sheesh Mahal",
+      "Hawa Mahal",
+      "City Palace & Jantar Mantar",
+      "Nahargarh Sunset Point",
+    ],
   },
 ];
 
@@ -123,87 +297,733 @@ export const destinationCategories = [
 ];
 
 export const hillStations = [
-  { name: "Manali", state: "Himachal Pradesh", temp: "8°C", image: manali },
-  { name: "Shimla", state: "Himachal Pradesh", temp: "11°C", image: hero },
-  { name: "Munnar", state: "Kerala", temp: "17°C", image: manali },
-  { name: "Ooty", state: "Tamil Nadu", temp: "15°C", image: hero },
-  { name: "Lonavala", state: "Maharashtra", temp: "21°C", image: hero },
-  { name: "Mahabaleshwar", state: "Maharashtra", temp: "19°C", image: manali },
-  { name: "Darjeeling", state: "West Bengal", temp: "12°C", image: hero },
-  { name: "Kashmir", state: "J&K", temp: "6°C", image: kashmir },
+  { name: "Manali", state: "Himachal Pradesh", temp: "8°C", image: manali, id: "manali" },
+  { name: "Shimla", state: "Himachal Pradesh", temp: "11°C", image: hero, id: "manali" },
+  { name: "Munnar", state: "Kerala", temp: "17°C", image: manali, id: "munnar" },
+  { name: "Ooty", state: "Tamil Nadu", temp: "15°C", image: hero, id: "munnar" },
+  { name: "Lonavala", state: "Maharashtra", temp: "21°C", image: hero, id: "lonavala" },
+  { name: "Mahabaleshwar", state: "Maharashtra", temp: "19°C", image: manali, id: "lonavala" },
+  { name: "Darjeeling", state: "West Bengal", temp: "12°C", image: hero, id: "kashmir" },
+  { name: "Kashmir", state: "J&K", temp: "6°C", image: kashmir, id: "kashmir" },
 ];
 
 export type MapPlace = {
   id: string;
   name: string;
+  destinationId: string;
   type: "Attractions" | "Hotels" | "Restaurants" | "Activities";
   rating: number;
-  distance: string;
+  distance?: string | undefined;
   note: string;
-  x: number;
-  y: number;
+  lat: number;
+  lng: number;
+  price?: number | undefined;
+  x?: number | undefined;
+  y?: number | undefined;
 };
 
+export function calculateDistanceKm(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
+  const R = 6371; // Earth's radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c * 10) / 10;
+}
+
 export const mapPlaces: MapPlace[] = [
+  // =========================================================================
+  // LONAVALA (Maharashtra)
+  // =========================================================================
   {
-    id: "p1",
-    name: "Lonavala",
+    id: "lon-1",
+    name: "Tiger Point Viewpoint",
+    destinationId: "lonavala",
     type: "Attractions",
     rating: 4.8,
-    distance: "62 km",
-    note: "Beautiful hill station surrounded by waterfalls and greenery.",
-    x: 32,
-    y: 38,
+    distance: "4.2 km",
+    note: "Cliff-edge sunrise views over the Sahyadri valley and monsoon waterfalls.",
+    lat: 18.7303,
+    lng: 73.3855,
+    price: 50,
   },
   {
-    id: "p2",
-    name: "Tiger Point Viewpoint",
+    id: "lon-2",
+    name: "Karla Buddhist Rock-Cut Caves",
+    destinationId: "lonavala",
     type: "Attractions",
     rating: 4.6,
-    distance: "68 km",
-    note: "Cliff-edge sunrise views over the Sahyadri valley.",
-    x: 58,
-    y: 26,
+    distance: "8.5 km",
+    note: "Ancient 2nd-century BC Buddhist rock-cut shrine with magnificent vaulted prayer hall.",
+    lat: 18.7828,
+    lng: 73.4706,
+    price: 100,
   },
   {
-    id: "p3",
-    name: "The Valley Retreat",
+    id: "lon-3",
+    name: "The Valley Retreat & Spa",
+    destinationId: "lonavala",
     type: "Hotels",
     rating: 4.5,
-    distance: "64 km",
-    note: "Boutique stay with infinity pool facing the ghats.",
-    x: 46,
-    y: 62,
+    distance: "2.1 km",
+    note: "Boutique hillside retreat with infinity pool overlooking the foggy Western Ghats.",
+    lat: 18.749,
+    lng: 73.415,
+    price: 4800,
   },
   {
-    id: "p4",
-    name: "Hilltop Chai House",
+    id: "lon-4",
+    name: "Hilltop Chai & Chikki House",
+    destinationId: "lonavala",
     type: "Restaurants",
     rating: 4.7,
-    distance: "61 km",
-    note: "Local Maharashtrian plates and legendary masala chai.",
-    x: 72,
-    y: 55,
+    distance: "1.3 km",
+    note: "Authentic Maharashtrian breakfast, piping hot ginger tea, and famous handmade chikki.",
+    lat: 18.753,
+    lng: 73.406,
+    price: 250,
   },
   {
-    id: "p5",
+    id: "lon-5",
     name: "Kayaking at Pawna Lake",
+    destinationId: "lonavala",
     type: "Activities",
     rating: 4.9,
-    distance: "74 km",
-    note: "Sunset kayaking and lakeside camping under the stars.",
-    x: 20,
-    y: 70,
+    distance: "14.0 km",
+    note: "Sunset kayaking followed by campfire BBQ and stargazing on the lake shore.",
+    lat: 18.6833,
+    lng: 73.4833,
+    price: 1200,
   },
   {
-    id: "p6",
-    name: "Della Adventure Park",
+    id: "lon-6",
+    name: "Della Adventure Sports Park",
+    destinationId: "lonavala",
     type: "Activities",
-    rating: 4.4,
-    distance: "66 km",
-    note: "Zipline, ATV and 50+ adventure experiences.",
-    x: 84,
-    y: 34,
+    rating: 4.5,
+    distance: "5.8 km",
+    note: "Flying fox ziplines, 4x4 ATV obstacle tracks, and 50+ thrill experiences.",
+    lat: 18.7758,
+    lng: 73.4002,
+    price: 2200,
+  },
+
+  // =========================================================================
+  // MANALI (Himachal Pradesh)
+  // =========================================================================
+  {
+    id: "man-1",
+    name: "Hadimba Devi Temple",
+    destinationId: "manali",
+    type: "Attractions",
+    rating: 4.8,
+    distance: "2.5 km",
+    note: "Iconic 16th-century wooden pagoda temple nestled inside a dense deodar pine forest.",
+    lat: 32.2483,
+    lng: 77.1804,
+    price: 30,
+  },
+  {
+    id: "man-2",
+    name: "Solang Valley Viewpoint",
+    destinationId: "manali",
+    type: "Attractions",
+    rating: 4.9,
+    distance: "12.0 km",
+    note: "Sweeping views of glaciers and snow-clad peaks, gateway to Rohtang Pass.",
+    lat: 32.3166,
+    lng: 77.1578,
+    price: 150,
+  },
+  {
+    id: "man-3",
+    name: "The Himalayan Luxury Resort",
+    destinationId: "manali",
+    type: "Hotels",
+    rating: 4.8,
+    distance: "1.8 km",
+    note: "Gothic stone castle architecture with heated pool and orchards facing Kullu valley.",
+    lat: 32.2405,
+    lng: 77.185,
+    price: 7500,
+  },
+  {
+    id: "man-4",
+    name: "Cafe 1947 & Riverside Trout",
+    destinationId: "manali",
+    type: "Restaurants",
+    rating: 4.8,
+    distance: "3.2 km",
+    note: "Live acoustic performances, wood-fired Italian pizza, and freshly caught Himalayan trout.",
+    lat: 32.259,
+    lng: 77.182,
+    price: 800,
+  },
+  {
+    id: "man-5",
+    name: "Solang Valley Tandem Paragliding",
+    destinationId: "manali",
+    type: "Activities",
+    rating: 4.9,
+    distance: "12.4 km",
+    note: "High-altitude glide soaring 2,000 feet above the valley with certified pilots.",
+    lat: 32.315,
+    lng: 77.159,
+    price: 2800,
+  },
+  {
+    id: "man-6",
+    name: "Jogini Waterfall Forest Hike",
+    destinationId: "manali",
+    type: "Activities",
+    rating: 4.7,
+    distance: "4.5 km",
+    note: "Scenic 3-hour trek through Vashisht village ending under a roaring natural cascade.",
+    lat: 32.268,
+    lng: 77.195,
+    price: 0,
+  },
+
+  // =========================================================================
+  // GOA
+  // =========================================================================
+  {
+    id: "goa-1",
+    name: "Aguada Fort & Portuguese Lighthouse",
+    destinationId: "goa",
+    type: "Attractions",
+    rating: 4.7,
+    distance: "8.0 km",
+    note: "17th-century Portuguese fortress overlooking the vast Arabian Sea and Mandovi estuary.",
+    lat: 15.4924,
+    lng: 73.7737,
+    price: 50,
+  },
+  {
+    id: "goa-2",
+    name: "Chapora Fort (Dil Chahta Hai Point)",
+    destinationId: "goa",
+    type: "Attractions",
+    rating: 4.8,
+    distance: "18.5 km",
+    note: "Cliff fortress ramparts with panoramic sunset vistas over Vagator and Morjim beaches.",
+    lat: 15.6058,
+    lng: 73.7381,
+    price: 0,
+  },
+  {
+    id: "goa-3",
+    name: "W Goa Beach Resort",
+    destinationId: "goa",
+    type: "Hotels",
+    rating: 4.8,
+    distance: "17.9 km",
+    note: "Five-star beachfront property nestled directly below the red laterite cliffs of Vagator.",
+    lat: 15.5998,
+    lng: 73.742,
+    price: 14500,
+  },
+  {
+    id: "goa-4",
+    name: "Fisherman's Wharf & Goan Curries",
+    destinationId: "goa",
+    type: "Restaurants",
+    rating: 4.8,
+    distance: "22.0 km",
+    note: "Riverfront dining serving fresh tiger prawns, kingfish rava fry, and spicy prawn balchão.",
+    lat: 15.228,
+    lng: 73.939,
+    price: 1100,
+  },
+  {
+    id: "goa-5",
+    name: "Grande Island Scuba & Coral Safari",
+    destinationId: "goa",
+    type: "Activities",
+    rating: 4.9,
+    distance: "15.0 km",
+    note: "Boat trip into open waters with PADI scuba diving, reef snorkeling, and dolphin sighting.",
+    lat: 15.352,
+    lng: 73.766,
+    price: 3200,
+  },
+  {
+    id: "goa-6",
+    name: "Calangute Jet Ski & Parasailing",
+    destinationId: "goa",
+    type: "Activities",
+    rating: 4.6,
+    distance: "12.0 km",
+    note: "Tandem parasailing and high-speed watercraft riding along the energetic north coast.",
+    lat: 15.543,
+    lng: 73.755,
+    price: 1600,
+  },
+
+  // =========================================================================
+  // KASHMIR (J&K)
+  // =========================================================================
+  {
+    id: "kas-1",
+    name: "Dal Lake & Char Chinar",
+    destinationId: "kashmir",
+    type: "Attractions",
+    rating: 4.9,
+    distance: "3.5 km",
+    note: "The jewel of Srinagar, dotted with carved cedar houseboats and floating lotus markets.",
+    lat: 34.095,
+    lng: 74.85,
+    price: 200,
+  },
+  {
+    id: "kas-2",
+    name: "Shankaracharya Hill Temple",
+    destinationId: "kashmir",
+    type: "Attractions",
+    rating: 4.8,
+    distance: "5.1 km",
+    note: "Historic hilltop stone temple providing a 360-degree vista of the entire Srinagar valley.",
+    lat: 34.0725,
+    lng: 74.8436,
+    price: 0,
+  },
+  {
+    id: "kas-3",
+    name: "The Lalit Grand Palace Srinagar",
+    destinationId: "kashmir",
+    type: "Hotels",
+    rating: 4.9,
+    distance: "4.8 km",
+    note: "Built by Maharaja Pratap Singh in 1910, offering manicured royal chinar tree gardens.",
+    lat: 34.081,
+    lng: 74.855,
+    price: 16000,
+  },
+  {
+    id: "kas-4",
+    name: "Mughal Darbar Wazwan Banquet",
+    destinationId: "kashmir",
+    type: "Restaurants",
+    rating: 4.8,
+    distance: "2.1 km",
+    note: "The traditional multi-course Kashmiri Wazwan feast featuring Rogan Josh, Rista and Gushtaba.",
+    lat: 34.074,
+    lng: 74.815,
+    price: 950,
+  },
+  {
+    id: "kas-5",
+    name: "Sunset Shikara Cruise on Dal Lake",
+    destinationId: "kashmir",
+    type: "Activities",
+    rating: 4.9,
+    distance: "3.2 km",
+    note: "Gliding through the floating vegetable market and quiet channels as dusk paints the mountains.",
+    lat: 34.088,
+    lng: 74.839,
+    price: 700,
+  },
+  {
+    id: "kas-6",
+    name: "Gulmarg Gondola & Alpine Ski Trail",
+    destinationId: "kashmir",
+    type: "Activities",
+    rating: 4.9,
+    distance: "48.0 km",
+    note: "World's second-highest operating cable car ascending to 13,780 ft at Mount Apharwat.",
+    lat: 34.0484,
+    lng: 74.3805,
+    price: 1850,
+  },
+
+  // =========================================================================
+  // KYOTO (Japan)
+  // =========================================================================
+  {
+    id: "kyo-1",
+    name: "Fushimi Inari-Taisha",
+    destinationId: "kyoto",
+    type: "Attractions",
+    rating: 4.9,
+    distance: "4.8 km",
+    note: "Path of 10,000 vermilion Torii gates climbing into the sacred cedar-covered Mount Inari.",
+    lat: 34.9671,
+    lng: 135.7727,
+    price: 0,
+  },
+  {
+    id: "kyo-2",
+    name: "Kinkaku-ji (Golden Pavilion)",
+    destinationId: "kyoto",
+    type: "Attractions",
+    rating: 4.8,
+    distance: "6.2 km",
+    note: "Zen Buddhist temple whose top two floors are completely covered in pure gold leaf.",
+    lat: 35.0394,
+    lng: 135.7292,
+    price: 350,
+  },
+  {
+    id: "kyo-3",
+    name: "Hoshinoya Kyoto Riverside Ryokan",
+    destinationId: "kyoto",
+    type: "Hotels",
+    rating: 4.9,
+    distance: "9.5 km",
+    note: "Secluded riverside pavilion accessible only by a traditional wooden riverboat ride.",
+    lat: 35.0125,
+    lng: 135.669,
+    price: 45000,
+  },
+  {
+    id: "kyo-4",
+    name: "Gion Karyo Kaiseki Dining",
+    destinationId: "kyoto",
+    type: "Restaurants",
+    rating: 4.9,
+    distance: "2.3 km",
+    note: "Exquisite 10-course seasonal Japanese dining in a restored historic Machiya townhouse.",
+    lat: 35.0035,
+    lng: 135.776,
+    price: 6500,
+  },
+  {
+    id: "kyo-5",
+    name: "Arashiyama Bamboo Grove Walk",
+    destinationId: "kyoto",
+    type: "Activities",
+    rating: 4.8,
+    distance: "8.9 km",
+    note: "Atmospheric nature walk through towering emerald bamboo stalks singing in the wind.",
+    lat: 35.017,
+    lng: 135.6713,
+    price: 0,
+  },
+  {
+    id: "kyo-6",
+    name: "Traditional Tea Ceremony in Gion",
+    destinationId: "kyoto",
+    type: "Activities",
+    rating: 4.9,
+    distance: "2.5 km",
+    note: "Authentic Chado matcha tea preparation guided by a Kyoto tea master.",
+    lat: 35.002,
+    lng: 135.775,
+    price: 2400,
+  },
+
+  // =========================================================================
+  // MALDIVES
+  // =========================================================================
+  {
+    id: "mal-1",
+    name: "Old Friday Mosque & Coral Stone Carvings",
+    destinationId: "maldives",
+    type: "Attractions",
+    rating: 4.7,
+    distance: "1.2 km",
+    note: "Built in 1658 from interlocking coral stone blocks, decorated with Quranic calligraphy.",
+    lat: 4.1783,
+    lng: 73.5133,
+    price: 150,
+  },
+  {
+    id: "mal-2",
+    name: "Maafushi Coral Barrier Reef",
+    destinationId: "maldives",
+    type: "Attractions",
+    rating: 4.9,
+    distance: "26.0 km",
+    note: "Pristine reef shelf teeming with sea turtles, stingrays, and vibrant coral gardens.",
+    lat: 3.941,
+    lng: 73.49,
+    price: 800,
+  },
+  {
+    id: "mal-3",
+    name: "Adaaran Prestige Overwater Villas",
+    destinationId: "maldives",
+    type: "Hotels",
+    rating: 4.8,
+    distance: "9.2 km",
+    note: "Private wooden stilt villas with glass-bottom lounge floors and direct lagoon ladder access.",
+    lat: 4.12,
+    lng: 73.456,
+    price: 32000,
+  },
+  {
+    id: "mal-4",
+    name: "Ithaa Undersea Dining",
+    destinationId: "maldives",
+    type: "Restaurants",
+    rating: 4.9,
+    distance: "88.0 km",
+    note: "World's premier all-glass underwater restaurant 5 meters below the Indian Ocean.",
+    lat: 3.615,
+    lng: 72.719,
+    price: 18500,
+  },
+  {
+    id: "mal-5",
+    name: "South Ari Whale Shark Snorkeling",
+    destinationId: "maldives",
+    type: "Activities",
+    rating: 4.9,
+    distance: "95.0 km",
+    note: "Swim alongside gentle ocean giants in their natural tropical marine sanctuary.",
+    lat: 3.48,
+    lng: 72.83,
+    price: 8500,
+  },
+  {
+    id: "mal-6",
+    name: "Sunset Spinner Dolphin Cruise",
+    destinationId: "maldives",
+    type: "Activities",
+    rating: 4.8,
+    distance: "3.5 km",
+    note: "Catamaran cruise spotting pods of wild spinner dolphins leaping in the dusk horizon.",
+    lat: 4.17,
+    lng: 73.52,
+    price: 3600,
+  },
+
+  // =========================================================================
+  // MUNNAR (Kerala)
+  // =========================================================================
+  {
+    id: "mun-1",
+    name: "Eravikulam National Park",
+    destinationId: "munnar",
+    type: "Attractions",
+    rating: 4.8,
+    distance: "12.5 km",
+    note: "Sanctuary for the endangered Nilgiri Tahr against rolling shola grasslands.",
+    lat: 10.2017,
+    lng: 77.06,
+    price: 200,
+  },
+  {
+    id: "mun-2",
+    name: "Mattupetty Dam & Eco Lake",
+    destinationId: "munnar",
+    type: "Attractions",
+    rating: 4.7,
+    distance: "11.0 km",
+    note: "Masonry dam enclosed by tea slopes, renowned for peaceful speedboating and birdwatching.",
+    lat: 10.106,
+    lng: 77.124,
+    price: 100,
+  },
+  {
+    id: "mun-3",
+    name: "Blanket Luxury Plantation Villa",
+    destinationId: "munnar",
+    type: "Hotels",
+    rating: 4.8,
+    distance: "7.0 km",
+    note: "Luxury suites nestled right on tea garden cliffs overlooking the Attukad Waterfall.",
+    lat: 10.045,
+    lng: 77.038,
+    price: 6800,
+  },
+  {
+    id: "mun-4",
+    name: "Rapsy Restaurant (Kerala Parotta & Stew)",
+    destinationId: "munnar",
+    type: "Restaurants",
+    rating: 4.6,
+    distance: "1.0 km",
+    note: "Popular hillside diner famed for flaky Malabar parottas, beef fry, and vegetable stew.",
+    lat: 10.089,
+    lng: 77.061,
+    price: 300,
+  },
+  {
+    id: "mun-5",
+    name: "Tea Leaf Plucking & Factory Tour",
+    destinationId: "munnar",
+    type: "Activities",
+    rating: 4.8,
+    distance: "2.4 km",
+    note: "Hands-on tea artisanal leaf plucking session followed by processing and tea tasting.",
+    lat: 10.091,
+    lng: 77.063,
+    price: 450,
+  },
+  {
+    id: "mun-6",
+    name: "Anamudi Foothills Sunrise Trek",
+    destinationId: "munnar",
+    type: "Activities",
+    rating: 4.8,
+    distance: "14.0 km",
+    note: "Guided morning trail along the perimeter of South India's highest mountain peak.",
+    lat: 10.17,
+    lng: 77.065,
+    price: 750,
+  },
+
+  // =========================================================================
+  // RISHIKESH (Uttarakhand)
+  // =========================================================================
+  {
+    id: "rish-1",
+    name: "Lakshman Jhula & Triveni Ghat",
+    destinationId: "rishikesh",
+    type: "Attractions",
+    rating: 4.8,
+    distance: "2.8 km",
+    note: "Historic suspension bridge across the emerald Ganga and evening Maha Aarti celebration.",
+    lat: 30.1305,
+    lng: 78.332,
+    price: 0,
+  },
+  {
+    id: "rish-2",
+    name: "The Beatles Ashram (Chaurasi Kutia)",
+    destinationId: "rishikesh",
+    type: "Attractions",
+    rating: 4.7,
+    distance: "4.5 km",
+    note: "Where the Beatles wrote the White Album in 1968, featuring graffiti murals and meditation domes.",
+    lat: 30.113,
+    lng: 78.315,
+    price: 150,
+  },
+  {
+    id: "rish-3",
+    name: "Aloha On The Ganges Luxury Resort",
+    destinationId: "rishikesh",
+    type: "Hotels",
+    rating: 4.7,
+    distance: "3.2 km",
+    note: "Riverside property with infinity pool situated on the quiet cliff bend of the Ganges.",
+    lat: 30.134,
+    lng: 78.33,
+    price: 7200,
+  },
+  {
+    id: "rish-4",
+    name: "Little Buddha Riverside Cafe",
+    destinationId: "rishikesh",
+    type: "Restaurants",
+    rating: 4.8,
+    distance: "2.9 km",
+    note: "Treehouse style cafe with river view serving shakshuka, fresh juices, and Tibetan momos.",
+    lat: 30.131,
+    lng: 78.331,
+    price: 450,
+  },
+  {
+    id: "rish-5",
+    name: "Shivpuri White-Water Rafting (16 km)",
+    destinationId: "rishikesh",
+    type: "Activities",
+    rating: 4.9,
+    distance: "14.5 km",
+    note: "Conquer famous rapids like Roller Coaster, Golf Course, and Club House with river guides.",
+    lat: 30.138,
+    lng: 78.389,
+    price: 1200,
+  },
+  {
+    id: "rish-6",
+    name: "Jumpin Heights 83m Bungee Jumping",
+    destinationId: "rishikesh",
+    type: "Activities",
+    rating: 4.9,
+    distance: "19.0 km",
+    note: "India's highest fixed cantilever bungee jump over the river valley at Mohan Chatti.",
+    lat: 30.065,
+    lng: 78.389,
+    price: 3700,
+  },
+
+  // =========================================================================
+  // JAIPUR (Rajasthan)
+  // =========================================================================
+  {
+    id: "jai-1",
+    name: "Amber Fort & Sheesh Mahal",
+    destinationId: "jaipur",
+    type: "Attractions",
+    rating: 4.9,
+    distance: "10.5 km",
+    note: "16th-century fortress on Maota Lake featuring the glittering mirrored Hall of Mirrors.",
+    lat: 26.9855,
+    lng: 75.8513,
+    price: 200,
+  },
+  {
+    id: "jai-2",
+    name: "Hawa Mahal (Palace of Winds)",
+    destinationId: "jaipur",
+    type: "Attractions",
+    rating: 4.8,
+    distance: "3.8 km",
+    note: "Iconic five-story pink sandstone facade with 953 honeycomb jharokha windows.",
+    lat: 26.9239,
+    lng: 75.8267,
+    price: 100,
+  },
+  {
+    id: "jai-3",
+    name: "Rambagh Palace Heritage Hotel",
+    destinationId: "jaipur",
+    type: "Hotels",
+    rating: 4.9,
+    distance: "4.5 km",
+    note: "Former residence of the Maharaja of Jaipur, renowned for grand architecture and peacocks.",
+    lat: 26.897,
+    lng: 75.808,
+    price: 28000,
+  },
+  {
+    id: "jai-4",
+    name: "Laxmi Mishthan Bhandar (LMB) Dal Baati",
+    destinationId: "jaipur",
+    type: "Restaurants",
+    rating: 4.7,
+    distance: "3.5 km",
+    note: "Legendary Johari Bazaar restaurant serving authentic Rajasthani Dal Baati Churma and Ghewar.",
+    lat: 26.9205,
+    lng: 75.8235,
+    price: 650,
+  },
+  {
+    id: "jai-5",
+    name: "SkyWaltz Hot Air Balloon over Amer",
+    destinationId: "jaipur",
+    type: "Activities",
+    rating: 4.9,
+    distance: "11.0 km",
+    note: "Sunrise hot air balloon flight gliding gently above the Aravali hills and royal palaces.",
+    lat: 26.98,
+    lng: 75.845,
+    price: 9500,
+  },
+  {
+    id: "jai-6",
+    name: "Nahargarh Fort Sunset Cycling Trek",
+    destinationId: "jaipur",
+    type: "Activities",
+    rating: 4.8,
+    distance: "8.2 km",
+    note: "Guided dusk bicycle climb along the historic ramparts with sunset city skyline views.",
+    lat: 26.9372,
+    lng: 75.8156,
+    price: 1100,
   },
 ];
 

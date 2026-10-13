@@ -18,6 +18,7 @@ import { Route as MyTripsRouteImport } from './routes/my-trips'
 import { Route as SaveRouteImport } from './routes/save'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as DestinationIdRouteImport } from './routes/destination/$id'
 import { Route as PlanIdRouteImport } from './routes/plan/$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -65,6 +66,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DestinationIdRoute = DestinationIdRouteImport.update({
+  id: '/destination/$id',
+  path: '/destination/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlanIdRoute = PlanIdRouteImport.update({
   id: '/plan/$id',
   path: '/plan/$id',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/save': typeof SaveRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/destination/$id': typeof DestinationIdRoute
   '/plan/$id': typeof PlanIdRoute
 }
 export interface FileRoutesByTo {
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/save': typeof SaveRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/destination/$id': typeof DestinationIdRoute
   '/plan/$id': typeof PlanIdRoute
 }
 export interface FileRoutesById {
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/save': typeof SaveRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/destination/$id': typeof DestinationIdRoute
   '/plan/$id': typeof PlanIdRoute
 }
 export interface FileRouteTypes {
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/save'
     | '/signup'
     | '/auth/callback'
+    | '/destination/$id'
     | '/plan/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/save'
     | '/signup'
     | '/auth/callback'
+    | '/destination/$id'
     | '/plan/$id'
   id:
     | '__root__'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/save'
     | '/signup'
     | '/auth/callback'
+    | '/destination/$id'
     | '/plan/$id'
   fileRoutesById: FileRoutesById
 }
@@ -157,6 +169,7 @@ export interface RootRouteChildren {
   SaveRoute: typeof SaveRoute
   SignupRoute: typeof SignupRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  DestinationIdRoute: typeof DestinationIdRoute
   PlanIdRoute: typeof PlanIdRoute
 }
 
@@ -225,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/destination/$id': {
+      id: '/destination/$id'
+      path: '/destination/$id'
+      fullPath: '/destination/$id'
+      preLoaderRoute: typeof DestinationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/plan/$id': {
       id: '/plan/$id'
       path: '/plan/$id'
@@ -245,6 +265,7 @@ const rootRouteChildren: RootRouteChildren = {
   SaveRoute: SaveRoute,
   SignupRoute: SignupRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  DestinationIdRoute: DestinationIdRoute,
   PlanIdRoute: PlanIdRoute,
 }
 export const routeTree = rootRouteImport

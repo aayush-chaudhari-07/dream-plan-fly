@@ -173,3 +173,50 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `src/server/__tests__/generate-plan.test.ts` (created)
   - `supabase/migrations/002_shared_plans.sql` (created)
   - `MIGRATION_LOG.md` (updated)
+
+## [Task 6] - Interactive Map ("Explore Around You") & Destination Detail Pages
+
+- **Goal**: Build the interactive Leaflet map with OpenStreetMap tiles, real coordinates for places and all 9 destinations, category filters, geolocation distance sorting, "Add to Trip" actions, landing page mounting, and `/destination/$id` detail views.
+- **Changes**:
+  1. **Leaflet & React-Leaflet SSR-Safe Integration**:
+     - Installed `leaflet`, `react-leaflet`, and `@types/leaflet`.
+     - Built client-only `src/components/smarttrip/map/LeafletMapClient.tsx` using OpenStreetMap tiles with custom DivIcon SVG pins for Attractions (emerald), Hotels (indigo), Dining (amber), and Activities (sky), plus a blue pulsing marker for user location.
+     - Implemented dynamic lazy-loading with skeleton fallback in `src/components/smarttrip/InteractiveMap.tsx` to prevent any SSR `window is not defined` errors.
+     - Added customized Leaflet popup and marker styles in `src/styles.css`.
+  2. **Real Latitude & Longitude Datasets (`src/data/travel.ts`)**:
+     - Replaced old percentage x/y coordinates with real `lat` and `lng` coordinates.
+     - Created detailed places (Attractions, Hotels, Restaurants, Activities) for all 9 destinations (`manali`, `goa`, `kashmir`, `kyoto`, `maldives`, `lonavala`, `munnar`, `rishikesh`, `jaipur`).
+     - Added rich destination fields: `lat`, `lng`, `description`, `weather` ({ temp, condition, season, summary }), `bestTimeToVisit`, and signature `highlights`.
+     - Added `calculateDistanceKm()` helper implementing the Haversine formula.
+  3. **Interactive Map Component (`src/components/smarttrip/InteractiveMap.tsx`)**:
+     - Added category filters (`All`, `Attractions`, `Hotels`, `Restaurants`, `Activities`) with keyboard focusability and ARIA accessibility.
+     - Added destination selector dropdown with options for all 9 destinations.
+     - Added "Use my location" button utilizing browser geolocation API (`navigator.geolocation`) to center the map, recalculate exact distances in kilometers, and re-sort places by proximity.
+     - Added sidebar place cards with ratings, distances, notes, prices, and clickable centering.
+     - Added "Add to Trip" button calling `smartTrip.addPlaceToTrip()` with visual checkmark feedback.
+  4. **Destination Detail Pages (`src/routes/destination/$id.tsx`)**:
+     - Created `/destination/$id` route with hero cover image, badges, rating, starting price.
+     - Weather overview card and best time to visit card.
+     - Narrative description and highlights grid.
+     - Embedded Interactive Map centered on the selected destination.
+     - Action CTAs for "Plan AI Itinerary" and "Book Hotels & Transport".
+     - Connected links in `ExploreDestinations.tsx` and `EscapeHills.tsx`.
+  5. **Landing Page Integration (`src/routes/index.tsx`)**:
+     - Added `<InteractiveMap />` section to landing page between AI Planner and Trip Fund.
+  6. **Unit Tests (`src/components/smarttrip/__tests__/InteractiveMap.test.ts`)**:
+     - 6 unit tests verifying all 9 destinations have coordinates/weather/advice, real lat/lng for places across all 4 categories, Haversine distance calculations, and `smartTrip.addPlaceToTrip()` functionality.
+- **Files Touched**:
+  - `package.json` (added `leaflet`, `react-leaflet`, `@types/leaflet`)
+  - `package-lock.json`
+  - `src/data/travel.ts` (updated `Destination` and `MapPlace` datasets and added `calculateDistanceKm`)
+  - `src/lib/smarttrip-store.ts` (added `addPlaceToTrip` method)
+  - `src/styles.css` (added Leaflet popup and custom pin CSS)
+  - `src/components/smarttrip/map/LeafletMapClient.tsx` (created)
+  - `src/components/smarttrip/InteractiveMap.tsx` (created)
+  - `src/routes/destination/$id.tsx` (created)
+  - `src/routes/index.tsx` (mounted InteractiveMap)
+  - `src/components/smarttrip/ExploreDestinations.tsx` (linked to destination detail page)
+  - `src/components/smarttrip/EscapeHills.tsx` (linked to destination detail page)
+  - `src/routeTree.gen.ts` (regenerated)
+  - `src/components/smarttrip/__tests__/InteractiveMap.test.ts` (created)
+  - `MIGRATION_LOG.md` (updated)
