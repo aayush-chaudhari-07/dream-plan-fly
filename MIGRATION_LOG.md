@@ -836,4 +836,42 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
      - `npx playwright test`: 9/9 E2E tests passed cleanly.
      - `npm run scan-secrets`: 0 secrets detected across 72 client bundle assets.
 
+---
+
+## Phase 15: Environment Template, Typed Validation, and Preflight Checks
+
+- **Date**: 2026-10-14
+- **Goal**: Rebuild `.env.example` with clear groupings and documentation, implement typed runtime validation with Zod on client and server boundaries, ensure complete git safety with `.gitignore`, and provide a privacy-preserving preflight CLI checker (`npm run check:env`).
+- **Key Actions**:
+  1. **Comprehensive Environment Template (`.env.example`)**:
+     - Organized into 3 clear sections:
+       1. Public / Client variables (`VITE_SITE_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_SENTRY_DSN`).
+       2. Server-Only variables (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, `DEMO_PAY_SECRET`, `CRON_SECRET`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`).
+       3. CI / Deployment variables (`NITRO_PRESET`, `CI`).
+     - Documented purpose, required vs optional tier, free source URL, and graceful fallback behavior for each variable.
+     - Guaranteed 0 real secrets; safe dummy placeholders only.
+  2. **Typed Server Validator (`src/server/config/env.server.ts`)**:
+     - Uses Zod to parse and validate `process.env` on the server.
+     - Implements `MissingEnvironmentVariableError` providing human-friendly diagnostic messages naming the missing variable, the affected feature, and where to obtain a free key.
+     - Implements safe resolvers: `getResolvedSupabaseUrl()`, `getResolvedSupabaseAnonKey()`, and `getResolvedCronSecret()`.
+     - Integrated with `src/server/db/supabase-server.ts`.
+  3. **Typed Client Validator (`src/client/lib/env.client.ts`)**:
+     - Safely parses public browser variables using `zod`.
+     - Exports `isSupabaseConfigured()` to check whether real cloud credentials are present without crashing on template/placeholder strings.
+     - Integrated with `src/client/lib/supabase/client.ts`.
+  4. **Preflight Environment Checker (`scripts/check-env.mjs`)**:
+     - Reads `.env` and environment state without printing real secret values.
+     - Inspects each variable and displays status: `SET`, `PLACEHOLDER`, or `UNSET`, with fallback details and free key URLs.
+     - Prints a high-level runtime summary (Cloud backend status, AI planner status, Demo payment status, Weather, Currency).
+     - Added npm script `"check:env": "node scripts/check-env.mjs"`.
+  5. **Git Safety & `.env` Initialization**:
+     - Verified `.gitignore` ignores all `.env*` except `.env.example`.
+     - Verified `git ls-files .env*` returns only `.env.example`.
+     - Copied `.env.example` to local `.env`.
+  6. **Verification Results**:
+     - `npm run check:boundaries`: Passed with 0 violations.
+     - `npm run check:env`: Executed cleanly, displaying privacy-preserving configuration report.
+     - `npm run lint`: 0 errors, 0 warnings.
+     - `npm run typecheck`: Passed cleanly (`tsc --noEmit`).
+     - `npm test`: 8 test suites, 80 unit tests passed.
 

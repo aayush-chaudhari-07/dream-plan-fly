@@ -1,33 +1,9 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getCookies } from "@tanstack/react-start/server";
-
-function getSupabaseUrl(): string {
-  if (typeof process !== "undefined" && process.env?.["VITE_SUPABASE_URL"]) {
-    return process.env["VITE_SUPABASE_URL"];
-  }
-  if (typeof import.meta !== "undefined" && import.meta.env?.["VITE_SUPABASE_URL"]) {
-    return import.meta.env["VITE_SUPABASE_URL"];
-  }
-  return "https://placeholder-project.supabase.co";
-}
-
-function getSupabaseAnonKey(): string {
-  if (typeof process !== "undefined") {
-    const key =
-      process.env?.["VITE_SUPABASE_ANON_KEY"] || process.env?.["VITE_SUPABASE_PUBLISHABLE_KEY"];
-    if (key) return key;
-  }
-  if (typeof import.meta !== "undefined") {
-    const key =
-      import.meta.env?.["VITE_SUPABASE_ANON_KEY"] ||
-      import.meta.env?.["VITE_SUPABASE_PUBLISHABLE_KEY"];
-    if (key) return key;
-  }
-  return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.placeholder";
-}
+import { getResolvedSupabaseUrl, getResolvedSupabaseAnonKey } from "@/server/config/env.server";
 
 export function getSupabaseServerClient(): SupabaseClient {
-  return createClient(getSupabaseUrl(), getSupabaseAnonKey(), {
+  return createClient(getResolvedSupabaseUrl(), getResolvedSupabaseAnonKey(), {
     auth: {
       persistSession: false,
       autoRefreshToken: false,

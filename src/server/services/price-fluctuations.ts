@@ -83,7 +83,11 @@ export async function evaluatePriceAlertsJob(
         typeof process !== "undefined"
           ? process.env?.["VITE_SUPABASE_URL"] || process.env?.["SUPABASE_URL"]
           : undefined;
-      const hasRealSupabase = url && !url.includes("placeholder");
+      const hasRealSupabase =
+        url &&
+        !url.includes("placeholder") &&
+        !url.includes("your-project-ref") &&
+        !url.includes("example.com");
 
       if (hasRealSupabase) {
         const supabase = getSupabaseServerClient();
