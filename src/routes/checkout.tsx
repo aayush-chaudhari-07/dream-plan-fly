@@ -15,16 +15,16 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Navbar } from "@/components/smarttrip/Navbar";
-import { Footer } from "@/components/smarttrip/Footer";
-import { PageHeader } from "@/components/smarttrip/PageHeader";
-import { SupportDock } from "@/components/smarttrip/SupportDock";
-import { inr } from "@/data/travel";
-import { DemoPaymentModal } from "@/components/smarttrip/booking/DemoPaymentModal";
-import type { StoredBooking } from "@/lib/smarttrip-store";
+import { Button } from "@/client/components/ui/button";
+import { Input } from "@/client/components/ui/input";
+import { Label } from "@/client/components/ui/label";
+import { Navbar } from "@/client/components/Navbar";
+import { Footer } from "@/client/components/Footer";
+import { PageHeader } from "@/client/components/PageHeader";
+import { SupportDock } from "@/client/features/support/SupportDock";
+import { inr } from "@/shared/types/travel";
+import { DemoPaymentModal } from "@/client/features/bookings/DemoPaymentModal";
+import type { StoredBooking } from "@/client/lib/smarttrip-store";
 
 const checkoutSearchSchema = z.object({
   kind: z.enum(["flight", "stay", "rental", "rail", "package"]).optional(),
@@ -59,7 +59,7 @@ type TravelerFormData = {
   notes?: string | undefined;
 };
 
-import { createSeoHead } from "@/lib/seo";
+import { createSeoHead } from "@/client/lib/seo";
 
 export const Route = createFileRoute("/checkout")({
   validateSearch: (search) => checkoutSearchSchema.parse(search),

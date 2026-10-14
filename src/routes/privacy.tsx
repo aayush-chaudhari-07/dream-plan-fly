@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Cookie, Database, EyeOff, Lock, Shield, UserCheck } from "lucide-react";
-import { Navbar } from "@/components/smarttrip/Navbar";
-import { Footer } from "@/components/smarttrip/Footer";
-import { PageHeader } from "@/components/smarttrip/PageHeader";
-import { SupportDock } from "@/components/smarttrip/SupportDock";
-import { createSeoHead } from "@/lib/seo";
+import { Navbar } from "@/client/components/Navbar";
+import { Footer } from "@/client/components/Footer";
+import { PageHeader } from "@/client/components/PageHeader";
+import { SupportDock } from "@/client/features/support/SupportDock";
+import { createSeoHead } from "@/client/lib/seo";
 
 export const Route = createFileRoute("/privacy")({
   head: () =>

@@ -13,26 +13,26 @@ import {
   User,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/client/components/ui/avatar";
+import { Button } from "@/client/components/ui/button";
+import { Input } from "@/client/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Footer } from "@/components/smarttrip/Footer";
-import { Navbar } from "@/components/smarttrip/Navbar";
-import { PageHeader } from "@/components/smarttrip/PageHeader";
-import { SupportDock } from "@/components/smarttrip/SupportDock";
-import { useAuth } from "@/lib/auth-context";
-import { updateProfileFn } from "@/lib/server/trip-actions";
-import { getExchangeRatesFn } from "@/lib/server/live-data-actions";
-import type { ExchangeRates } from "@/server/currency";
+} from "@/client/components/ui/select";
+import { Footer } from "@/client/components/Footer";
+import { Navbar } from "@/client/components/Navbar";
+import { PageHeader } from "@/client/components/PageHeader";
+import { SupportDock } from "@/client/features/support/SupportDock";
+import { useAuth } from "@/client/lib/auth-context";
+import { updateProfileFn } from "@/server/functions/trip-actions";
+import { getExchangeRatesFn } from "@/server/functions/live-data-actions";
+import type { ExchangeRates } from "@/server/services/currency";
 
-import { createSeoHead } from "@/lib/seo";
+import { createSeoHead } from "@/client/lib/seo";
 
 export const Route = createFileRoute("/settings")({
   head: () =>

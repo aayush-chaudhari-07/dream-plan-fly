@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ExploreDestinations } from "@/components/smarttrip/ExploreDestinations";
-import { Footer } from "@/components/smarttrip/Footer";
-import { Navbar } from "@/components/smarttrip/Navbar";
-import { PageHeader } from "@/components/smarttrip/PageHeader";
-import { SupportDock } from "@/components/smarttrip/SupportDock";
+import { ExploreDestinations } from "@/client/features/destinations/ExploreDestinations";
+import { Footer } from "@/client/components/Footer";
+import { Navbar } from "@/client/components/Navbar";
+import { PageHeader } from "@/client/components/PageHeader";
+import { SupportDock } from "@/client/features/support/SupportDock";
 
-import { createSeoHead } from "@/lib/seo";
+import { createSeoHead } from "@/client/lib/seo";
 
 export const Route = createFileRoute("/explore")({
   head: () =>

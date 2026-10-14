@@ -1,7 +1,7 @@
-import "./lib/error-capture";
+import "@/client/lib/error-capture";
 
-import { consumeLastCapturedError } from "./lib/error-capture";
-import { renderErrorPage } from "./lib/error-page";
+import { consumeLastCapturedError } from "@/client/lib/error-capture";
+import { renderErrorPage } from "@/client/lib/error-page";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -122,7 +122,7 @@ function applySecurityHeaders(res: Response): Response {
   });
 }
 
-import { handlePriceFluctuationsCron } from "./server/price-fluctuations";
+import { handlePriceFluctuationsCron } from "@/server/services/price-fluctuations";
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {

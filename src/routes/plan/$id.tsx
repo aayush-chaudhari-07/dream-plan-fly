@@ -1,16 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookmarkPlus, Compass, Download, Leaf, Share2, Sparkles, Wand2 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Navbar } from "@/components/smarttrip/Navbar";
-import { Footer } from "@/components/smarttrip/Footer";
-import { QuickTravelGuide } from "@/components/smarttrip/QuickTravelGuide";
-import { WeatherForecastCard } from "@/components/smarttrip/WeatherForecastCard";
-import { inr, destinations } from "@/data/travel";
-import { smartTrip } from "@/lib/smarttrip-store";
-import { getPublicPlanFn } from "@/server/generate-plan";
+import { Button } from "@/client/components/ui/button";
+import { Navbar } from "@/client/components/Navbar";
+import { Footer } from "@/client/components/Footer";
+import { QuickTravelGuide } from "@/client/features/planner/QuickTravelGuide";
+import { WeatherForecastCard } from "@/client/features/destinations/WeatherForecastCard";
+import { inr, destinations } from "@/shared/types/travel";
+import { smartTrip } from "@/client/lib/smarttrip-store";
+import { getPublicPlanFn } from "@/server/services/gemini-planner";
 
-import { createSeoHead } from "@/lib/seo";
+import { createSeoHead } from "@/client/lib/seo";
 
 export const Route = createFileRoute("/plan/$id")({
   loader: async ({ params }) => {

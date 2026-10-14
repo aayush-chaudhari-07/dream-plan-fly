@@ -11,17 +11,17 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useAuth } from "@/lib/auth-context";
-import { Navbar } from "@/components/smarttrip/Navbar";
-import { Footer } from "@/components/smarttrip/Footer";
+import { Button } from "@/client/components/ui/button";
+import { Input } from "@/client/components/ui/input";
+import { useAuth } from "@/client/lib/auth-context";
+import { Navbar } from "@/client/components/Navbar";
+import { Footer } from "@/client/components/Footer";
 
 type SignupSearch = {
   redirect?: string | undefined;
 };
 
-import { createSeoHead } from "@/lib/seo";
+import { createSeoHead } from "@/client/lib/seo";
 
 export const Route = createFileRoute("/signup")({
   validateSearch: (search: Record<string, unknown>): SignupSearch => ({

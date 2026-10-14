@@ -652,33 +652,33 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
 - **Goal**: Resolve all 7 reported Playwright E2E test failures, eliminate CI flakiness, ensure production SSR server readiness, establish clean deterministic state isolation, and replace fragile locators with stable `data-testid` attributes without loosening assertions or skipping tests.
 - **Root Cause & Fix Breakdown**:
   1. **Production Server 500 Crash on Startup (`__commonJSMin is not a function`)**:
-     - *Root Cause*: In the production Nitro/Rolldown build, `@supabase/ssr` imported CommonJS `cookie`, which created a circular module dependency where `__commonJSMin` was referenced before initialization in `_ssr/ssr.mjs`, causing immediate HTTP 500 on all server requests.
-     - *Fix*: Replaced `@supabase/ssr` with standard `@supabase/supabase-js` client in `src/lib/supabase/client.ts` and `src/lib/supabase/server.ts`. Configured `playwright.config.ts` `webServer` to serve `node .output/server/index.mjs` with `timeout: 120000` and `reuseExistingServer: !process.env.CI`.
-     - *App Change*: Updated `src/lib/supabase/client.ts` and `src/lib/supabase/server.ts`.
+     - _Root Cause_: In the production Nitro/Rolldown build, `@supabase/ssr` imported CommonJS `cookie`, which created a circular module dependency where `__commonJSMin` was referenced before initialization in `_ssr/ssr.mjs`, causing immediate HTTP 500 on all server requests.
+     - _Fix_: Replaced `@supabase/ssr` with standard `@supabase/supabase-js` client in `src/lib/supabase/client.ts` and `src/lib/supabase/server.ts`. Configured `playwright.config.ts` `webServer` to serve `node .output/server/index.mjs` with `timeout: 120000` and `reuseExistingServer: !process.env.CI`.
+     - _App Change_: Updated `src/lib/supabase/client.ts` and `src/lib/supabase/server.ts`.
   2. **`signup.spec.ts`: Strict-Mode Violation (`input[type="email"]` matched 2 elements)**:
-     - *Root Cause*: `input[type="email"]` matched both `#signup-email` inside the signup form and the newsletter input in `<Footer />`.
-     - *Fix*: Scoped test locators strictly to `page.getByTestId("signup-form")` (`page.getByTestId("signup-form").getByTestId("signup-email")`) without using `.first()`.
-     - *App Change*: Added `data-testid="signup-form"`, `data-testid="signup-name"`, `data-testid="signup-email"`, `data-testid="signup-password"`, `data-testid="signup-submit"` to `src/routes/signup.tsx`.
+     - _Root Cause_: `input[type="email"]` matched both `#signup-email` inside the signup form and the newsletter input in `<Footer />`.
+     - _Fix_: Scoped test locators strictly to `page.getByTestId("signup-form")` (`page.getByTestId("signup-form").getByTestId("signup-email")`) without using `.first()`.
+     - _App Change_: Added `data-testid="signup-form"`, `data-testid="signup-name"`, `data-testid="signup-email"`, `data-testid="signup-password"`, `data-testid="signup-submit"` to `src/routes/signup.tsx`.
   3. **`signup.spec.ts`: Header Text Mismatch**:
-     - *Root Cause*: Test asserted `/Join SmartTrip/i`, whereas the production UI design uses the heading "Plan Less. Travel More." with subtext "Create your free account...".
-     - *Fix*: Updated test assertion to verify `page.getByTestId("signup-heading")` contains `/Plan Less\. Travel More\./`.
-     - *App Change*: Added `data-testid="signup-heading"` to `src/routes/signup.tsx`.
+     - _Root Cause_: Test asserted `/Join SmartTrip/i`, whereas the production UI design uses the heading "Plan Less. Travel More." with subtext "Create your free account...".
+     - _Fix_: Updated test assertion to verify `page.getByTestId("signup-heading")` contains `/Plan Less\. Travel More\./`.
+     - _App Change_: Added `data-testid="signup-heading"` to `src/routes/signup.tsx`.
   4. **`fund-and-wishlist.spec.ts`: Wishlist Button / Sheet Not Visible**:
-     - *Root Cause*: CSS selector `button:has(svg.lucide-heart)` was brittle and raced layout/hydration.
-     - *Fix*: Added explicit testids. Test toggles wishlist on destination card `data-testid="wishlist-toggle-d1"`, opens navbar `data-testid="wishlist-button"`, and asserts `data-testid="wishlist-sheet"` visibility using auto-retrying web-first assertions.
-     - *App Change*: Added `data-testid="wishlist-button"` in `Navbar.tsx`, `data-testid="wishlist-sheet"` in `WishlistSheet.tsx`, and `data-testid="wishlist-toggle-${d.id}"` in `ExploreDestinations.tsx`.
+     - _Root Cause_: CSS selector `button:has(svg.lucide-heart)` was brittle and raced layout/hydration.
+     - _Fix_: Added explicit testids. Test toggles wishlist on destination card `data-testid="wishlist-toggle-d1"`, opens navbar `data-testid="wishlist-button"`, and asserts `data-testid="wishlist-sheet"` visibility using auto-retrying web-first assertions.
+     - _App Change_: Added `data-testid="wishlist-button"` in `Navbar.tsx`, `data-testid="wishlist-sheet"` in `WishlistSheet.tsx`, and `data-testid="wishlist-toggle-${d.id}"` in `ExploreDestinations.tsx`.
   5. **`fund-and-wishlist.spec.ts`: Trip Fund Dialog / "Contribute" Button Not Found**:
-     - *Root Cause*: Fragile text matching and card selection raced hydration of the fund section.
-     - *Fix*: Scoped to `data-testid="fund-card-ft1"`, clicked `data-testid="trip-fund-open"`, awaited `data-testid="trip-fund-dialog"`, and submitted via `data-testid="contribute-dialog-submit"`.
-     - *App Change*: Added `data-testid="trip-fund-section"`, `data-testid="fund-card-${trip.id}"`, `data-testid="trip-fund-open"`, `data-testid="trip-fund-dialog"`, `data-testid="contribute-input"`, and `data-testid="contribute-dialog-submit"` in `TripFund.tsx`.
+     - _Root Cause_: Fragile text matching and card selection raced hydration of the fund section.
+     - _Fix_: Scoped to `data-testid="fund-card-ft1"`, clicked `data-testid="trip-fund-open"`, awaited `data-testid="trip-fund-dialog"`, and submitted via `data-testid="contribute-dialog-submit"`.
+     - _App Change_: Added `data-testid="trip-fund-section"`, `data-testid="fund-card-${trip.id}"`, `data-testid="trip-fund-open"`, `data-testid="trip-fund-dialog"`, `data-testid="contribute-input"`, and `data-testid="contribute-dialog-submit"` in `TripFund.tsx`.
   6. **`plan-and-save.spec.ts`: "Generate Plan" Button Not Found**:
-     - *Root Cause*: Divergence in button text ("Generate My Trip" vs "Generate Plan") combined with text selector fragility.
-     - *Fix*: Replaced text-based locators with `data-testid="generate-plan-button"`, `data-testid="planner-prompt-input"`, and `data-testid="save-plan-button"`.
-     - *App Change*: Added `data-testid` attributes to `AiPlanner.tsx`.
+     - _Root Cause_: Divergence in button text ("Generate My Trip" vs "Generate Plan") combined with text selector fragility.
+     - _Fix_: Replaced text-based locators with `data-testid="generate-plan-button"`, `data-testid="planner-prompt-input"`, and `data-testid="save-plan-button"`.
+     - _App Change_: Added `data-testid` attributes to `AiPlanner.tsx`.
   7. **`search-and-book.spec.ts`: Expected Checkout/Confirmation URL Navigation Race**:
-     - *Root Cause*: Fast clicking on flight cards asserted URLs before client-side TanStack Router transitions settled, causing race conditions.
-     - *Fix*: Coupled user actions with explicit URL waits using `Promise.all([page.waitForURL(/\/checkout/), button.click()])` and `Promise.all([page.waitForURL(/\/booking-confirmation\//), button.click()])`. Added stable testids for flight cards, booking triggers, and e-ticket confirmations.
-     - *App Change*: Added `data-testid="first-flight-card"`, `data-testid="book-flight-btn"` in `bookings.tsx`, `data-testid="checkout-continue"` in `checkout.tsx`, and `data-testid="booking-confirmation"` in `ETicketView.tsx`.
+     - _Root Cause_: Fast clicking on flight cards asserted URLs before client-side TanStack Router transitions settled, causing race conditions.
+     - _Fix_: Coupled user actions with explicit URL waits using `Promise.all([page.waitForURL(/\/checkout/), button.click()])` and `Promise.all([page.waitForURL(/\/booking-confirmation\//), button.click()])`. Added stable testids for flight cards, booking triggers, and e-ticket confirmations.
+     - _App Change_: Added `data-testid="first-flight-card"`, `data-testid="book-flight-btn"` in `bookings.tsx`, `data-testid="checkout-continue"` in `checkout.tsx`, and `data-testid="booking-confirmation"` in `ETicketView.tsx`.
 - **Deterministic State & CI Workflow Updates**:
   - Created `e2e/test-helpers.ts` providing `setupIsolatedTestPage`: clears `localStorage`/`sessionStorage` before each test and routes external network requests (Open-Meteo, Frankfurter, OpenStreetMap tiles) to deterministic mock payloads so tests run 100% offline and free of rate limits.
   - Updated `playwright.config.ts`: single worker in CI (`workers: 1`), 1 retry in CI (`retries: 1`), 120s timeout, production server preview command (`node .output/server/index.mjs`).
@@ -713,26 +713,26 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
 - **Date**: 2026-10-14
 - **Goal**: Resolve Vercel build block caused by CVE-2026-102989 in `@tanstack/react-start@1.168.32` by upgrading the TanStack ecosystem to the latest stable release (>= 1.168.60) without using any `DANGEROUSLY_` bypass flags.
 - **Dependency Version Matrix**:
-  | Package | Old Version | New Version | Status |
-  |---|---|---|---|
-  | `@tanstack/react-start` | `1.168.32` | `1.169.2` | Upgraded (Patched CVE-2026-102989) |
-  | `@tanstack/react-router` | `1.170.18` | `1.170.44` | Upgraded (Coordinated) |
-  | `@tanstack/router-plugin` | `1.168.23` | `1.168.46` | Upgraded (Coordinated) |
-  | `@tanstack/react-query` | `5.104.2` | `5.104.2` | Unchanged (Compatible) |
-  | `nitro` | `3.0.260603-beta` | `3.0.260603-beta` | Unchanged |
-  | `vite` | `8.1.5` | `8.1.5` | Unchanged |
-  | `rolldown` (override) | `1.2.1` | `1.2.1` | Unchanged |
+  | Package                   | Old Version       | New Version       | Status                             |
+  | ------------------------- | ----------------- | ----------------- | ---------------------------------- |
+  | `@tanstack/react-start`   | `1.168.32`        | `1.169.2`         | Upgraded (Patched CVE-2026-102989) |
+  | `@tanstack/react-router`  | `1.170.18`        | `1.170.44`        | Upgraded (Coordinated)             |
+  | `@tanstack/router-plugin` | `1.168.23`        | `1.168.46`        | Upgraded (Coordinated)             |
+  | `@tanstack/react-query`   | `5.104.2`         | `5.104.2`         | Unchanged (Compatible)             |
+  | `nitro`                   | `3.0.260603-beta` | `3.0.260603-beta` | Unchanged                          |
+  | `vite`                    | `8.1.5`           | `8.1.5`           | Unchanged                          |
+  | `rolldown` (override)     | `1.2.1`           | `1.2.1`           | Unchanged                          |
 - **Breaking Changes Handled**:
   1. **Router `ErrorComponentProps` Type Alignment**:
-     - *Change*: TanStack Router's `ErrorComponent` now types `error` as `unknown` rather than `Error`.
-     - *Fix*: Imported `ErrorComponentProps` in `src/routes/__root.tsx` and handled both `Error` instances and string error values safely before rendering and reporting.
+     - _Change_: TanStack Router's `ErrorComponent` now types `error` as `unknown` rather than `Error`.
+     - _Fix_: Imported `ErrorComponentProps` in `src/routes/__root.tsx` and handled both `Error` instances and string error values safely before rendering and reporting.
   2. **ESLint Ignore Configuration**:
-     - *Change*: Ignored test and report artifacts (`playwright-report`, `test-results`, `coverage`) in `eslint.config.js`.
+     - _Change_: Ignored test and report artifacts (`playwright-report`, `test-results`, `coverage`) in `eslint.config.js`.
   3. **Vercel Output Compatibility**:
-     - *Verified*: `vite.config.ts` auto-detects `VERCEL=1` and applies Nitro's `vercel` preset to output to `.vercel/output`.
+     - _Verified_: `vite.config.ts` auto-detects `VERCEL=1` and applies Nitro's `vercel` preset to output to `.vercel/output`.
   4. **Security & Environment Hygiene**:
-     - *Verified*: Confirmed zero occurrences of `DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS` across code, docs, and configs.
-     - *Docs*: Added clear "Deploying to Vercel" section in `README.md` listing environment variables with no secret values.
+     - _Verified_: Confirmed zero occurrences of `DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS` across code, docs, and configs.
+     - _Docs_: Added clear "Deploying to Vercel" section in `README.md` listing environment variables with no secret values.
 - **Verification Results**:
   - `npm run lint`: 0 errors, 0 warnings.
   - `npm run typecheck`: Passed cleanly with zero TypeScript errors.
@@ -776,5 +776,36 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `npx playwright test`: 9/9 E2E tests passed cleanly across accessibility, booking, fund, planning, and signup.
 - **Baseline Failures**: 0 failures (clean green baseline).
 
+---
 
+## Phase 13: Architectural Restructuring (Client / Server / Shared Layout)
+
+- **Date**: 2026-10-14
+- **Goal**: Reorganize codebase into clean `client/`, `server/`, and `shared/` architecture using `git mv` to preserve git history, maintain thin file routes, and prevent server-only code from leaking into the browser.
+- **New Structure**:
+  - `src/routes/`: Thin TanStack file routes composing client features and calling server functions.
+  - `src/client/`:
+    - `components/`: Core UI components (`Navbar`, `Footer`, `PageHeader`, `Reveal`, `EscapeHills`, `Hero`, `HowItWorks`, `Testimonials`, `TravelSafe`) and Radix UI primitives (`components/ui/`).
+    - `features/`: Domain feature folders (`planner/`, `bookings/`, `trips/`, `map/`, `destinations/`, `fund/`, `wishlist/`, `search/`, `reviews/`, `support/`).
+    - `hooks/`: Browser hooks (`use-mobile.tsx`).
+    - `lib/`: Browser utilities (`smarttrip-store.ts`, `auth-context.tsx`, `query-client.ts`, `seo.ts`, `utils.ts`, `error-report.ts`, `supabase/client.ts`).
+  - `src/server/`:
+    - `functions/`: `createServerFn` RPC endpoints (`booking-actions.ts`, `live-data-actions.ts`, `trip-actions.ts`, `planner-actions.ts`).
+    - `services/`: Server-only implementations (`gemini-planner.ts`, `weather.ts`, `currency.ts`, `rate-limiter.ts`, `rate-limit-guard.ts`, `price-fluctuations.ts`, `payments/demo-provider.ts`, `payments/razorpay-provider.ts`).
+    - `db/`: Server Supabase client (`supabase-server.ts`).
+    - `config/`: Reserved for validated server environment config.
+  - `src/shared/`:
+    - `types/`: Domain models and contracts (`travel.ts`, `trip-plan.ts`, `weather.ts`).
+    - `constants/`: Reference data (`airports.ts`, `inventory-data.ts`, `flight-generator.ts`).
+    - `utils/`: Universal utilities (`card-validator.ts`).
+- **Path Aliases & Tooling**:
+  - Updated `tsconfig.json` paths with explicit `@/client/*`, `@/server/*`, `@/shared/*`.
+  - Updated `components.json` shadcn aliases to `@/client/components`, `@/client/components/ui`, `@/client/lib`.
+  - Added `.vercel` to `.prettierignore`.
+- **Verification Results**:
+  - `npm run lint`: 0 errors, 0 warnings.
+  - `npm run typecheck`: Passed (`tsc --noEmit`).
+  - `npm test`: 8 test suites, 80 unit tests passed.
+  - `npm run build`: Production SSR bundle generated in `.output/`.
+  - `npx playwright test`: 9/9 E2E tests passed cleanly.
 

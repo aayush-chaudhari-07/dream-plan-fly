@@ -10,11 +10,11 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
-import { Toaster } from "@/components/ui/sonner";
-import { AuthProvider } from "@/lib/auth-context";
+import { Toaster } from "@/client/components/ui/sonner";
+import { AuthProvider } from "@/client/lib/auth-context";
 import appCss from "../styles.css?url";
 import { AlertTriangle, Compass, Home, MapPin, RefreshCw, Sparkles, Wand2 } from "lucide-react";
-import { reportError } from "../lib/error-report";
+import { reportError } from "@/client/lib/error-report";
 
 function NotFoundComponent() {
   return (

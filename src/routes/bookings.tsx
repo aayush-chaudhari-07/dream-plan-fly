@@ -19,18 +19,22 @@ import {
   BellRing,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Footer } from "@/components/smarttrip/Footer";
-import { Navbar } from "@/components/smarttrip/Navbar";
-import { PageHeader } from "@/components/smarttrip/PageHeader";
-import { SupportDock } from "@/components/smarttrip/SupportDock";
-import { AirportCombobox } from "@/components/smarttrip/booking/AirportCombobox";
-import { inr } from "@/data/travel";
-import { smartTrip } from "@/lib/smarttrip-store";
-import { createPriceAlertFn } from "@/lib/server/live-data-actions";
-import { getAirportByIata } from "@/data/airports";
-import { generateFlights, type FlightOption, type CabinClass } from "@/data/flight-generator";
+import { Button } from "@/client/components/ui/button";
+import { Input } from "@/client/components/ui/input";
+import { Footer } from "@/client/components/Footer";
+import { Navbar } from "@/client/components/Navbar";
+import { PageHeader } from "@/client/components/PageHeader";
+import { SupportDock } from "@/client/features/support/SupportDock";
+import { AirportCombobox } from "@/client/features/bookings/AirportCombobox";
+import { inr } from "@/shared/types/travel";
+import { smartTrip } from "@/client/lib/smarttrip-store";
+import { createPriceAlertFn } from "@/server/functions/live-data-actions";
+import { getAirportByIata } from "@/shared/constants/airports";
+import {
+  generateFlights,
+  type FlightOption,
+  type CabinClass,
+} from "@/shared/constants/flight-generator";
 import {
   INVENTORY_STAYS,
   INVENTORY_RENTALS,
@@ -40,8 +44,8 @@ import {
   type InventoryRental,
   type InventoryTransit,
   type InventoryPackage,
-} from "@/data/inventory-data";
-import { cn } from "@/lib/utils";
+} from "@/shared/constants/inventory-data";
+import { cn } from "@/client/lib/utils";
 
 const bookingsSearchSchema = z.object({
   tab: z.enum(["flights", "stay", "rental", "rail", "packages"]).optional(),
@@ -52,7 +56,7 @@ const bookingsSearchSchema = z.object({
   cabinClass: z.enum(["economy", "premium_economy", "business", "first"]).optional(),
 });
 
-import { createSeoHead } from "@/lib/seo";
+import { createSeoHead } from "@/client/lib/seo";
 
 export const Route = createFileRoute("/bookings")({
   validateSearch: (search) => bookingsSearchSchema.parse(search),

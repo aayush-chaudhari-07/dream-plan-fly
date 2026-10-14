@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Footer } from "@/components/smarttrip/Footer";
-import { Navbar } from "@/components/smarttrip/Navbar";
-import { PageHeader } from "@/components/smarttrip/PageHeader";
-import { SupportDock } from "@/components/smarttrip/SupportDock";
-import { TripFund } from "@/components/smarttrip/TripFund";
-import { useAuth } from "@/lib/auth-context";
+import { Footer } from "@/client/components/Footer";
+import { Navbar } from "@/client/components/Navbar";
+import { PageHeader } from "@/client/components/PageHeader";
+import { SupportDock } from "@/client/features/support/SupportDock";
+import { TripFund } from "@/client/features/fund/TripFund";
+import { useAuth } from "@/client/lib/auth-context";
 
 export const Route = createFileRoute("/save")({
   head: () => ({

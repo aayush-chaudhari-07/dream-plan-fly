@@ -15,18 +15,23 @@ import {
   Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/lib/auth-context";
-import { Footer } from "@/components/smarttrip/Footer";
-import { Navbar } from "@/components/smarttrip/Navbar";
-import { PageHeader } from "@/components/smarttrip/PageHeader";
-import { SupportDock } from "@/components/smarttrip/SupportDock";
-import { Reveal, SectionHeading } from "@/components/smarttrip/Reveal";
-import { destinations, inr } from "@/data/travel";
-import { smartTrip, useSmartTrip, type StoredTrip, type TripBucket } from "@/lib/smarttrip-store";
+import { Button } from "@/client/components/ui/button";
+import { Skeleton } from "@/client/components/ui/skeleton";
+import { useAuth } from "@/client/lib/auth-context";
+import { Footer } from "@/client/components/Footer";
+import { Navbar } from "@/client/components/Navbar";
+import { PageHeader } from "@/client/components/PageHeader";
+import { SupportDock } from "@/client/features/support/SupportDock";
+import { Reveal, SectionHeading } from "@/client/components/Reveal";
+import { destinations, inr } from "@/shared/types/travel";
+import {
+  smartTrip,
+  useSmartTrip,
+  type StoredTrip,
+  type TripBucket,
+} from "@/client/lib/smarttrip-store";
 
-import { createSeoHead } from "@/lib/seo";
+import { createSeoHead } from "@/client/lib/seo";
 
 export const Route = createFileRoute("/my-trips")({
   head: () =>
