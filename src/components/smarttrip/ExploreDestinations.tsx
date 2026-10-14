@@ -19,30 +19,36 @@ export function DestinationCard({
 }) {
   return (
     <article className="card-hover group relative w-[300px] shrink-0 overflow-hidden rounded-3xl border border-border bg-card shadow-soft sm:w-auto">
-      <Link
-        to="/destination/$id"
-        params={{ id: d.id }}
-        className="block relative h-52 overflow-hidden"
-      >
-        <img
-          src={d.image}
-          alt={`${d.name}, ${d.region}`}
-          loading="lazy"
-          decoding="async"
-          width={1024}
-          height={768}
-          className="size-full object-cover transition-transform duration-700 group-hover:scale-110"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/75 via-ink/10 to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-95" />
+      <div className="block relative h-52 overflow-hidden">
+        <Link
+          to="/destination/$id"
+          params={{ id: d.id }}
+          className="absolute inset-0"
+          aria-label={`Explore ${d.name}`}
+        >
+          <img
+            src={d.image}
+            alt={`${d.name}, ${d.region}`}
+            loading="lazy"
+            decoding="async"
+            width={1024}
+            height={768}
+            className="size-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/75 via-ink/10 to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-95" />
+          <div className="absolute bottom-3 left-4 text-primary-foreground">
+            <p className="font-display text-lg font-bold group-hover:underline">{d.name}</p>
+            <p className="text-xs opacity-85">{d.region}</p>
+          </div>
+          <span className="absolute right-3 bottom-3 flex items-center gap-1 rounded-full bg-card/90 px-2.5 py-1 text-xs font-semibold">
+            <Star className="size-3 fill-sunset text-sunset" /> {d.rating}
+          </span>
+        </Link>
         <button
           type="button"
           aria-label="Add to wishlist"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onWish?.(d.id);
-          }}
-          className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-card/85 backdrop-blur transition-transform hover:scale-110 z-10"
+          onClick={() => onWish?.(d.id)}
+          className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-card/85 backdrop-blur transition-transform hover:scale-110 z-10 cursor-pointer"
         >
           <Heart
             className={cn(
@@ -51,14 +57,7 @@ export function DestinationCard({
             )}
           />
         </button>
-        <div className="absolute bottom-3 left-4 text-primary-foreground">
-          <p className="font-display text-lg font-bold group-hover:underline">{d.name}</p>
-          <p className="text-xs opacity-85">{d.region}</p>
-        </div>
-        <span className="absolute right-3 bottom-3 flex items-center gap-1 rounded-full bg-card/90 px-2.5 py-1 text-xs font-semibold">
-          <Star className="size-3 fill-sunset text-sunset" /> {d.rating}
-        </span>
-      </Link>
+      </div>
       <div className="p-4">
         <p className="min-h-10 text-sm text-muted-foreground">{d.blurb}</p>
         <div className="mt-4 flex items-center justify-between">

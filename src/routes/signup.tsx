@@ -206,12 +206,16 @@ function SignUpPage() {
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                <label
+                  htmlFor="signup-name"
+                  className="block text-xs font-semibold text-foreground/80 mb-1.5"
+                >
                   Full Name
                 </label>
                 <div className="relative">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
+                    id="signup-name"
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
@@ -222,12 +226,16 @@ function SignUpPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                <label
+                  htmlFor="signup-email"
+                  className="block text-xs font-semibold text-foreground/80 mb-1.5"
+                >
                   Email Address
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
+                    id="signup-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -239,12 +247,16 @@ function SignUpPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                <label
+                  htmlFor="signup-password"
+                  className="block text-xs font-semibold text-foreground/80 mb-1.5"
+                >
                   Password
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
+                    id="signup-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}

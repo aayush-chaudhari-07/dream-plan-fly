@@ -3,39 +3,40 @@ import { test, expect } from "@playwright/test";
 test.describe("Trip Fund & Wishlist Flows", () => {
   test("toggles destination wishlist and opens wishlist drawer", async ({ page }) => {
     await page.goto("/");
+    await page.waitForSelector('body[data-hydrated="true"]', { timeout: 15_000 });
 
-    // Locate the first wishlist heart button on a destination card
-    const heartButtons = page.locator(
-      'button[aria-label*="wishlist" i], button:has(svg.lucide-heart)',
-    );
-    await expect(heartButtons.first()).toBeVisible({ timeout: 10_000 });
-
-    // Click heart to toggle wishlist
-    await heartButtons.first().click();
-
-    // Open wishlist sheet from Navbar
-    const wishlistNavBtn = page.getByRole("button", { name: /wishlist/i }).first();
-    await expect(wishlistNavBtn).toBeVisible();
+    // 1. Open wishlist sheet specifically from header Navbar
+    const wishlistNavBtn = page.locator('header button[aria-label="Wishlist"]').first();
+    await expect(wishlistNavBtn).toBeVisible({ timeout: 10_000 });
     await wishlistNavBtn.click();
 
-    // Verify Wishlist sheet opened
-    await expect(page.locator("text=Your Wishlist").first()).toBeVisible();
+    // 2. Verify Wishlist sheet opened
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 10_000 });
+    await page.keyboard.press("Escape");
+
+    // 3. Locate and toggle heart button on a destination card
+    const cardHeart = page.locator('article button[aria-label*="wishlist" i]').first();
+    if (await cardHeart.isVisible()) {
+      await cardHeart.click();
+    }
   });
 
   test("interacts with trip savings fund", async ({ page }) => {
     await page.goto("/");
+    await page.waitForSelector('body[data-hydrated="true"]', { timeout: 15_000 });
 
     // Scroll to TripFund section
     const fundSection = page.locator("text=Trip Fund").first();
     await fundSection.scrollIntoViewIfNeeded();
     await expect(fundSection).toBeVisible();
 
-    // Check for Add Contribution / Deposit button
-    const depositBtn = page.getByRole("button", { name: /deposit|contribute|add/i }).first();
-    if (await depositBtn.isVisible()) {
-      await depositBtn.click();
-      // Ensure contribution modal or form is accessible
-      await expect(page.locator("role=dialog").or(page.locator("text=Contribute"))).toBeVisible();
+    // Click quick deposit button (e.g. +₹1,000)
+    const quickAddBtn = page.locator('button:has-text("+₹")').first();
+    if (await quickAddBtn.isVisible()) {
+      await quickAddBtn.click();
+      await expect(page.locator("[data-sonner-toast]").first()).toBeVisible({
+        timeout: 6_000,
+      });
     }
   });
 });

@@ -184,6 +184,10 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    document.body.setAttribute("data-hydrated", "true");
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

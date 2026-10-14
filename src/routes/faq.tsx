@@ -442,10 +442,15 @@ function FaqPage() {
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                    <label
+                      htmlFor="issue-category"
+                      className="text-xs font-semibold text-muted-foreground block mb-1"
+                    >
                       Issue Category
                     </label>
                     <select
+                      id="issue-category"
+                      aria-label="Issue Category"
                       value={category}
                       onChange={(e) =>
                         setCategory(

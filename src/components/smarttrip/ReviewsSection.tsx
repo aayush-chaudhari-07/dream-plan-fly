@@ -282,7 +282,12 @@ export function ReviewsSection() {
                 booking or saved trip can post.
               </p>
               <Button variant="hero" asChild className="rounded-full">
-                <Link to="/login" search={{ redirect: window.location.pathname }}>
+                <Link
+                  to="/login"
+                  search={{
+                    redirect: typeof window !== "undefined" ? window.location.pathname : "/",
+                  }}
+                >
                   Sign In / Create Account
                 </Link>
               </Button>

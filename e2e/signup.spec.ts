@@ -6,13 +6,13 @@ test.describe("Authentication - Sign Up Flow", () => {
 
     // Check title and header
     await expect(page).toHaveTitle(/Create Account/);
-    await expect(page.locator("h1")).toContainText(/Join SmartTrip|Create your account/i);
+    await expect(page.locator("h1")).toContainText(/Plan Less. Travel More.|Create/i);
 
     // Verify form elements exist
-    const nameInput = page.locator('input[type="text"]').first();
-    const emailInput = page.locator('input[type="email"]');
-    const passwordInput = page.locator('input[type="password"]');
-    const submitButton = page.locator('button[type="submit"]');
+    const nameInput = page.locator("#signup-name");
+    const emailInput = page.locator("#signup-email");
+    const passwordInput = page.locator("#signup-password");
+    const submitButton = page.getByRole("button", { name: /create account/i });
 
     await expect(nameInput).toBeVisible();
     await expect(emailInput).toBeVisible();
@@ -20,18 +20,18 @@ test.describe("Authentication - Sign Up Flow", () => {
     await expect(submitButton).toBeVisible();
 
     // Verify link to login page works
-    const loginLink = page.locator('a[href*="/login"]');
+    const loginLink = page.locator('a[href*="/login"]').first();
     await expect(loginLink).toBeVisible();
   });
 
   test("can fill demo signup credentials and trigger flow", async ({ page }) => {
     await page.goto("/signup");
 
-    await page.locator('input[type="text"]').first().fill("Rohan Sharma");
-    await page.locator('input[type="email"]').fill("rohan.sharma@example.com");
-    await page.locator('input[type="password"]').fill("DemoSecret123!");
+    await page.locator("#signup-name").fill("Rohan Sharma");
+    await page.locator("#signup-email").fill("rohan.sharma@example.com");
+    await page.locator("#signup-password").fill("DemoSecret123!");
 
-    const submitButton = page.locator('button[type="submit"]');
+    const submitButton = page.getByRole("button", { name: /create account/i });
     await expect(submitButton).toBeEnabled();
   });
 });
