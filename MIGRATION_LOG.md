@@ -946,3 +946,65 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
      - `npm run scan-secrets`: 0 secrets detected.
      - `npx playwright test`: 9/9 E2E tests passed cleanly.
 
+---
+
+## Phase 18: Resolution of Vercel SSR 500 Error, Runtime Hardening & Health Monitoring
+
+- **Date**: 2026-10-14
+- **Goal**: Reproduce and resolve the Vercel branch preview deployment 500 unhandled SSR crash (`{"error":true,"status":500,"unhandled":true}`), ensure public routes render without environment variables, configure the correct Nitro preset and Node runtime, implement user-friendly styled error responses for browser requests versus JSON for APIs, and add diagnostic `/api/health`.
+- **Root Cause Analysis (Empirical Proof)**:
+  1. **Accidental Git-Tracked Prebuilt Output (`.vercel/output/`)**:
+     - Git commit `0aa0fc4` previously committed 118 build files under `.vercel/output/`.
+     - Inside `.vercel/output/functions/__server.func/.vc-config.json`, the generated lambda runtime was `"nodejs24.x"` (derived from the local build machine's Node 24 binary).
+     - Vercel Serverless Functions do not support `nodejs24.x` (AWS Lambda supports `nodejs20.x` and `nodejs22.x`). When Vercel clones a git repository that contains a pre-existing `.vercel/output/` directory, it deploys the prebuilt output directly (`--prebuilt` behavior) without running the standard build command. The resulting serverless function fails to boot on Vercel's infrastructure, triggering Nitro's generic 500 crash handler.
+  2. **Nitro Production Error JSON Passthrough**:
+     - In `src/server.ts`, `isH3SwallowedErrorBody()` checked specifically for `payload.unhandled === true && payload.message === "HTTPError"`.
+     - In Nitro's production Vercel bundle, unhandled exceptions produce `{"error":true,"status":500,"unhandled":true}` (omitting the `"message"` key). Because `payload.message === "HTTPError"` was false, `normalizeCatastrophicSsrResponse()` returned false, allowing the raw Nitro JSON crash payload to leak directly into the browser tab instead of rendering the styled error recovery template.
+  3. **Empty String Environment Variables on Vercel Dashboard**:
+     - When optional environment variables (such as `VITE_SUPABASE_URL=""` or `VITE_SITE_URL=""`) are added as empty values in Vercel's Project Settings, Zod's `z.string().url().optional()` failed validation because `""` is not a valid URL.
+- **Key Actions & Fixes**:
+  1. **Untrack Prebuilt Output & Enforce Node 22 Runtime**:
+     - Added `.vercel` to `.gitignore` and removed all 118 files from Git index via `git rm -r --cached .vercel`.
+     - Added `"engines": { "node": "^20.0.0 || ^22.0.0" }` to `package.json`.
+     - Configured Nitro's Vercel runtime explicitly in `vite.config.ts`:
+       ```ts
+       nitro({
+         ...(nitroPreset ? { preset: nitroPreset } : {}),
+         vercel: { functions: { runtime: "nodejs22.x" } },
+       })
+       ```
+  2. **Zod Environment Preprocessing for Empty Strings**:
+     - Updated `src/server/config/env.server.ts` and `src/client/lib/client-env.ts` with `emptyStringToUndefined` preprocessor. Any variable configured as empty string or whitespace in Vercel or `.env` automatically falls back to `undefined` without throwing validation errors.
+  3. **Browser vs API Error Normalization (`src/server.ts`)**:
+     - Updated `isH3SwallowedErrorBody()` to detect any unhandled Nitro/H3 500 payload (`unhandled === true || status === 500 || error === true || message === "HTTPError"`).
+     - Differentiated browser vs API requests using `Accept` header and pathname (`/api/*`, `/_serverFn/*`). Browser requests receive the styled, branded HTML error recovery screen with HTTP 500; API calls receive clean JSON `{ error: true, status: 500, message: "Internal Server Error" }`.
+     - Filtered benign client disconnect errors (`aborted`, `ECONNRESET`, `AbortError`) from server console error logs.
+  4. **Diagnostic `/api/health` Endpoint**:
+     - Implemented `/api/health` in `src/server.ts` returning `{ ok: true, status: "healthy" | "degraded", timestamp: string }`.
+     - In non-production environments (`development`, `test`), returns `missingVariables` array containing variable **NAMES ONLY** (never values). In production, returns generic status only to prevent environment disclosure.
+  5. **Regression & Resilience Testing**:
+     - Added unit tests in `src/server/__tests__/ssr-production.test.ts` covering `/api/health` behavior across production and non-production modes, and empty string sanitization.
+     - Added Playwright E2E suite in `e2e/ssr-resilience.spec.ts` asserting that `/`, `/explore`, `/ai-planner`, `/my-trips`, `/bookings`, `/save`, and `/api/health` return HTTP 200 without environment variables.
+     - Added reproduction scripts `scripts/test-prod-ssr.mjs` and `scripts/test-vercel-handler.mjs` to execute direct Vercel serverless function entry points across NO-ENV, PUBLIC-ONLY, FULL-ENV, and EMPTY-STRINGS states.
+- **Files Touched**:
+  - `package.json` (added node 20/22 engines)
+  - `vite.config.ts` (configured nitro vercel functions runtime nodejs22.x)
+  - `.gitignore` (added .vercel)
+  - `.vercel/` (untracked 118 build files)
+  - `src/server.ts` (error normalization for browser vs API, /api/health endpoint, error filtering)
+  - `src/server/config/env.server.ts` (empty string sanitization)
+  - `src/client/lib/client-env.ts` (empty string sanitization)
+  - `src/server/__tests__/ssr-production.test.ts` (created)
+  - `e2e/ssr-resilience.spec.ts` (created)
+  - `scripts/test-prod-ssr.mjs` (created)
+  - `scripts/test-vercel-handler.mjs` (created)
+  - `MIGRATION_LOG.md` (updated)
+- **Verification Results**:
+  - Direct Vercel Function Simulation (`node scripts/test-vercel-handler.mjs`): 100% passed across all 4 environments (NO-ENV, PUBLIC-ONLY, FULL-ENV, EMPTY-STRINGS).
+  - `npm run lint`: 0 errors, 0 warnings.
+  - `npm run typecheck`: Passed with 0 errors (`tsc --noEmit`).
+  - `npm run check:boundaries`: Passed with 0 violations.
+  - `npm run scan-secrets`: 0 secrets detected.
+  - `npm test`: 9 test suites, 85 unit tests passed.
+  - `npx playwright test`: 12/12 E2E tests passed.
+

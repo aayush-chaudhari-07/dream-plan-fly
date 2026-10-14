@@ -23,34 +23,46 @@ export class MissingEnvironmentVariableError extends Error {
   }
 }
 
+const emptyStringToUndefined = (schema: z.ZodTypeAny) =>
+  z.preprocess((val) => {
+    if (typeof val === "string") {
+      const trimmed = val.trim();
+      return trimmed === "" ? undefined : trimmed;
+    }
+    return val;
+  }, schema);
+
 const serverEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   PORT: z.coerce.number().default(3000),
-  NITRO_PRESET: z.string().optional(),
+  NITRO_PRESET: emptyStringToUndefined(z.string().optional()),
 
   // Supabase Database & Auth (Server-side)
-  SUPABASE_URL: z.string().url().optional(),
-  VITE_SUPABASE_URL: z.string().url().optional(),
-  SUPABASE_ANON_KEY: z.string().min(1).optional(),
-  VITE_SUPABASE_ANON_KEY: z.string().min(1).optional(),
-  VITE_SUPABASE_PUBLISHABLE_KEY: z.string().min(1).optional(),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
+  SUPABASE_URL: emptyStringToUndefined(z.string().url().optional()),
+  VITE_SUPABASE_URL: emptyStringToUndefined(z.string().url().optional()),
+  SUPABASE_ANON_KEY: emptyStringToUndefined(z.string().min(1).optional()),
+  VITE_SUPABASE_ANON_KEY: emptyStringToUndefined(z.string().min(1).optional()),
+  VITE_SUPABASE_PUBLISHABLE_KEY: emptyStringToUndefined(z.string().min(1).optional()),
+  SUPABASE_SERVICE_ROLE_KEY: emptyStringToUndefined(z.string().min(1).optional()),
 
   // Google Gemini AI
-  GEMINI_API_KEY: z.string().min(1).optional(),
+  GEMINI_API_KEY: emptyStringToUndefined(z.string().min(1).optional()),
 
   // Demo Payment HMAC Secret
-  DEMO_PAY_SECRET: z.string().min(1).default("smarttrip-demo-secret-key-do-not-use-in-real-prod"),
+  DEMO_PAY_SECRET: z.preprocess((val) => {
+    if (typeof val === "string" && val.trim() === "") return undefined;
+    return val;
+  }, z.string().min(1).default("smarttrip-demo-secret-key-do-not-use-in-real-prod")),
 
   // Scheduled Jobs Cron Secret
-  CRON_SECRET: z.string().min(1).optional(),
+  CRON_SECRET: emptyStringToUndefined(z.string().min(1).optional()),
 
   // Optional Razorpay Gateway
-  RAZORPAY_KEY_ID: z.string().optional(),
-  RAZORPAY_KEY_SECRET: z.string().optional(),
+  RAZORPAY_KEY_ID: emptyStringToUndefined(z.string().optional()),
+  RAZORPAY_KEY_SECRET: emptyStringToUndefined(z.string().optional()),
 
   // Public Site Base URL
-  VITE_SITE_URL: z.string().url().optional(),
+  VITE_SITE_URL: emptyStringToUndefined(z.string().url().optional()),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;

@@ -7,12 +7,21 @@ import { z } from "zod";
  * Strictly uses VITE_ public variables or client fallbacks.
  */
 
+const emptyStringToUndefined = (schema: z.ZodTypeAny) =>
+  z.preprocess((val) => {
+    if (typeof val === "string") {
+      const trimmed = val.trim();
+      return trimmed === "" ? undefined : trimmed;
+    }
+    return val;
+  }, schema);
+
 const clientEnvSchema = z.object({
-  VITE_SITE_URL: z.string().url().optional(),
-  VITE_SUPABASE_URL: z.string().url().optional(),
-  VITE_SUPABASE_ANON_KEY: z.string().min(1).optional(),
-  VITE_SUPABASE_PUBLISHABLE_KEY: z.string().min(1).optional(),
-  VITE_SENTRY_DSN: z.string().optional(),
+  VITE_SITE_URL: emptyStringToUndefined(z.string().url().optional()),
+  VITE_SUPABASE_URL: emptyStringToUndefined(z.string().url().optional()),
+  VITE_SUPABASE_ANON_KEY: emptyStringToUndefined(z.string().min(1).optional()),
+  VITE_SUPABASE_PUBLISHABLE_KEY: emptyStringToUndefined(z.string().min(1).optional()),
+  VITE_SENTRY_DSN: emptyStringToUndefined(z.string().optional()),
   MODE: z.string().optional(),
   DEV: z.boolean().optional(),
   PROD: z.boolean().optional(),

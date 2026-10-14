@@ -25,6 +25,11 @@ export default defineConfig(({ command }) => ({
       ? [
           nitro({
             ...(nitroPreset ? { preset: nitroPreset } : {}),
+            vercel: {
+              functions: {
+                runtime: "nodejs22.x",
+              },
+            },
           }),
         ]
       : []),

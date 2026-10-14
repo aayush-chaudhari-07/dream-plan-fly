@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /settings
-Disallow: /checkout
-Disallow: /booking-confirmation/
-Disallow: /my-trips
-
-Sitemap: https://dream-plan-fly.vercel.app/sitemap.xml
