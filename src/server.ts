@@ -42,8 +42,7 @@ async function normalizeCatastrophicSsrResponse(
 
   const lastErr = consumeLastCapturedError();
   const lastErrorObj = lastErr instanceof Error ? lastErr : null;
-  const lastErrorMsg =
-    lastErrorObj?.message ?? (typeof lastErr === "string" ? lastErr : undefined);
+  const lastErrorMsg = lastErrorObj?.message ?? (typeof lastErr === "string" ? lastErr : undefined);
   const isAborted =
     lastErrorMsg === "aborted" ||
     (lastErr as { code?: string })?.code === "ECONNRESET" ||
