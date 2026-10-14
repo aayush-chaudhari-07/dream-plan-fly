@@ -748,4 +748,33 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `README.md`
   - `MIGRATION_LOG.md`
 
+---
+
+## Phase 12: Pre-Restructuring Audit & Baseline Verification (Client / Server / Shared Transition)
+
+- **Date**: 2026-10-14
+- **Goal**: Audit the existing repository layout, identify all files touching server-only operations and environment variables, and establish empirical baseline verification prior to restructuring into `client/`, `server/`, and `shared/` directories.
+- **Server-Only Code & Secrets Inventory**:
+  1. `src/server.ts`: TanStack Start root SSR handler; accesses `VITE_SUPABASE_URL`, `SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `SUPABASE_ANON_KEY`.
+  2. `src/lib/server/booking-actions.ts`: `createServerFn` handlers for checkout, demo payment HMAC verification, e-ticket generation.
+  3. `src/lib/server/live-data-actions.ts`: `createServerFn` handlers for live weather (`fetchDestinationWeather`) and Frankfurter currency (`convertCurrencyLive`).
+  4. `src/lib/server/trip-actions.ts`: `createServerFn` handlers for Gemini AI itinerary generation and retrieval.
+  5. `src/lib/supabase/server.ts`: Server-side Supabase client (`getSupabaseServerClient`, `createClient`) accessing `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+  6. `src/server/generate-plan.ts`: Google Gemini Flash API caller via `@google/genai` (reads `GEMINI_API_KEY`) and offline heuristic fallback.
+  7. `src/server/weather.ts`: Open-Meteo external service with in-memory caching.
+  8. `src/server/currency.ts`: Frankfurter external service with in-memory TTL caching.
+  9. `src/server/price-fluctuations.ts`: Scheduled cron job for simulated price fluctuations (reads `CRON_SECRET`).
+  10. `src/server/rate-limiter.ts` & `src/server/rate-limit-guard.ts`: In-memory rate limiting for server functions.
+  11. `src/server/payments/demo-provider.ts`: Node `crypto` HMAC-SHA256 provider (reads `DEMO_PAY_SECRET`).
+  12. `src/server/payments/razorpay-provider.ts`: Optional Razorpay provider (reads `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`).
+  13. `src/server/payments/card-validator.ts` & `src/server/payments/index.ts`: Payment resolution and card brand detection.
+- **Empirical Baseline Verification**:
+  - `npm run lint`: 0 errors, 0 warnings.
+  - `npm run typecheck`: Passed (`tsc --noEmit`).
+  - `npm test`: 8 test files, 80 unit tests passed.
+  - `npm run build`: Production SSR bundle generated in `.output/`.
+  - `npx playwright test`: 9/9 E2E tests passed cleanly across accessibility, booking, fund, planning, and signup.
+- **Baseline Failures**: 0 failures (clean green baseline).
+
+
 
