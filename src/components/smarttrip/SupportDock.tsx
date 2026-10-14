@@ -257,10 +257,15 @@ export function SupportDock() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                <label
+                  htmlFor="support-category"
+                  className="text-xs font-semibold text-muted-foreground block mb-1"
+                >
                   Inquiry Category
                 </label>
                 <select
+                  id="support-category"
+                  aria-label="Inquiry Category"
                   value={category}
                   onChange={(e) =>
                     setCategory(

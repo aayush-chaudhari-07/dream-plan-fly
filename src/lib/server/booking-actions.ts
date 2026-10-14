@@ -9,6 +9,7 @@ import {
   INVENTORY_PACKAGES,
 } from "@/data/inventory-data";
 import { images } from "@/data/travel";
+import { assertServerFnRateLimit } from "@/server/rate-limit-guard";
 
 // Helper image fallback
 function imageFor(text: string): string {
@@ -54,6 +55,7 @@ const createBookingOrderSchema = z.object({
 export const createBookingOrderFn = createServerFn({ method: "POST" })
   .validator((data: unknown) => createBookingOrderSchema.parse(data))
   .handler(async ({ data: input }) => {
+    assertServerFnRateLimit("create_booking_order", 30);
     const user = await getServerUser();
     // Allow guest or authenticated user
     const provider = getPaymentProvider();
@@ -136,6 +138,7 @@ const confirmBookingSchema = z.object({
 export const verifyAndConfirmBookingFn = createServerFn({ method: "POST" })
   .validator((data: unknown) => confirmBookingSchema.parse(data))
   .handler(async ({ data: input }) => {
+    assertServerFnRateLimit("verify_confirm_booking", 30);
     const user = await getServerUser();
     const provider = getPaymentProvider();
 
@@ -321,6 +324,7 @@ const cancelRefundSchema = z.object({
 export const cancelBookingWithRefundFn = createServerFn({ method: "POST" })
   .validator((data: unknown) => cancelRefundSchema.parse(data))
   .handler(async ({ data: { bookingId, reason } }) => {
+    assertServerFnRateLimit("cancel_booking", 30);
     const user = await getServerUser();
     const supabase = getSupabaseServerClient();
     const provider = getPaymentProvider();

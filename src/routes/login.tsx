@@ -12,19 +12,18 @@ type LoginSearch = {
   redirect?: string | undefined;
 };
 
+import { createSeoHead } from "@/lib/seo";
+
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>): LoginSearch => ({
     redirect: typeof search["redirect"] === "string" ? (search["redirect"] as string) : undefined,
   }),
-  head: () => ({
-    meta: [
-      { title: "Sign In — SmartTrip" },
-      {
-        name: "description",
-        content: "Sign in to access your cloud-synced trips, bookings, and funds on SmartTrip.",
-      },
-    ],
-  }),
+  head: () =>
+    createSeoHead({
+      title: "Sign In",
+      description: "Sign in to access your cloud-synced trips, bookings, and funds on SmartTrip.",
+      path: "/login",
+    }),
   component: LoginPage,
 });
 

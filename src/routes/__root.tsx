@@ -12,27 +12,59 @@ import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth-context";
 import appCss from "../styles.css?url";
+import { AlertTriangle, Compass, Home, MapPin, RefreshCw, Sparkles, Wand2 } from "lucide-react";
 import { reportError } from "../lib/error-report";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+    <main
+      className="flex min-h-screen items-center justify-center bg-background px-4 py-16"
+      role="main"
+    >
+      <div className="surface-card max-w-lg w-full p-8 sm:p-10 text-center rounded-3xl shadow-elevated border border-border">
+        <div className="mx-auto flex size-16 items-center justify-center rounded-3xl bg-primary/10 text-primary mb-6">
+          <Compass className="size-8" />
+        </div>
+        <p className="text-xs font-bold uppercase tracking-wider text-primary">Error 404</p>
+        <h1 className="mt-2 font-display text-3xl font-extrabold text-foreground sm:text-4xl">
+          Off the Map
+        </h1>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          The destination or page you're searching for hasn't been chartered yet. Let's get you back
+          on course.
         </p>
-        <div className="mt-6">
+
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 shadow-md"
           >
-            Go home
+            <Home className="size-4" /> Go Home
+          </Link>
+          <Link
+            to="/explore"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground transition-all hover:bg-accent"
+          >
+            <MapPin className="size-4" /> Explore Places
+          </Link>
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-border flex items-center justify-center gap-6 text-xs text-muted-foreground">
+          <Link
+            to="/ai-planner"
+            className="hover:text-primary transition-colors inline-flex items-center gap-1"
+          >
+            <Wand2 className="size-3.5" /> AI Planner
+          </Link>
+          <Link to="/bookings" className="hover:text-primary transition-colors">
+            Bookings
+          </Link>
+          <Link to="/faq" className="hover:text-primary transition-colors">
+            Help Center
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -44,33 +76,52 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+    <main
+      className="flex min-h-screen items-center justify-center bg-background px-4 py-16"
+      role="alert"
+      aria-live="assertive"
+    >
+      <div className="surface-card max-w-lg w-full p-8 sm:p-10 text-center rounded-3xl shadow-elevated border border-border">
+        <div className="mx-auto flex size-16 items-center justify-center rounded-3xl bg-destructive/10 text-destructive mb-6">
+          <AlertTriangle className="size-8" />
+        </div>
+        <p className="text-xs font-bold uppercase tracking-wider text-destructive">
+          Application Error
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <h1 className="mt-2 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          Something went wrong
+        </h1>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          We encountered an unexpected glitch loading this view. The telemetry has been logged to
+          our free error monitoring system.
+        </p>
+
+        {error?.message && (
+          <div className="mt-4 rounded-xl bg-muted/60 p-3 text-left font-mono text-xs text-muted-foreground overflow-x-auto max-h-24">
+            {error.message}
+          </div>
+        )}
+
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
+            type="button"
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 shadow-md cursor-pointer"
           >
-            Try again
+            <RefreshCw className="size-4" /> Try Again
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground transition-all hover:bg-accent"
           >
-            Go home
+            <Home className="size-4" /> Go Home
           </a>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -132,6 +183,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    document.body.setAttribute("data-hydrated", "true");
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

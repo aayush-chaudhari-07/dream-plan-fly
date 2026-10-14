@@ -180,6 +180,10 @@ export function ReviewsSection() {
                         <img
                           src={review.authorAvatar}
                           alt={review.authorName}
+                          loading="lazy"
+                          decoding="async"
+                          width={44}
+                          height={44}
                           className="size-11 rounded-full object-cover ring-2 ring-primary/20"
                         />
                       ) : (
@@ -278,7 +282,12 @@ export function ReviewsSection() {
                 booking or saved trip can post.
               </p>
               <Button variant="hero" asChild className="rounded-full">
-                <Link to="/login" search={{ redirect: window.location.pathname }}>
+                <Link
+                  to="/login"
+                  search={{
+                    redirect: typeof window !== "undefined" ? window.location.pathname : "/",
+                  }}
+                >
                   Sign In / Create Account
                 </Link>
               </Button>

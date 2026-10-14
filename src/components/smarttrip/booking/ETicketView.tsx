@@ -106,6 +106,7 @@ export function ETicketView({ booking, onCancel }: ETicketViewProps) {
       <div
         className="relative overflow-hidden rounded-3xl border-2 border-border bg-card p-6 sm:p-8 shadow-xl print:shadow-none print:border-black print:p-6"
         id="printable-eticket"
+        data-testid="booking-confirmation"
       >
         {/* Diagonal DEMO Watermark */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-10 select-none rotate-[-25deg]">
@@ -202,6 +203,9 @@ export function ETicketView({ booking, onCancel }: ETicketViewProps) {
               <img
                 src={qrDataUrl}
                 alt={`QR Verification for PNR ${booking.reference}`}
+                width={144}
+                height={144}
+                decoding="async"
                 className="size-36 rounded-xl object-contain bg-white p-1"
                 data-testid="eticket-qr-code"
               />

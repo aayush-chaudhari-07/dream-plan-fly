@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getServerUser, getSupabaseServerClient } from "@/lib/supabase/server";
 import type { TripBucket, BookingKind } from "@/lib/smarttrip-store";
 import { images } from "@/data/travel";
+import { assertServerFnRateLimit } from "@/server/rate-limit-guard";
 
 // ==============================================================================
 // ZOD VALIDATION SCHEMAS
@@ -145,6 +146,7 @@ export const getUserFn = createServerFn({ method: "GET" }).handler(async () => {
  * Fetch all trips, bookings, funds, and wishlist for the authenticated user.
  */
 export const fetchUserDataFn = createServerFn({ method: "GET" }).handler(async () => {
+  assertServerFnRateLimit("fetch_user_data", 120);
   const user = await getServerUser();
   if (!user) {
     return {
@@ -282,6 +284,7 @@ export const fetchUserDataFn = createServerFn({ method: "GET" }).handler(async (
 export const savePlanFn = createServerFn({ method: "POST" })
   .validator((data: unknown) => generatedPlanSchema.parse(data))
   .handler(async ({ data: plan }) => {
+    assertServerFnRateLimit("save_plan", 60);
     const user = await getServerUser();
     if (!user) throw new Error("Unauthorized: Please sign in to save plans to the cloud.");
 

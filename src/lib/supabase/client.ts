@@ -1,4 +1,4 @@
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 function getSupabaseUrl(): string {
   if (typeof import.meta !== "undefined" && import.meta.env?.["VITE_SUPABASE_URL"]) {
@@ -35,11 +35,18 @@ export function isSupabaseConfigured(): boolean {
   );
 }
 
-let browserClient: ReturnType<typeof createBrowserClient> | undefined;
+let browserClient: SupabaseClient | undefined;
 
-export function getSupabaseBrowserClient() {
+export function getSupabaseBrowserClient(): SupabaseClient {
   if (!browserClient) {
-    browserClient = createBrowserClient(getSupabaseUrl(), getSupabaseAnonKey());
+    browserClient = createClient(getSupabaseUrl(), getSupabaseAnonKey(), {
+      auth: {
+        flowType: "pkce",
+        detectSessionInUrl: typeof window !== "undefined",
+        persistSession: true,
+        autoRefreshToken: true,
+      },
+    });
   }
   return browserClient;
 }

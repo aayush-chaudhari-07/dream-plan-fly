@@ -117,7 +117,12 @@ export default function LeafletMapClient({
 
         {/* User Geolocation Marker */}
         {userCoords && (
-          <Marker position={userCoords} icon={userLocationIcon}>
+          <Marker
+            position={userCoords}
+            icon={userLocationIcon}
+            title="Your Location"
+            alt="Your Location"
+          >
             <Popup>
               <div className="p-1 text-center font-display">
                 <p className="flex items-center justify-center gap-1.5 font-bold text-primary text-xs">
@@ -143,6 +148,8 @@ export default function LeafletMapClient({
               key={p.id}
               position={[p.lat, p.lng]}
               icon={icon}
+              title={p.name}
+              alt={p.name}
               eventHandlers={{
                 click: () => onSelectPlace?.(p),
               }}

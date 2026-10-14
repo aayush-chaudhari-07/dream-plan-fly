@@ -1,9 +1,35 @@
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { Thermometer } from "lucide-react";
+import { Thermometer, Radio } from "lucide-react";
 import { hillStations } from "@/data/travel";
 import { Reveal, SectionHeading } from "./Reveal";
+import { getHillStationsWeatherFn } from "@/lib/server/live-data-actions";
 
 export function EscapeHills() {
+  const [liveWeather, setLiveWeather] = useState<
+    Record<string, { temp: string; condition: string; isLive: boolean; fetchedAt: number }>
+  >({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    getHillStationsWeatherFn()
+      .then((data) => {
+        if (active) {
+          setLiveWeather(data);
+          setIsLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not load live hill stations weather:", err);
+        if (active) setIsLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <section className="relative overflow-hidden bg-gradient-sky py-24">
       <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -36,37 +62,78 @@ export function EscapeHills() {
           subtitle="Cold air, slow mornings, tea at a viewpoint. The trips people remember for years."
         />
 
-        <p className="mt-4 text-center text-xs font-medium text-muted-foreground">
-          Sample temperatures — not live weather data
-        </p>
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {hillStations.map((h, i) => (
-            <Reveal key={h.name} delay={i * 60}>
-              <Link to="/destination/$id" params={{ id: h.id }} className="block">
-                <article className="group relative h-64 overflow-hidden rounded-3xl shadow-soft transition-transform duration-500 hover:-translate-y-1.5 cursor-pointer">
-                  <img
-                    src={h.image}
-                    alt={`${h.name}, ${h.state}`}
-                    loading="lazy"
-                    width={1024}
-                    height={768}
-                    className="size-full object-cover transition-transform duration-[900ms] group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-transparent" />
-                  <div className="absolute inset-x-4 bottom-4 text-primary-foreground">
-                    <p className="font-display text-xl font-bold group-hover:underline">{h.name}</p>
-                    <div className="mt-1 flex items-center justify-between text-xs opacity-90">
-                      <span>{h.state}</span>
-                      <span className="flex items-center gap-1">
-                        <Thermometer className="size-3.5" /> {h.temp}
-                      </span>
-                    </div>
-                  </div>
-                </article>
-              </Link>
-            </Reveal>
-          ))}
+        <div className="mt-4 flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground">
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
+          </span>
+          <span>
+            Live weather via{" "}
+            <a
+              href="https://open-meteo.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary underline hover:text-primary/80"
+            >
+              Open-Meteo
+            </a>{" "}
+            · Cached every 30m
+          </span>
         </div>
+
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {hillStations.map((h, i) => {
+            const weather = liveWeather[h.name];
+            const displayTemp = weather?.temp || h.temp;
+
+            return (
+              <Reveal key={h.name} delay={i * 60}>
+                <Link to="/destination/$id" params={{ id: h.id }} className="block">
+                  <article className="group relative h-64 overflow-hidden rounded-3xl shadow-soft transition-transform duration-500 hover:-translate-y-1.5 cursor-pointer">
+                    <img
+                      src={h.image}
+                      alt={`${h.name}, ${h.state}`}
+                      loading="lazy"
+                      decoding="async"
+                      width={1024}
+                      height={768}
+                      className="size-full object-cover transition-transform duration-[900ms] group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-transparent" />
+                    <div className="absolute inset-x-4 bottom-4 text-primary-foreground">
+                      <p className="font-display text-xl font-bold group-hover:underline">
+                        {h.name}
+                      </p>
+                      <div className="mt-1 flex items-center justify-between text-xs opacity-90">
+                        <span>{h.state}</span>
+                        <span className="flex items-center gap-1 font-semibold">
+                          <Thermometer className="size-3.5 text-sky-400" />
+                          <span>{displayTemp}</span>
+                          {!isLoading && (
+                            <Radio className="size-2.5 text-emerald-400 animate-pulse ml-0.5" />
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+                </Link>
+              </Reveal>
+            );
+          })}
+        </div>
+
+        <p className="mt-6 text-center text-[11px] text-muted-foreground/80">
+          Weather data by{" "}
+          <a
+            href="https://open-meteo.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-foreground"
+          >
+            Open-Meteo.com
+          </a>{" "}
+          (CC BY 4.0)
+        </p>
       </div>
     </section>
   );

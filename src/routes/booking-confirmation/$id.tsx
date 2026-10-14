@@ -12,16 +12,16 @@ import { useSmartTrip, smartTrip, type StoredBooking } from "@/lib/smarttrip-sto
 import { cancelBookingWithRefundFn } from "@/lib/server/booking-actions";
 import { inr } from "@/data/travel";
 
+import { createSeoHead } from "@/lib/seo";
+
 export const Route = createFileRoute("/booking-confirmation/$id")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Booking #${params.id} Confirmed — SmartTrip` },
-      {
-        name: "description",
-        content: "View your confirmed reservation and download your demo E-ticket.",
-      },
-    ],
-  }),
+  head: ({ params }) =>
+    createSeoHead({
+      title: `Booking #${params.id} Confirmed`,
+      description: "View your confirmed reservation and download your demo E-ticket.",
+      path: `/booking-confirmation/${params.id}`,
+      noindex: true,
+    }),
   component: BookingConfirmationPage,
 });
 

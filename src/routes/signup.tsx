@@ -21,19 +21,18 @@ type SignupSearch = {
   redirect?: string | undefined;
 };
 
+import { createSeoHead } from "@/lib/seo";
+
 export const Route = createFileRoute("/signup")({
   validateSearch: (search: Record<string, unknown>): SignupSearch => ({
     redirect: typeof search["redirect"] === "string" ? (search["redirect"] as string) : undefined,
   }),
-  head: () => ({
-    meta: [
-      { title: "Create Account — SmartTrip" },
-      {
-        name: "description",
-        content: "Join SmartTrip to generate AI itineraries, save trips, and track travel funds.",
-      },
-    ],
-  }),
+  head: () =>
+    createSeoHead({
+      title: "Create Account",
+      description: "Join SmartTrip to generate AI itineraries, save trips, and track travel funds.",
+      path: "/signup",
+    }),
   component: SignUpPage,
 });
 
@@ -123,7 +122,10 @@ function SignUpPage() {
               <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-gradient-brand text-primary-foreground shadow-soft mb-3">
                 <Compass className="size-6" />
               </div>
-              <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+              <h1
+                className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground"
+                data-testid="signup-heading"
+              >
                 Plan Less. Travel More.
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -205,53 +207,68 @@ function SignUpPage() {
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" data-testid="signup-form">
               <div>
-                <label className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                <label
+                  htmlFor="signup-name"
+                  className="block text-xs font-semibold text-foreground/80 mb-1.5"
+                >
                   Full Name
                 </label>
                 <div className="relative">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
+                    id="signup-name"
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Jane Doe"
                     className="pl-10 h-11 rounded-xl bg-background/50 border-border/80"
+                    data-testid="signup-name"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                <label
+                  htmlFor="signup-email"
+                  className="block text-xs font-semibold text-foreground/80 mb-1.5"
+                >
                   Email Address
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
+                    id="signup-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     required
                     className="pl-10 h-11 rounded-xl bg-background/50 border-border/80"
+                    data-testid="signup-email"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                <label
+                  htmlFor="signup-password"
+                  className="block text-xs font-semibold text-foreground/80 mb-1.5"
+                >
                   Password
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
+                    id="signup-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="At least 6 characters"
                     required
                     className="pl-10 h-11 rounded-xl bg-background/50 border-border/80"
+                    data-testid="signup-password"
                   />
                 </div>
               </div>
@@ -262,6 +279,7 @@ function SignUpPage() {
                 size="lg"
                 className="w-full rounded-2xl h-11 text-sm font-semibold shadow-soft"
                 disabled={submitting}
+                data-testid="signup-submit"
               >
                 {submitting ? (
                   <>
@@ -285,6 +303,7 @@ function SignUpPage() {
                   to="/login"
                   search={{ redirect: redirectUrl }}
                   className="font-semibold text-primary hover:underline"
+                  data-testid="signup-login-link"
                 >
                   Sign in
                 </Link>

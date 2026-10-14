@@ -21,6 +21,7 @@ import {
   markNotificationReadFn,
   editFundFn,
 } from "@/lib/server/trip-actions";
+import { createPriceAlertFn, deletePriceAlertFn } from "@/lib/server/live-data-actions";
 
 export type TripBucket = "Upcoming" | "Past" | "Saved";
 
@@ -108,6 +109,19 @@ export type StoredNotification = {
   link?: string | undefined;
 };
 
+export type StoredPriceAlert = {
+  id: string;
+  itemType: "flight" | "stay" | "package";
+  itemId: string;
+  title: string;
+  targetPrice: number;
+  basePrice: number;
+  currentPrice: number;
+  isActive: boolean;
+  createdAt: number;
+  lastNotifiedAt?: number | undefined;
+};
+
 export type SmartTripState = {
   trips: StoredTrip[];
   bookings: StoredBooking[];
@@ -115,6 +129,7 @@ export type SmartTripState = {
   fundContributions: FundContribution[];
   wishlist: string[];
   notifications: StoredNotification[];
+  priceAlerts: StoredPriceAlert[];
   isLoading?: boolean;
   isError?: boolean;
   isAuthenticated?: boolean;
@@ -189,6 +204,7 @@ const SEED: SmartTripState = {
   ],
   wishlist: [],
   notifications: SEED_NOTIFICATIONS,
+  priceAlerts: [],
   isLoading: false,
   isError: false,
   isAuthenticated: false,
@@ -229,6 +245,7 @@ function hydrate() {
         fundContributions: parsed.fundContributions ?? SEED.fundContributions,
         wishlist: parsed.wishlist ?? [],
         notifications: parsed.notifications ?? SEED_NOTIFICATIONS,
+        priceAlerts: parsed.priceAlerts ?? [],
         isLoading: false,
         isError: false,
         isAuthenticated: false,
@@ -285,6 +302,7 @@ export function useSmartTrip(): SmartTripState {
         fundContributions: local.fundContributions,
         wishlist: local.wishlist,
         notifications: local.notifications,
+        priceAlerts: local.priceAlerts,
         isLoading: true,
         isError: false,
         isAuthenticated: true,
@@ -300,6 +318,7 @@ export function useSmartTrip(): SmartTripState {
         fundContributions: local.fundContributions,
         wishlist: local.wishlist,
         notifications: local.notifications,
+        priceAlerts: local.priceAlerts,
         isLoading: false,
         isError: true,
         isAuthenticated: true,
@@ -315,6 +334,7 @@ export function useSmartTrip(): SmartTripState {
         fundContributions: local.fundContributions,
         wishlist: query.data.wishlist,
         notifications: query.data.notifications || local.notifications,
+        priceAlerts: local.priceAlerts,
         isLoading: false,
         isError: false,
         isAuthenticated: true,
@@ -876,6 +896,65 @@ export const smartTrip = {
     }
   },
 
+  addNotification(input: {
+    title: string;
+    message: string;
+    type: NotificationType;
+    link?: string | undefined;
+  }) {
+    const notif: StoredNotification = {
+      id: id("notif"),
+      title: input.title,
+      message: input.message,
+      type: input.type,
+      read: false,
+      createdAt: Date.now(),
+      link: input.link,
+    };
+    update({ notifications: [notif, ...localState.notifications] });
+    return notif;
+  },
+
+  /* ---------- price alerts ---------- */
+  addPriceAlert(input: {
+    itemType: "flight" | "stay" | "package";
+    itemId: string;
+    title: string;
+    targetPrice: number;
+    basePrice: number;
+  }) {
+    const alert: StoredPriceAlert = {
+      id: id("alt"),
+      itemType: input.itemType,
+      itemId: input.itemId,
+      title: input.title,
+      targetPrice: input.targetPrice,
+      basePrice: input.basePrice,
+      currentPrice: input.basePrice,
+      isActive: true,
+      createdAt: Date.now(),
+    };
+
+    update({ priceAlerts: [alert, ...localState.priceAlerts] });
+
+    if (currentAuthUser) {
+      createPriceAlertFn({ data: input }).catch((err) => {
+        console.error("Failed to create price alert on server:", err);
+      });
+    }
+
+    return alert;
+  },
+
+  removePriceAlert(alertId: string) {
+    update({ priceAlerts: localState.priceAlerts.filter((a) => a.id !== alertId) });
+    if (currentAuthUser) {
+      deletePriceAlertFn({ data: { alertId } }).catch((err) => {
+        console.error("Failed to delete price alert on server:", err);
+      });
+    }
+  },
+
   getState(): SmartTripState {
     return localState;
   },
@@ -886,6 +965,7 @@ export const smartTrip = {
       trips: seedTrips(),
       fundContributions: SEED.fundContributions,
       notifications: SEED_NOTIFICATIONS,
+      priceAlerts: [],
     });
   },
 };

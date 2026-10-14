@@ -1,6 +1,6 @@
 # PROJECT CONTEXT: SmartTrip (dream-plan-fly)
 
-> Comprehensive architectural, structural, and technical documentation of the codebase for AI assistants and developers without direct repository access.
+> Comprehensive architectural, structural, and technical documentation of the codebase for AI assistants, engineers, and developers.
 
 ---
 
@@ -9,36 +9,39 @@
 ### 1.1 Project Identity & Purpose
 
 - **Project Name**: SmartTrip (Repository: `dream-plan-fly`, Package name: `smarttrip`)
-- **Live Deployment**: `https://your-domain.com`
-- **Platform**: Standalone TanStack Start web application
+- **Live Deployment**: `https://dream-plan-fly.vercel.app` (or custom domain)
+- **Platform**: Fullstack TanStack Start SSR web application (Nitro server engine)
 - **Tagline**: _"Plan Less. Travel More."_ / _"Travel smarter. Explore more."_
 - **Core Concept**: `Dream → Ask AI → Plan → Save → Book → Travel`
-- **Problem Solved**: Traditional travel planning is disjointed and stressful. Travelers juggle multiple tabs for inspiration, itinerary builders, price comparisons, savings calculators, and booking platforms. SmartTrip unifies destination discovery, rule-based/AI trip planning, future trip savings tracking, and end-to-end demo bookings into a cohesive, travel-tech product with modern aesthetics.
+- **Problem Solved**: Traditional travel planning is fragmented and expensive. Travelers juggle multiple tabs for inspiration, itinerary builders, price comparisons, savings calculators, and booking platforms, often trapped by paid API keys and trial subscriptions. SmartTrip unifies destination discovery, Google Gemini AI trip planning with quota protection, future trip savings tracking, and an end-to-end simulated booking experience with zero-cost demo payment gateways on **100% permanent free tiers**.
 
 ### 1.2 Target Users
 
-- Leisure travelers looking for curated destinations and quick itinerary inspiration.
-- Group and family vacationers coordinating multi-day itineraries and budgets.
-- Future trip planners wanting to create savings targets and track progress over months/years (e.g., Japan 2027, Kashmir Winter).
-- Travelers looking for categorized options across Hill Stations, Beaches, Heritage, and Adventure spots.
+- Leisure travelers seeking curated destination inspiration and automated AI itineraries.
+- Budget-conscious travelers and families coordinating multi-day itineraries, group sizes, and cost ceilings.
+- Future trip dreamers creating dedicated savings funds with monthly targets (e.g., Japan 2027, Kashmir Winter).
+- Travelers exploring Indian and international routes across Hill Stations, Beaches, Heritage, and Adventure spots.
 
 ### 1.3 Main Features
 
-1. **Interactive Hero & Search**: Destination search form with fields for Destination, Travel Dates, Travelers, and Budget, styled over an animated sky canvas (clouds, flying birds, and transiting aircraft via CSS animations).
-2. **Quick Booking Panel**: Dynamic multi-tab booking search interface for Flights, Hotels/Stays, Car/Bike Rentals, Train/Bus, and Packages.
-3. **Explore Destinations**: Categorized destination catalog (Hill Stations, Beaches, Adventure, Heritage, Nature, International, Weekend Getaways) with real pricing in INR (₹), ratings, blurbs, and instant wishlist toggling.
-4. **AI Trip Planner**: Heuristic itinerary engine (`buildPlan`) that generates personalized multi-day schedules, estimated budgets, lodging recommendations, transport modes, food trail ideas, packing lists, weather alerts, tips, and carbon footprint estimations. Features PDF/print export, shareable URLs, and dynamic budget/day recalculations.
-5. **Trip Fund (Save for Future Trip)**: Travel dream tracker enabling users to create dedicated funds for specific destinations and dates, make quick contributions (+₹500, +₹1,000, +₹2,500, or custom), track percentage completion, and view required monthly savings.
-6. **Escape to the Hills**: Dedicated scenic showcase featuring 8 hill stations (Manali, Shimla, Munnar, Ooty, Lonavala, Mahabaleshwar, Darjeeling, Kashmir) with temperatures and rich visual presentation.
-7. **"My Trips" Dashboard**: Central traveler hub featuring aggregate statistics (trips tracked, bookings, fund totals, wishlisted spots), active booking management with cancellation, and trip classification into three buckets: Upcoming, Past, and Saved.
-8. **Travel Safety & Support Dock**: Safety guidance checklist and floating 24/7 support trigger with quick access to the AI planner, help center, and support hotline simulation.
+1. **Interactive Hero & Search**: Destination search form (Destination, Dates, Travelers, Budget) styled over an animated sky canvas (clouds, birds, aircraft).
+2. **Quick Booking Panel**: Multi-tab search for Flights, Hotels/Stays, Car/Bike Rentals, Train/Bus, and Curated Packages.
+3. **Airport Autocomplete**: Instant search backed by the offline OpenFlights dataset (zero external API calls).
+4. **Programmatic Flight Schedules**: Deterministic schedule and fare generator producing 6–10 realistic flight options per route with live-looking demo price fluctuations.
+5. **Explore Destinations**: Categorized catalog (7 categories, 9 core destinations) with INR pricing, ratings, blurbs, and instant wishlist toggling.
+6. **AI Trip Planner**: Powered by **Google Gemini 2.5 Flash** with an offline heuristic fallback (`buildPlan`). Features server-side query caching, user/guest daily quota limits, circuit breaker, drag-and-drop itinerary reordering, activity add/edit/delete, and PDF export.
+7. **Interactive Leaflet & OpenStreetMap**: Fullscreen/card interactive map featuring 54 points of interest across destinations, category filters, browser geolocation distance sorting, and strict OSM attribution compliance.
+8. **Real-Time Weather & Currency**: Current weather and 7-day forecast via Open-Meteo API (cached 30m); real-time currency conversion (INR, USD, EUR, GBP) via Frankfurter ECB reference rates (cached 24h).
+9. **Trip Savings Fund**: Dedicated savings goals with animated progress bars, monthly savings calculators, quick contributions (+₹500, +₹1,000, +₹2,500), and canvas confetti celebrations upon completion.
+10. **Zero-Cost Demo Checkout & E-Ticket**: Complete booking experience with idempotency protection, mock payment gateway (Card, UPI, NetBanking with real Luhn safety guards), and printable E-tickets with dynamic QR codes.
+11. **My Trips Dashboard**: Central traveler hub managing active bookings, trip buckets (Upcoming, Past, Saved), savings funds, and wishlisted places with cancellation and demo reset actions.
+12. **Supabase Cloud Sync & Keep-Alive**: Multi-user cloud persistence with Row Level Security and indexed foreign keys, paired with an automated GitHub Actions keep-alive workflow that pings `/api/keep-alive` twice weekly to prevent 7-day inactivity pause.
 
 ### 1.4 Current Status
 
-- **Current Status**: **Working Prototype / In Progress**
-- **Working**: All UI pages, client-side routing, responsive layouts, animated hero layers, heuristic AI itinerary generation, reactive `localStorage` persistence, booking creation/cancellation, savings fund contributions, and wishlisting are functional.
-- **Partially Working / Mocked**: All flight, hotel, rental, rail, and package inventory is backed by static demo data in `src/data/travel.ts`. Bookings generate simulated reference numbers without payment gateways or external GDS/OTA APIs. AI generation uses a client-side regex and template builder rather than an external LLM.
-- **Incomplete / Pending**: The interactive map section described in `README.md` (which utilizes the `mapPlaces` dataset defined in `src/data/travel.ts`) is not yet wired into any component or page. Drag-and-drop itinerary reordering, automated price-drop alerts, and persistent cloud authentication are pending.
+- **Current Status**: **Production-Ready (100% Free Tier Architecture)**
+- **Working**: All UI pages, SSR rendering, responsive layouts, Gemini AI integration, offline fallbacks, Supabase auth/sync, Leaflet map, booking lifecycle, checkout flow, price alerts, weather, currency, unit tests (80 tests), and E2E tests (9 tests) are fully passing and verified.
+- **Demo Guarding**: All booking inventory and payment transactions are strictly simulated demo operations, prominently labeled with "Demo pricing", "Demo Safe Gateway", and test card numbers. Real payment numbers and credit cards are strictly refused.
 
 ---
 
@@ -46,104 +49,91 @@
 
 ### 2.1 Languages, Frameworks & Libraries
 
-_(Exact versions extracted from `package.json`)_
-
 #### Core & Runtime
 
-- **Language**: TypeScript (`^5.8.3`), Node.js (tested on Node v24.20.0 / npm 11.19.0; bun configuration present)
-- **UI Library**: React 19 (`react: ^19.2.0`, `react-dom: ^19.2.0`)
+- **Language**: TypeScript (`^5.8.3`), Node.js (v20+ / v22+ / v24+)
+- **UI Framework**: React 19 (`react: ^19.2.0`, `react-dom: ^19.2.0`)
 - **SSR & Fullstack Framework**: TanStack Start (`@tanstack/react-start: 1.168.32`)
 - **Router**: TanStack Router (`@tanstack/react-router: 1.170.18`, `@tanstack/router-plugin: 1.168.23`)
 - **Async State Management**: TanStack Query (`@tanstack/react-query: ^5.101.1`)
 
-#### Build Tools & Bundler
+#### Build Tools & Server Engine
 
-- **Build Tool**: Vite (`vite: 8.1.5`, `@vitejs/plugin-react: ^5.2.0`)
-- **SSR Server Engine**: Nitro (`nitro: 3.0.260603-beta`)
-- **Configuration**: Standalone Vite + Nitro configuration
+- **Bundler**: Vite (`vite: 8.1.5`, `@vitejs/plugin-react: ^5.2.0`)
+- **Server Engine**: Nitro (`nitro: 3.0.260603-beta`) outputting standalone `.output/server/index.mjs`
 - **Path Resolution**: `vite-tsconfig-paths: ^6.0.2`
-- **Overrides**: `rolldown: 1.2.1`
+- **Engine Overrides**: `rolldown: 1.2.1`
 
 #### Styling & Design System
 
 - **CSS Engine**: Tailwind CSS v4 (`tailwindcss: ^4.2.1`, `@tailwindcss/vite: ^4.2.1`)
-- **Animations**: `tw-animate-css: ^1.3.4` + custom keyframes in `src/styles.css`
+- **Animations**: `tw-animate-css: ^1.3.4` + custom CSS keyframe animations
 - **Class Utilities**: `clsx: ^2.1.1`, `tailwind-merge: ^3.5.0`, `class-variance-authority: ^0.7.1`
-- **Color System**: OKLCH semantic tokens defined in `src/styles.css` with dark mode support
-- **Fonts**: Manrope (Body sans-serif), Sora (Headings display) from Google Fonts
+- **Color System**: Semantic OKLCH tokens with full Dark/Light theme switching
+- **Typography**: Sora (display headings) & Manrope (body sans) via Google Fonts CDN
 
-#### UI Component Primitives & Utilities
+#### UI Components & Interactive Libraries
 
-- **Radix UI Primitives**:
-  - `@radix-ui/react-accordion: ^1.2.12`
-  - `@radix-ui/react-alert-dialog: ^1.1.15`
-  - `@radix-ui/react-aspect-ratio: ^1.1.8`
-  - `@radix-ui/react-avatar: ^1.1.11`
-  - `@radix-ui/react-checkbox: ^1.3.3`
-  - `@radix-ui/react-collapsible: ^1.1.12`
-  - `@radix-ui/react-context-menu: ^2.2.16`
-  - `@radix-ui/react-dialog: ^1.1.15`
-  - `@radix-ui/react-dropdown-menu: ^2.1.16`
-  - `@radix-ui/react-hover-card: ^1.1.15`
-  - `@radix-ui/react-label: ^2.1.8`
-  - `@radix-ui/react-menubar: ^1.1.16`
-  - `@radix-ui/react-navigation-menu: ^1.2.14`
-  - `@radix-ui/react-popover: ^1.1.15`
-  - `@radix-ui/react-progress: ^1.1.8`
-  - `@radix-ui/react-radio-group: ^1.3.8`
-  - `@radix-ui/react-scroll-area: ^1.2.10`
-  - `@radix-ui/react-select: ^2.2.6`
-  - `@radix-ui/react-separator: ^1.1.8`
-  - `@radix-ui/react-slider: ^1.3.6`
-  - `@radix-ui/react-slot: ^1.2.4`
-  - `@radix-ui/react-switch: ^1.2.6`
-  - `@radix-ui/react-tabs: ^1.1.13`
-  - `@radix-ui/react-toggle: ^1.1.10`
-  - `@radix-ui/react-toggle-group: ^1.1.11`
-  - `@radix-ui/react-tooltip: ^1.2.8`
+- **UI Primitives**: Radix UI (dialog, dropdown, popover, sheet, tabs, accordion, avatar, select, slider, tooltip)
+- **Drag & Drop**: `@dnd-kit/core: ^6.3.1`, `@dnd-kit/sortable: ^10.0.0`, `@dnd-kit/utilities: ^3.2.2`
+- **Mapping**: `leaflet: ^1.9.4`, `react-leaflet: ^5.0.0`, `@types/leaflet: ^1.9.22`
+- **Command Palette**: `cmdk: ^1.1.1`
+- **QR Codes**: `qrcode: ^1.5.4`, `@types/qrcode: ^1.5.6`
+- **Confetti**: `canvas-confetti: ^1.9.4`, `@types/canvas-confetti: ^1.9.0`
 - **Icons**: `lucide-react: ^0.575.0`
 - **Toasts**: `sonner: ^2.0.7`
-- **Form Handling & Validation**: `react-hook-form: ^7.71.2`, `@hookform/resolvers: ^5.2.2`, `zod: ^3.24.2`
-- **Date Handling**: `date-fns: ^4.1.0`, `react-day-picker: ^9.14.0`
-- **Charts & Drawers & Carousel**: `recharts: ^2.15.4`, `vaul: ^1.1.2`, `embla-carousel-react: ^8.6.0`, `cmdk: ^1.1.1`, `input-otp: ^1.4.2`, `react-resizable-panels: ^4.6.5`
+- **Validation**: `zod: ^3.24.2`, `react-hook-form: ^7.71.2`, `@hookform/resolvers: ^5.2.2`
 
-#### Linting & Formatting
+#### Testing & Quality Assurance
 
-- **Linter**: ESLint 9 (`eslint: ^9.32.0`, `@eslint/js: ^9.32.0`, `typescript-eslint: ^8.56.1`, `eslint-plugin-react-hooks: ^5.2.0`, `eslint-plugin-react-refresh: ^0.4.20`)
-- **Formatter**: Prettier 3 (`prettier: ^3.7.3`, `eslint-config-prettier: ^10.1.1`, `eslint-plugin-prettier: ^5.2.6`)
+- **Unit Testing**: Vitest (`vitest: ^5.0.4`, `@testing-library/react: ^16.3.3`, `jsdom: ^30.1.2`) — 8 test suites, 80 tests passing.
+- **End-to-End Testing**: Playwright (`@playwright/test: ^1.64.0`, `@axe-core/playwright: ^4.13.0`) — 9 tests passing.
+- **Linting & Formatting**: ESLint 9 (`eslint: ^9.32.0`, `typescript-eslint: ^8.56.1`), Prettier 3 (`prettier: ^3.7.3`).
+- **Security Scanner**: Client bundle secret scanner (`scripts/scan-client-secrets.mjs`) verifying 0 secrets leaked across all client chunks.
 
 ### 2.2 Database, APIs & External Services
 
-- **Database**: None. State is held in-memory and synced to the browser's `localStorage` via `src/lib/smarttrip-store.ts`.
-- **APIs**: None currently connected. Data is local and statically seeded (`src/data/travel.ts`).
-- **External Web Services**:
-  - Google Fonts CDN (`https://fonts.googleapis.com` for Manrope and Sora).
+| Service / API           | Free Tier Terms                              | Purpose                                  | SmartTrip Integration                                                                             |
+| ----------------------- | -------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **Google Gemini Flash** | 15 RPM, 1M TPM, 1,500 RPD (Zero credit card) | AI Itinerary Generation                  | `@google/genai` via server function with in-memory caching, per-user limits, and offline fallback |
+| **Supabase**            | 500 MB DB, 50k MAU (Zero credit card)        | Auth, Profiles, Bookings, Funds          | `@supabase/ssr` with RLS, indexed foreign keys, and `/api/keep-alive` cron                        |
+| **Open-Meteo**          | 10,000 calls/day without API key             | Live weather & 7-day forecasts           | Cached 30 minutes in server memory with seasonal fallback                                         |
+| **Frankfurter**         | Unlimited open ECB rates without API key     | Currency conversion (INR, USD, EUR, GBP) | Cached 24 hours in server memory with static fallback rates                                       |
+| **OpenFlights**         | Open Data (ODbL)                             | Airport Autocomplete                     | Embedded offline JSON (`src/data/airports.json`), 0 external requests                             |
+| **OpenStreetMap**       | Open Data (ODbL)                             | Interactive Map Tiles                    | Lazy-loaded client-only Leaflet with strict attribution & aggressive tile caching                 |
 
 ### 2.3 Installation & Run Commands
 
 ```bash
 # 1. Install dependencies
 npm install
-# (Alternatively, if bun is installed: bun install)
 
-# 2. Run local development server
+# 2. Configure environment (copy example)
+cp .env.example .env
+# Edit .env with your free keys:
+# GEMINI_API_KEY=[REDACTED_API_KEY]
+# VITE_SUPABASE_URL=https://your-project.supabase.co
+# VITE_SUPABASE_ANON_KEY=[REDACTED_ANON_KEY]
+
+# 3. Start local development server
 npm run dev
-# Starts Vite development server with SSR support at http://localhost:3000 (or first open port)
 
-# 3. Build for production
-npm run build
-
-# 4. Build development bundle
-npm run build:dev
-
-# 5. Preview production build locally
-npm run preview
-
-# 6. Run linter
+# 4. Run linting & type checks
 npm run lint
+npm run typecheck
 
-# 7. Run code formatter
-npm run format
+# 5. Run Vitest unit test suite (80 tests)
+npm test
+
+# 6. Run Playwright end-to-end tests (9 tests)
+npm run test:e2e
+
+# 7. Build production bundle & scan client chunks for secrets
+npm run build
+npm run scan-secrets
+
+# 8. Run production server locally
+npm run preview
 ```
 
 ---
@@ -152,114 +142,115 @@ npm run format
 
 ```
 dream-plan-fly/
-├── .gitignore                      # Git ignore file (excludes build outputs, node_modules, logs)
-├── .prettierignore                 # Prettier ignore rules
-├── .prettierrc                     # Prettier formatting configuration
-├── README.md                       # Product specification, design guidelines, and feature requirements
-├── components.json                 # Shadcn-UI configuration file (New York style, slate color base)
-├── eslint.config.js                # ESLint configuration supporting React Hooks, Refresh, and Prettier
-├── package.json                    # Dependencies, build scripts, engine overrides
-├── public/
-│   ├── favicon.ico                 # Application favicon
-│   └── robots.txt                  # Search engine crawler permissions (allows all search crawlers)
+├── .agent/                         # Antigravity GSD workflow specifications
+├── .agents/                        # Specialized agent definitions & skills
+├── .github/
+│   └── workflows/
+│       ├── ci.yml                  # CI pipeline (lint, typecheck, vitest, build, secret-scan)
+│       ├── daily-price-alerts.yml  # Daily price fluctuation trigger (runs at 04:00 UTC)
+│       └── keep-alive.yml          # Supabase keep-alive cron (Mon & Thu 06:00 UTC)
+├── docs/
+│   └── FREE_STACK.md               # 100% Free Stack Architecture & Quota Protection Guide
+├── Documents/
+│   ├── PRD.md                      # Product Requirements Document
+│   └── PROJECT_RULES.md            # Architectural rules & design specifications
+├── e2e/                            # Playwright end-to-end test suites
+│   ├── accessibility.spec.ts       # WCAG accessibility scans with axe-core
+│   ├── fund-and-wishlist.spec.ts   # Trip fund deposits & wishlist drawer flows
+│   ├── plan-and-save.spec.ts       # AI itinerary generation & save to trips flow
+│   ├── search-and-book.spec.ts     # Destination search, demo booking & E-ticket verification
+│   └── signup.spec.ts              # Authentication & form validation flows
+├── scripts/
+│   └── scan-client-secrets.mjs     # Production client bundle secret leak scanner
 ├── src/
-│   ├── assets/                     # High-resolution static photography used across the app
-│   │   ├── dest-goa.jpg            # Beach and sunset photography for Goa destinations/stays
-│   │   ├── dest-japan.jpg          # Kyoto/Tokyo photography for Japan destinations/funds
-│   │   ├── dest-kashmir.jpg        # Dal Lake and mountains photography for Kashmir
-│   │   ├── dest-maldives.jpg       # Turquoise lagoon and villa imagery for Maldives
-│   │   ├── dest-manali.jpg         # Snow peak and valley imagery for Manali / hill stations
-│   │   └── hero-mountains.jpg      # High-res panoramic landscape for the Hero background
+│   ├── assets/                     # High-resolution static photography
 │   ├── components/
-│   │   ├── smarttrip/              # Core business components implementing the SmartTrip experience
-│   │   │   ├── AiPlanner.tsx       # AI prompt box, quick buttons, itinerary generator, and plan viewer
-│   │   │   ├── EscapeHills.tsx     # Scenic showcase section featuring 8 hill station destinations
-│   │   │   ├── ExploreDestinations.tsx # Catalog of destinations with category filtering and wishlist actions
-│   │   │   ├── Footer.tsx          # Multi-column footer, newsletter subscribe form, social links
-│   │   │   ├── Hero.tsx            # Hero banner with animated sky elements and multi-field search
-│   │   │   ├── HowItWorks.tsx      # 4-step visual flow (Ask AI -> Explore -> Save -> Book & Go)
-│   │   │   ├── Navbar.tsx          # Sticky glassmorphic navbar with desktop/mobile navigation menus
-│   │   │   ├── PageHeader.tsx      # Reusable sub-page banner header with breadcrumb navigation
-│   │   │   ├── QuickBooking.tsx    # Multi-tab booking search bar (Flights, Stay, Rental, Rail, Packages)
-│   │   │   ├── Reveal.tsx          # IntersectionObserver scroll-reveal animations and section headers
-│   │   │   ├── SupportDock.tsx     # Floating bottom-right 24/7 support trigger and speed-dial actions
-│   │   │   ├── Testimonials.tsx    # Social proof traveler review cards with star ratings
-│   │   │   ├── TravelSafe.tsx      # Health, safety, verified stays, and emergency support section
-│   │   │   └── TripFund.tsx        # Dream trip savings tracker with progress bars and contribution inputs
-│   │   └── ui/                     # Shadcn-UI component library primitives (Radix UI wrappers)
-│   │       ├── accordion.tsx
-│   │       ├── alert-dialog.tsx
-│   │       ├── alert.tsx
-│   │       ├── aspect-ratio.tsx
-│   │       ├── avatar.tsx
-│   │       ├── badge.tsx
-│   │       ├── breadcrumb.tsx
-│   │       ├── button.tsx          # Customized button with hero, glass, sunset, leaf, soft variants
-│   │       ├── calendar.tsx
-│   │       ├── card.tsx
-│   │       ├── carousel.tsx
-│   │       ├── chart.tsx
-│   │       ├── checkbox.tsx
-│   │       ├── collapsible.tsx
-│   │       ├── command.tsx
-│   │       ├── context-menu.tsx
-│   │       ├── dialog.tsx
-│   │       ├── drawer.tsx
-│   │       ├── dropdown-menu.tsx
-│   │       ├── form.tsx
-│   │       ├── hover-card.tsx
-│   │       ├── input-otp.tsx
-│   │       ├── input.tsx           # Styled text/number input primitive
-│   │       ├── label.tsx
-│   │       ├── menubar.tsx
-│   │       ├── navigation-menu.tsx
-│   │       ├── pagination.tsx
-│   │       ├── popover.tsx
-│   │       ├── progress.tsx
-│   │       ├── radio-group.tsx
-│   │       ├── resizable.tsx
-│   │       ├── scroll-area.tsx
-│   │       ├── select.tsx
-│   │       ├── separator.tsx
-│   │       ├── sheet.tsx
-│   │       ├── sidebar.tsx
-│   │       ├── skeleton.tsx
-│   │       ├── slider.tsx
-│   │       ├── sonner.tsx          # Sonner toast provider container
-│   │       ├── switch.tsx
-│   │       ├── table.tsx
-│   │       ├── tabs.tsx
-│   │       ├── textarea.tsx        # Styled textarea primitive
-│   │       ├── toggle-group.tsx
-│   │       ├── toggle.tsx
-│   │       └── tooltip.tsx
+│   │   ├── smarttrip/              # Core application business components
+│   │   │   ├── booking/            # Booking dialogs, comboboxes, payments & E-tickets
+│   │   │   │   ├── AirportCombobox.tsx
+│   │   │   │   ├── DemoPaymentModal.tsx
+│   │   │   │   └── ETicketView.tsx
+│   │   │   ├── map/                # Client-only Leaflet map wrapper
+│   │   │   │   └── LeafletMapClient.tsx
+│   │   │   ├── AiPlanner.tsx       # AI prompt box, quick pills & itinerary display
+│   │   │   ├── EscapeHills.tsx     # Scenic showcase with live Open-Meteo weather
+│   │   │   ├── ExploreDestinations.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   ├── Hero.tsx
+│   │   │   ├── HowItWorks.tsx
+│   │   │   ├── InteractiveMap.tsx  # Interactive Leaflet map with 54 points of interest
+│   │   │   ├── ItineraryEditor.tsx # Drag-and-drop itinerary editor powered by @dnd-kit
+│   │   │   ├── Navbar.tsx          # Responsive navigation, search, wishlist & auth profile
+│   │   │   ├── NotificationsPopover.tsx
+│   │   │   ├── PageHeader.tsx
+│   │   │   ├── QuickBooking.tsx
+│   │   │   ├── QuickTravelGuide.tsx
+│   │   │   ├── Reveal.tsx
+│   │   │   ├── ReviewsSection.tsx
+│   │   │   ├── SearchCommandDialog.tsx
+│   │   │   ├── SupportDock.tsx
+│   │   │   ├── Testimonials.tsx
+│   │   │   ├── TravelSafe.tsx
+│   │   │   ├── TripFund.tsx
+│   │   │   ├── WeatherForecastCard.tsx
+│   │   │   └── WishlistSheet.tsx
+│   │   └── ui/                     # Accessible Shadcn UI component primitives
 │   ├── data/
-│   │   └── travel.ts               # Static datasets: destinations, hill stations, flights, hotels, map places, etc.
-│   ├── hooks/
-│   │   └── use-mobile.tsx          # React hook detecting viewport width < 768px
+│   │   ├── airports.json           # Filtered OpenFlights global airports dataset
+│   │   ├── airports.ts             # OpenFlights loader & autocomplete search index
+│   │   ├── flight-generator.ts     # Deterministic daily flight schedule & fare engine
+│   │   ├── inventory-data.ts       # Indian stays, car rentals, bus/train transit & packages
+│   │   └── travel.ts               # Seed catalog, destinations, hill stations & 54 map places
 │   ├── lib/
-│   │   ├── error-capture.ts        # Out-of-band error recorder for SSR unhandled exceptions in h3
-│   │   ├── error-page.ts           # Pure HTML/CSS fallback page rendered when catastrophic SSR fails
-│   │   ├── error-report.ts         # Application error reporting utility (ready for Sentry integration)
-│   │   ├── smarttrip-store.ts      # Reactive external store with localStorage sync for trips, bookings, funds
-│   │   ├── trip-plan.ts            # Heuristic algorithm for parsing travel prompts and building itineraries
-│   │   └── utils.ts                # Tailwind class merge helper (`cn()`)
-│   ├── routeTree.gen.ts            # Auto-generated TanStack Router route tree definition
-│   ├── router.tsx                  # Factory initializing TanStack Router with QueryClient
-│   ├── routes/                     # TanStack Start file-based route definitions
-│   │   ├── README.md               # Guide explaining file-based route conventions
-│   │   ├── __root.tsx              # Root HTML shell, QueryClientProvider, Toaster, and global Error Boundary
-│   │   ├── index.tsx               # Route `/` — Complete SmartTrip landing page
-│   │   ├── ai-planner.tsx          # Route `/ai-planner` — Dedicated AI Trip Planner page
-│   │   ├── bookings.tsx            # Route `/bookings` — Multi-category booking catalog and booking triggers
-│   │   ├── explore.tsx             # Route `/explore` — Full-page destination discovery grid
-│   │   ├── my-trips.tsx            # Route `/my-trips` — Dashboard for bookings, trips, funds, and wishlist
-│   │   └── save.tsx                # Route `/save` — Dedicated page for Trip Fund savings management
-│   ├── server.ts                   # TanStack Start SSR server entrypoint with error interception
-│   ├── start.ts                    # TanStack Start application setup with CSRF and error middlewares
-│   └── styles.css                  # Tailwind v4 theme, OKLCH semantic tokens, and custom keyframe animations
-├── tsconfig.json                   # TypeScript compiler options, path alias `@/* -> ./src/*`
-└── vite.config.ts                  # Standalone Vite configuration using official plugins
+│   │   ├── server/                 # TanStack Start server functions (auth, bookings, trips, live data)
+│   │   │   ├── booking-actions.ts
+│   │   │   ├── live-data-actions.ts
+│   │   │   └── trip-actions.ts
+│   │   ├── supabase/               # Supabase SSR & client instances
+│   │   │   ├── client.ts
+│   │   │   └── server.ts
+│   │   ├── auth-context.tsx        # React authentication provider with Supabase sync
+│   │   ├── error-report.ts         # Centralized error reporting & Supabase error_logs logging
+│   │   ├── seo.ts                  # Comprehensive SEO metadata, OG, Twitter & JSON-LD generator
+│   │   ├── smarttrip-store.ts      # Reactive external store with localStorage persistence
+│   │   └── trip-plan.ts            # Heuristic offline itinerary & budget estimation engine
+│   ├── routes/                     # TanStack Start file-based routes
+│   │   ├── __root.tsx              # Root HTML shell, SEO head, error boundary, Sonner toaster
+│   │   ├── index.tsx               # Route `/` — Landing page
+│   │   ├── ai-planner.tsx          # Route `/ai-planner`
+│   │   ├── bookings.tsx            # Route `/bookings`
+│   │   ├── checkout.tsx            # Route `/checkout`
+│   │   ├── booking-confirmation/$id.tsx # Route `/booking-confirmation/$id`
+│   │   ├── destination/$id.tsx     # Route `/destination/$id`
+│   │   ├── explore.tsx             # Route `/explore`
+│   │   ├── faq.tsx                 # Route `/faq`
+│   │   ├── login.tsx               # Route `/login`
+│   │   ├── my-trips.tsx            # Route `/my-trips`
+│   │   ├── plan/$id.tsx            # Route `/plan/$id`
+│   │   ├── privacy.tsx             # Route `/privacy`
+│   │   ├── save.tsx                # Route `/save`
+│   │   ├── settings.tsx            # Route `/settings`
+│   │   ├── signup.tsx              # Route `/signup`
+│   │   └── terms.tsx               # Route `/terms`
+│   ├── server/                     # Server-side business logic & background adapters
+│   │   ├── payments/               # Payment providers & Luhn card safety validator
+│   │   ├── currency.ts             # Frankfurter currency exchange with daily cache
+│   │   ├── generate-plan.ts        # Google Gemini Flash API with schema validation & caching
+│   │   ├── price-fluctuations.ts   # Deterministic price fluctuation job & alert notifier
+│   │   ├── rate-limit-guard.ts     # In-memory IP rate limiter for server functions
+│   │   ├── rate-limiter.ts         # Gemini quota tracker, daily ceiling & circuit breaker
+│   │   └── weather.ts              # Open-Meteo weather client with 30-minute cache
+│   ├── server.ts                   # Nitro/SSR entrypoint with keep-alive, sitemap & robots.txt
+│   ├── start.ts                    # TanStack Start bootstrap with CSRF & error middlewares
+│   └── styles.css                  # Tailwind CSS v4 design tokens & keyframes
+├── supabase/
+│   ├── migrations/                 # PostgreSQL schema, RLS policies & B-tree indexes
+│   └── seed.sql                    # Initial seed data for inventory and destinations
+├── package.json
+├── playwright.config.ts
+├── tsconfig.json
+├── vite.config.ts
+└── vitest.config.ts
 ```
 
 ---
@@ -274,74 +265,40 @@ dream-plan-fly/
        ▼
 [ HTTP Request to Nitro / Vite Server ]
        │
-       ├──> [ src/server.ts ] (Server Entry Wrapper)
+       ├──> [ src/server.ts ] (Server Entrypoint)
        │         │
-       │         ├──> Catches / unwraps h3 swallowed 500 errors
+       │         ├──> /api/keep-alive (Resets Supabase 7-day inactivity pause)
+       │         ├──> /api/cron/price-alerts (GitHub Actions secret-protected daily job)
+       │         ├──> /sitemap.xml & /robots.txt (Dynamic SEO endpoints)
        │         └──> Delegates to @tanstack/react-start/server-entry
        │
        ▼
 [ src/start.ts ] (TanStack Start Middlewares)
        │
-       ├──> errorMiddleware (Server function exception handling)
-       └──> csrfMiddleware (Cross-Site Request Forgery protection for serverFn)
+       ├──> errorMiddleware (Server function exception capture)
+       └──> csrfMiddleware (CSRF token verification on POST server functions)
        │
        ▼
-[ src/router.tsx & src/routeTree.gen.ts ] (File-based Route Resolution)
+[ src/router.tsx & src/routeTree.gen.ts ] (Route Resolution)
        │
        ▼
 [ src/routes/__root.tsx ] (App Shell)
        │
-       ├──> Head metadata & Google Fonts
+       ├──> Head metadata & Open Graph / Twitter Tags
        ├──> QueryClientProvider (TanStack Query)
-       ├──> Sonner Toaster (Global Toast Notifications)
-       └──> <Outlet /> (Renders Route Component)
-                 │
-                 ├──> / (routes/index.tsx)
-                 ├──> /ai-planner (routes/ai-planner.tsx)
-                 ├──> /bookings (routes/bookings.tsx)
-                 ├──> /explore (routes/explore.tsx)
-                 ├──> /my-trips (routes/my-trips.tsx)
-                 └──> /save (routes/save.tsx)
+       ├──> AuthProvider (Supabase Auth Context)
+       ├──> Sonner Toaster (Global Toast Container)
+       └──> <Outlet /> (Renders Child Route)
 ```
 
 ### 4.2 State Architecture & Client Persistence
 
-The project uses a reactive **External Store** pattern (`src/lib/smarttrip-store.ts`) paired with React's `useSyncExternalStore`:
-
-1. **Initial Seed**: If `localStorage` is empty, state initializes with seed trips from `src/data/travel.ts` (Goa, Manali, Kashmir, Kyoto), initial funds (Japan 2027, Kashmir Winter, Maldives Escape), empty bookings, and empty wishlist.
-2. **Hydration**: On mount, `hydrate()` parses `localStorage.getItem("smarttrip.state.v1")` and emits an update.
-3. **Reactivity**: Mutations (`savePlan`, `moveTrip`, `removeTrip`, `addBooking`, `cancelBooking`, `addFund`, `contribute`, `removeFund`, `toggleWish`, `reset`) update the internal state object, write to `localStorage`, and notify all subscribed components.
-4. **SSR Safety**: Server renders default `SEED` data; client hydrates seamlessly without hydration mismatches.
-
-### 4.3 Key User & Data Flows
-
-#### Flow 1: AI Itinerary Creation & Saving
-
-1. **Input**: User enters a prompt in `Hero.tsx` or `AiPlanner.tsx` (e.g., _"I want a 5-day trip to Himachal Pradesh for 3 people under ₹35,000"_).
-2. **Parsing**: `buildPlan()` in `src/lib/trip-plan.ts` uses regex to extract the budget (defaults to ₹35,000), passenger count (defaults to 2), duration (between 2 and 10 days, default 5), and destination keywords.
-3. **Synthesis**: The algorithm generates day-by-day itineraries, lodging recommendations, transport guidance, dining trails, weather warnings, packing lists, money-saving tips, budget breakdowns, and an estimated carbon footprint.
-4. **Interaction**: User can adjust budget, days, or traveler counts and trigger `onReplan()`.
-5. **Persistence**: Clicking _"Save to My Trips"_ calls `smartTrip.savePlan(plan)`. This generates an ID (`trip-*`), places it into the `"Saved"` bucket, updates `localStorage`, and displays a success toast.
-
-#### Flow 2: Booking Flights, Hotels, Rentals, Rails, or Packages
-
-1. **Selection**: User goes to `/bookings` and chooses a tab (Flights, Hotels, Rentals, Train/Bus, Packages).
-2. **Booking Action**: User clicks _"Book"_ or _"Reserve"_.
-3. **Execution**: `smartTrip.addBooking(...)` is invoked. It generates a reference code (e.g. `ST4X89K`), adds an item to `state.bookings`, and automatically generates an accompanying `"Upcoming"` trip entry in `state.trips`.
-4. **Notification**: Sonner toast notifies the user that the demo booking was confirmed. The booking immediately appears in `/my-trips`.
-
-#### Flow 3: Trip Fund & Future Savings
-
-1. **Creation**: User enters a trip name (e.g., _"Santorini 2027"_) and target budget (e.g., `₹80,000`) in `TripFund.tsx`.
-2. **Action**: `smartTrip.addFund(...)` stores the goal.
-3. **Contributions**: User clicks quick-add buttons (`+₹500`, `+₹1,000`, `+₹2,500`) or enters a custom sum.
-4. **Calculation**: `smartTrip.contribute(fundId, amount)` increments `saved` (capped at `target`). The UI updates the progress percentage and recalculates the required monthly rate: `(target - saved) / monthsLeft`.
-
-#### Flow 4: Wishlisting Destinations
-
-1. **Trigger**: User clicks the heart icon on any destination card in `ExploreDestinations.tsx`.
-2. **Execution**: `smartTrip.toggleWish(destinationId)` adds or removes the ID in `state.wishlist`.
-3. **Sync**: All wishlisted destinations are aggregated and displayed inside the `"Places You Loved"` section of `/my-trips`.
+1. **Dual-Layer Persistence**:
+   - **Local Tier**: Unauthenticated guests use an external reactive store (`smarttrip-store.ts`) synchronized to `localStorage` (`smarttrip.state.v1`), allowing full app functionality without an account or network dependency.
+   - **Cloud Tier**: Authenticated users automatically synchronize bookings, saved trips, and future funds with Supabase PostgreSQL tables (`user_trips`, `user_bookings`, `trip_funds`, `user_profiles`).
+2. **Deterministic Offline Fallbacks**:
+   - If Supabase environment variables are omitted or invalid, the app falls back to safe local mock connections without throwing fatal errors.
+   - If Google Gemini returns an HTTP 429 or reaches daily rate ceilings, itineraries are generated seamlessly via `buildPlan()`.
 
 ---
 
@@ -349,164 +306,93 @@ The project uses a reactive **External Store** pattern (`src/lib/smarttrip-store
 
 ### 5.1 `src/server.ts`
 
-- **Purpose**: Custom SSR entry wrapper for TanStack Start and Nitro builds.
-- **Critical Logic**: h3 (Nitro's underlying HTTP layer) swallows in-handler errors into generic 500 JSON responses (`{"unhandled":true,"message":"HTTPError"}`). `src/server.ts` checks for this condition, pulls the original stack trace via `consumeLastCapturedError()`, logs the details, and returns a clean HTML fallback page using `renderErrorPage()`.
+- **Purpose**: Nitro SSR entrypoint handling security headers, SEO sitemaps, robots.txt, keep-alive pings, and price alerts.
+- **Security Headers**: Injects `Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, and `Referrer-Policy: strict-origin-when-cross-origin`.
+- **Special Endpoints**:
+  - `/api/keep-alive`: Executes a lightweight query against Supabase to reset the 7-day inactivity pause timer.
+  - `/api/cron/price-alerts`: Authenticated via `x-cron-secret` header to simulate daily fare fluctuations and notify users with active price watches.
+  - `/sitemap.xml`: Dynamically generated XML sitemap listing all static routes and destinations with change frequencies and priorities.
 
-```typescript
-export default {
-  async fetch(request: Request, env: unknown, ctx: unknown) {
-    try {
-      const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
-    } catch (error) {
-      console.error(error);
-      return new Response(renderErrorPage(), {
-        status: 500,
-        headers: { "content-type": "text/html; charset=utf-8" },
-      });
-    }
-  },
-};
-```
+### 5.2 `src/server/generate-plan.ts` & `src/server/rate-limiter.ts`
 
-### 5.2 `src/start.ts`
+- **Purpose**: Google Gemini 2.5 Flash itinerary generation with free-tier quota protection.
+- **Protections**:
+  - **In-Memory Cache**: Deterministic hash of prompt, destination, budget, days, and travelers. Exact queries are returned immediately with 0 API tokens consumed.
+  - **Daily Limits**: 15 plans/day for signed-in users, 5/day for guests.
+  - **Global Ceiling**: Halts external API calls after 1,000 calls/day (500-request safety cushion below Google's 1,500 daily limit).
+  - **Circuit Breaker**: On HTTP 429 from Google, trips a 60-second backoff and seamlessly delivers an offline plan from `buildPlan()`.
 
-- **Purpose**: Defines TanStack Start instance configuration, error middleware, and CSRF protection.
-- **Critical Logic**: Installs `csrfMiddleware` filtered to `serverFn` handlers to secure server actions from cross-site request attacks.
+### 5.3 `src/lib/server/live-data-actions.ts`
 
-### 5.3 `src/router.tsx` & `src/routes/__root.tsx`
+- **Purpose**: Free keyless live data integrations for weather and currency.
+- **Open-Meteo Weather**: Fetches real-time temperature, weather codes, and 7-day daily forecasts for destination coordinates; cached 30 minutes in server memory.
+- **Frankfurter Currency**: Fetches daily ECB reference exchange rates for INR against USD, EUR, and GBP; cached 24 hours in server memory.
 
-- **Purpose**: Defines router context and root application shell.
-- **Key Elements**:
-  - Sets up `QueryClient` and scroll restoration.
-  - Injects global HTML `<head>` tags (meta descriptions, OG tags, Google Fonts stylesheets).
-  - Contains `NotFoundComponent` (404 UI) and `ErrorComponent` (React Error Boundary catching client route failures and calling `reportError`).
-  - Wraps children in `<QueryClientProvider>` and mounts `<Toaster position="bottom-right" richColors />`.
+### 5.4 `src/data/flight-generator.ts`
 
-### 5.4 `src/lib/smarttrip-store.ts`
+- **Purpose**: Generates realistic flight schedules between any origin and destination airport pair.
+- **Features**: Deterministic pseudo-random seed based on route and date, producing 6 to 10 plausible airline options (IndiGo, Air India, Vistara, SpiceJet, Akasa Air) with realistic flight numbers, departure/arrival times, durations, stop counts, and class fares.
 
-- **Purpose**: Centralized application state management and `localStorage` synchronization.
-- **Exported API**:
-  - `useSmartTrip()`: Hook for components to subscribe to state updates.
-  - `smartTrip`: Object containing action methods:
-    - `savePlan(plan: GeneratedPlan): StoredTrip`
-    - `moveTrip(tripId: string, bucket: TripBucket): void`
-    - `removeTrip(tripId: string): void`
-    - `addBooking(input): StoredBooking`
-    - `cancelBooking(bookingId: string): void`
-    - `addFund(input): FutureTrip`
-    - `contribute(fundId: string, amount: number): void`
-    - `removeFund(fundId: string): void`
-    - `toggleWish(destinationId: string): boolean`
-    - `reset(): void`
-- **State Interface**:
+### 5.5 `src/components/smarttrip/booking/DemoPaymentModal.tsx`
 
-```typescript
-export type SmartTripState = {
-  trips: StoredTrip[];
-  bookings: StoredBooking[];
-  funds: FutureTrip[];
-  wishlist: string[];
-};
-```
-
-### 5.5 `src/lib/trip-plan.ts`
-
-- **Purpose**: Local deterministic travel planner and budget estimation engine.
-- **Main Function**: `buildPlan(prompt: string, opts: PlanOptions): GeneratedPlan`
-  - Parses budget via regex `(\d{4,7})`.
-  - Parses passenger count via `(\d+)\s*(people|persons|travell?ers|friends|adults)`.
-  - Parses day count via `(\d+)\s*-?\s*day` (clamped between 2 and 10 days).
-  - Determines destination category (beach, mountain, international) based on prompt keyword matching.
-  - Returns structured plan with budget allocation: Transport (30%), Stays (35%), Food (20%), Activities (10%), Buffer (5%).
-  - Computes approximate carbon footprint (`distKm * 2 * perKm`).
-
-### 5.6 `src/data/travel.ts`
-
-- **Purpose**: Primary database of static mock items.
-- **Exported Collections**:
-  - `destinations`: 9 destinations (Manali, Goa, Kashmir, Kyoto, Maldives, Lonavala, Munnar, Rishikesh, Jaipur).
-  - `destinationCategories`: 8 category filters.
-  - `hillStations`: 8 hill stations with simulated current temperatures.
-  - `mapPlaces`: 6 points of interest with coordinates and categories (_Note: Defined here, but currently unused in the UI_).
-  - `flights`, `hotels`, `rentals`, `railBus`, `packages`: Booking mock inventory.
-  - `initialFutureTrips`: 3 starter savings goals.
-  - `myTrips`: Starter trips classified by bucket.
-  - `inr(n: number)`: Currency formatter returning `₹XX,XXX`.
-
-### 5.7 Route Files (`src/routes/*.tsx`)
-
-- `routes/index.tsx`: Main landing page assembling Navbar, Hero, QuickBooking, ExploreDestinations, HowItWorks, EscapeHills, AiPlanner, TripFund, Testimonials, TravelSafe, Footer, and SupportDock.
-- `routes/ai-planner.tsx`: Dedicated full page for the AI Trip Planner with a `PageHeader`.
-- `routes/bookings.tsx`: Booking catalog supporting 5 tabs (flights, stays, rentals, rail, packages) with instant booking triggers.
-- `routes/explore.tsx`: Dedicated destination catalog in responsive grid view.
-- `routes/my-trips.tsx`: Full traveler dashboard displaying stat cards, active bookings, 3 trip buckets with collapsible itineraries, wishlisted items, and a demo reset trigger.
-- `routes/save.tsx`: Dedicated page for the Future Trip Fund.
-
-### 5.8 Key UI Components (`src/components/smarttrip/`)
-
-- `Hero.tsx`: Implements the hero visual with `SkyLayer` (CSS-animated clouds, birds, and plane) and responsive search card.
-- `QuickBooking.tsx`: Floating booking widget supporting tab switches with specialized form inputs per tab.
-- `AiPlanner.tsx`: Two-column planning interface featuring prompt input, quick suggestion pills, animated typing skeleton, and rich generated plan view.
-- `TripFund.tsx`: Savings goal creator and list of cards with animated progress bars, monthly required contributions, and quick add buttons.
-- `Reveal.tsx`: Wraps elements in an `IntersectionObserver` to apply `.reveal.is-visible` CSS animations on scroll.
-- `SupportDock.tsx`: Fixed floating headset button toggling a quick-help glassmorphic modal.
+- **Purpose**: Simulated zero-cost payment gateway supporting Card, UPI, and NetBanking.
+- **Safety**: Uses `validateDemoCardSafety()` to reject real credit cards (via Luhn algorithm checks) and only permits explicitly declared test card numbers (e.g., `4111 1111 1111 1111`).
 
 ---
 
 ## 6. DATA MODELS AND API
 
-### 6.1 Data Models (TypeScript Types)
+### 6.1 Core Data Models
 
-#### Destination
+#### Flight Option
 
 ```typescript
-export type Destination = {
+export type FlightOption = {
   id: string;
-  name: string;
-  region: string;
-  category: string;
+  airline: string;
+  airlineCode: string;
+  flightNumber: string;
+  originIata: string;
+  originCity: string;
+  destinationIata: string;
+  destinationCity: string;
+  departureTime: string;
+  arrivalTime: string;
+  durationFormatted: string;
+  stopCount: number;
+  stops: string;
   price: number;
-  rating: number;
-  blurb: string;
-  image: string;
+  date: string;
+  cabinClass: "economy" | "premium" | "business";
+  seatsLeft: number;
+  baggage: { cabin: string; checkIn: string };
+  carbonKg: number;
 };
 ```
 
-#### Stored Trip & Trip Buckets
+#### Booking Record
 
 ```typescript
-export type TripBucket = "Upcoming" | "Past" | "Saved";
-
-export type StoredTrip = {
-  id: string;
-  name: string;
-  dates: string;
-  status: string[];
-  image: string;
-  bucket: TripBucket;
-  plan?: GeneratedPlan;
-};
-```
-
-#### Booking
-
-```typescript
-export type BookingKind = "flight" | "stay" | "rental" | "rail" | "package";
-
 export type StoredBooking = {
   id: string;
-  kind: BookingKind;
+  kind: "flight" | "stay" | "rental" | "rail" | "package";
   title: string;
   subtitle: string;
   price: number;
   reference: string;
   createdAt: number;
+  status: "confirmed" | "cancelled" | "pending";
+  paidAt?: number;
+  origin?: string;
+  destination?: string;
+  date?: string;
+  travelers?: number;
+  cabinClass?: string;
+  inventoryId?: string;
 };
 ```
 
-#### Future Trip (Trip Fund)
+#### Trip Savings Fund
 
 ```typescript
 export type FutureTrip = {
@@ -522,177 +408,41 @@ export type FutureTrip = {
 };
 ```
 
-#### Generated AI Plan
-
-```typescript
-export type GeneratedPlan = {
-  title: string;
-  budget: number;
-  summary: string;
-  days: { day: string; title: string; items: string[] }[];
-  stays: string[];
-  transport: string;
-  food: string[];
-  weather: string;
-  packing: string[];
-  tips: string[];
-  travelers: number;
-  nights: number;
-  breakdown: { label: string; amount: number }[];
-  carbonKg: number;
-};
-```
-
-#### Map Place
-
-```typescript
-export type MapPlace = {
-  id: string;
-  name: string;
-  type: "Attractions" | "Hotels" | "Restaurants" | "Activities";
-  rating: number;
-  distance: string;
-  note: string;
-  x: number;
-  y: number;
-};
-```
-
-### 6.2 Routes and Endpoints
-
-#### File Routes (Client / SSR Web Pages)
-
-| Route         | File Path                   | Method | Description                                                |
-| ------------- | --------------------------- | ------ | ---------------------------------------------------------- |
-| `/`           | `src/routes/index.tsx`      | GET    | Full SmartTrip homepage                                    |
-| `/ai-planner` | `src/routes/ai-planner.tsx` | GET    | AI Trip Planner page                                       |
-| `/bookings`   | `src/routes/bookings.tsx`   | GET    | Booking catalog (flights, hotels, rentals, rail, packages) |
-| `/explore`    | `src/routes/explore.tsx`    | GET    | Destination discovery grid                                 |
-| `/my-trips`   | `src/routes/my-trips.tsx`   | GET    | User trips dashboard, bookings list, and wishlist          |
-| `/save`       | `src/routes/save.tsx`       | GET    | Save for Future Trip / Trip Fund page                      |
-
-#### Backend API Endpoints
-
-- **Not found / None implemented**: There are no custom API route files (e.g. `src/routes/api/*.ts`) or server functions (`createServerFn`) currently defined. All actions are handled client-side via `src/lib/smarttrip-store.ts`.
-
-### 6.3 Environment Variables
-
-- **Status**: No `.env` or required secrets exist in the codebase.
-- Standard Vite `VITE_*` environment variable injection is supported.
-
 ---
 
-## 7. UI / UX
+## 7. UI / UX DESIGN SYSTEM
 
-### 7.1 Visual Identity & Color Palette
-
-- The interface adheres to an **OKLCH Semantic Color System** defined in `src/styles.css`:
-  - **Primary**: Deep travel blue `oklch(0.42 0.14 260)`
-  - **Ink (Dark Neutral)**: Deep navy `oklch(0.26 0.08 262)`
-  - **Sky Accent**: Bright sky blue `oklch(0.72 0.14 232)`
-  - **Teal Accent**: Turquoise `oklch(0.74 0.12 187)`
-  - **Leaf Accent**: Nature green `oklch(0.7 0.14 152)`
-  - **Sunset Accent**: Warm orange `oklch(0.75 0.15 62)`
-  - **Background**: Soft off-white `oklch(0.995 0.004 230)`
-  - **Card / Surface**: Pure white `oklch(1 0 0)` / Subtle slate `oklch(0.972 0.012 230)`
-  - **Dark Mode Support**: Complete dark-theme token override mapping in `.dark`.
-
-### 7.2 Typography & Spacing
-
-- **Display Typography**: **Sora** (`font-display`), with tight tracking (`-0.02em`) for titles and headers.
-- **Body Typography**: **Manrope** (`font-sans`), an open, geometric sans-serif optimized for legibility.
-- **Card Geometry**: Large rounded radiuses (`--radius-3xl` ~ `2.4rem`, `--radius-4xl` ~ `3.15rem`).
-- **Shadows**: Multi-layered soft shadows (`--shadow-soft`, `--shadow-lift`, `--shadow-glass`).
-
-### 7.3 Motion & Micro-interactions
-
-- **Keyframe Animations**:
-  - `drift` / `drift-slow`: Continuous horizontal translation of clouds across the hero.
-  - `fly-across`: Slow 34-second translation of an airplane icon crossing the upper hero.
-  - `bird`: Floating SVG bird flock animation.
-  - `pulse-ring`: Radiating ring animation behind the SmartTrip AI bot icon.
-  - `blink`: Dot loading animation indicating AI generation.
-  - `card-hover`: 320ms smooth lift (`translateY(-6px)`) with shadow elevation.
-- **Scroll Reveal**: `src/components/smarttrip/Reveal.tsx` triggers opacity and transform transitions as elements scroll into view.
-- **Accessibility**: `@media (prefers-reduced-motion: reduce)` resets all transitions and animations to `0.001ms`.
+- **Design Philosophy**: High-fidelity, travel-tech aesthetic combining vibrant OKLCH gradients, glassmorphism, and micro-interactions.
+- **Palette**:
+  - Primary Brand: Deep travel blue `oklch(0.42 0.14 260)`
+  - Sky Accent: Bright sky blue `oklch(0.72 0.14 232)`
+  - Sunset Accent: Warm amber/orange `oklch(0.75 0.15 62)`
+  - Leaf Accent: Emerald green `oklch(0.7 0.14 152)`
+  - Surface: Elevated glassmorphic cards with soft borders (`border-border/50`) and soft shadows (`shadow-soft`, `shadow-elevated`).
+- **Accessibility**: Passes WCAG AA axe accessibility scans with 0 critical violations. Full keyboard navigation support and dark-mode high contrast.
 
 ---
 
 ## 8. CODING CONVENTIONS
 
-### 8.1 Naming & Organization
-
-- **Components**: PascalCase filenames (e.g. `AiPlanner.tsx`, `TripFund.tsx`) located in `src/components/smarttrip/` and `src/components/ui/`.
-- **Utilities & State**: kebab-case filenames (e.g. `smarttrip-store.ts`, `trip-plan.ts`, `use-mobile.tsx`) located in `src/lib/` and `src/hooks/`.
-- **Routes**: kebab-case filenames matching URL paths in `src/routes/` (e.g. `ai-planner.tsx` -> `/ai-planner`).
-- **Path Aliases**: `@/*` maps to `./src/*` across all imports via `tsconfig.json`.
-
-### 8.2 State Management & React Patterns
-
-- Component-level state is handled with standard `useState`, `useRef`, and `useMemo`.
-- Global domain state uses the **External Store** pattern with `useSyncExternalStore` for flicker-free, SSR-safe hydration.
-- User feedback is communicated via `sonner` toasts (`toast.success()`, `toast.error()`, `toast.message()`).
-
-### 8.3 Error Handling Approach
-
-1. **Catastrophic SSR Error Capture**: `src/lib/error-capture.ts` intercepts and retains unhandled server errors out-of-band so `src/server.ts` can recover the stack before serving a 500 response.
-2. **SSR Fallback Page**: `src/lib/error-page.ts` returns lightweight HTML with "Try again" and "Go home" actions when rendering fails entirely.
-3. **Client Route Error Boundary**: `ErrorComponent` in `src/routes/__root.tsx` renders a graceful recovery UI and forwards telemetry to `reportError` in `src/lib/error-report.ts`.
+- **Component Architecture**: Modular presentation components in `src/components/smarttrip/`, atomic primitives in `src/components/ui/`.
+- **Server Functions**: All backend logic encapsulated in TanStack Start `createServerFn` handlers located in `src/lib/server/` and `src/server/`.
+- **Validation**: Strict input validation using Zod schemas for all route search parameters and server function payloads.
+- **Error Handling**: Telemetry captured via `reportError()` and stored in Supabase `error_logs` without paid monitoring dependencies.
+- **Formatting**: ESLint 9 + Prettier 3 standard rules with strict TypeScript compilation (`--noEmit`).
 
 ---
 
-## 9. KNOWN ISSUES AND INCOMPLETE WORK
+## 9. VERIFICATION & TEST METRICS
 
-### 9.1 Incomplete Features & Specification Gaps
-
-1. **Unused Interactive Map Dataset**: `src/data/travel.ts` exports `mapPlaces: MapPlace[]` containing coordinates and attraction data, but there is no interactive map component implemented or mounted on any page. (Requested in `README.md` Section 9: "INTERACTIVE MAP / EXPLORE AROUND YOU").
-2. **Quick Travel Guide**: The 3-stage travel guide section described in `README.md` Section 10 ("Before You Go", "During Your Trip", "Smart Tips") is not yet implemented.
-3. **Simulated AI Planning**: The AI Trip Planner does not call an actual LLM (OpenAI, Gemini, Anthropic); it uses a deterministic regex parsing and string interpolation engine (`src/lib/trip-plan.ts`).
-4. **Header Navigation Placeholders**: The Search, Wishlist, Notifications, and Profile buttons in `Navbar.tsx` only trigger toast notifications saying _"panel coming up next"_ rather than opening functional dialogs or drawers.
-5. **No Persistent Backend / Authentication**: All user modifications (saved plans, bookings, funds, wishlist) reside strictly in single-browser `localStorage`. There is no multi-user database, session handling, or cross-device synchronization.
-6. **Confetti Animation Unused in Logic**: `@keyframes confetti` is declared in `src/styles.css` (lines 346–355), but is never triggered by `TripFund.tsx` when a savings goal reaches 100%.
-7. **Itinerary Re-ordering**: The AI itinerary view does not support drag-and-drop re-ordering of activities, which was specified in `README.md` Section 19.
-
-### 9.2 Fragility & Technical Debt
-
-1. **Over-provisioned UI Directory**: `src/components/ui/` contains 46 Shadcn UI component files, of which only `button.tsx`, `input.tsx`, `textarea.tsx`, and `sonner.tsx` are actively imported by application code. The remaining 42 files are unused template scaffolding.
-2. **Missing Test Suite**: There are no automated unit tests, integration tests, or end-to-end tests in the repository (`no test script in package.json`).
-3. **Package Name Mismatch**: `package.json` retains the default template name `"tanstack_start_ts"` instead of `"smarttrip"` or `"dream-plan-fly"`.
-4. **Missing Dependencies on Clean Clone**: Running `npm run lint` immediately after cloning fails because `node_modules` is not present; developers must execute `npm install` first.
-
----
-
-## 10. SUGGESTED IMPROVEMENTS
-
-### 10.1 High Priority (Immediate Value)
-
-1. **Implement the Interactive Travel Map**:
-   - Create `src/components/smarttrip/InteractiveMap.tsx` using the existing `mapPlaces` dataset from `src/data/travel.ts`.
-   - Implement category filters (Attractions, Hotels, Restaurants, Activities) and clickable pins displaying place details and an _"Add to Trip"_ button.
-2. **Integrate Real LLM API for Trip Planning**:
-   - Replace or supplement `buildPlan()` with a TanStack Start server function (`createServerFn`) that queries an LLM (e.g., Google Gemini 2.5 Flash or OpenAI GPT-4o-mini).
-   - Use structured JSON output adhering to the existing `GeneratedPlan` schema.
-3. **Database & Authentication Integration**:
-   - Add Supabase or Cloudflare D1/KV to store user accounts, bookings, and savings funds in a persistent remote database.
-
-### 10.2 Medium Priority (UX Polish & Completeness)
-
-4. **Implement Header Modals**:
-   - Replace placeholder toasts in `Navbar.tsx` with functional modals:
-     - Search: Connect Shadcn's `command.tsx` (`cmdk`) to search destinations and trips.
-     - Wishlist: Open a side drawer (`sheet.tsx`) listing wishlisted items.
-5. **Goal Reached Celebration**:
-   - Trigger a canvas confetti animation (using `canvas-confetti`) when a fund's progress reaches 100% in `TripFund.tsx`.
-6. **Drag-and-Drop Itinerary Editor**:
-   - Incorporate drag-and-drop reordering for itinerary items inside `AiPlanner.tsx` using `dnd-kit` or `@hello-pangea/dnd`.
-7. **Quick Travel Guide Component**:
-   - Implement the "Before You Go", "During Your Trip", and "Smart Tips" accordion component specified in `README.md` Section 10.
-
-### 10.3 Low Priority (Maintenance & Cleanup)
-
-8. **Prune Unused UI Components**:
-   - Remove or archive unused component files from `src/components/ui/` to reduce repository bloat.
-9. **Add Unit & Smoke Tests**:
-   - Add Vitest test suites for `src/lib/trip-plan.ts` (verifying plan generation calculations) and `src/lib/smarttrip-store.ts` (verifying state operations and `localStorage` syncing).
-10. **Clean Up `package.json`**:
-    - Update `"name": "tanstack_start_ts"` to `"smarttrip"`.
+- **ESLint**: 0 errors, 0 warnings across entire codebase.
+- **TypeScript**: 0 typecheck errors (`tsc --noEmit`).
+- **Vitest**: 8 test suites, 80 unit tests passing (100% pass rate).
+- **Playwright**: 9 end-to-end tests passing covering:
+  - Accessibility audit with `@axe-core/playwright`
+  - Authentication & signup flow validation
+  - AI trip planner generation & saving
+  - Search, booking flow, payment modal & E-ticket verification
+  - Wishlist drawer & savings fund deposits
+- **Secret Scanning**: Client bundle scanner verifies 0 secret tokens in 72 assets.
+- **Production Build**: Standalone Nitro server bundle built and ready for zero-cost deployment.

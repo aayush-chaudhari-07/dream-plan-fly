@@ -5,25 +5,16 @@ import { Navbar } from "@/components/smarttrip/Navbar";
 import { PageHeader } from "@/components/smarttrip/PageHeader";
 import { SupportDock } from "@/components/smarttrip/SupportDock";
 
+import { createSeoHead } from "@/lib/seo";
+
 export const Route = createFileRoute("/ai-planner")({
-  head: () => ({
-    meta: [
-      { title: "AI Trip Planner — SmartTrip" },
-      {
-        name: "description",
-        content:
-          "Tell SmartTrip your dream trip and let AI build a personalized itinerary, budget, stays and packing list.",
-      },
-      { property: "og:title", content: "AI Trip Planner — SmartTrip" },
-      {
-        property: "og:description",
-        content:
-          "Tell SmartTrip your dream trip and let AI build a personalized itinerary, budget, stays and packing list.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () =>
+    createSeoHead({
+      title: "AI Trip Planner — Personalized Itineraries",
+      description:
+        "Describe your dream trip to SmartTrip AI to generate comprehensive day-by-day itineraries, exact cost breakdowns, verified stays, and custom packing checklists.",
+      path: "/ai-planner",
+    }),
   component: AiPlannerPage,
 });
 

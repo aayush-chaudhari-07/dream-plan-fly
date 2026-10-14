@@ -31,18 +31,46 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { createSeoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/faq")({
-  head: () => ({
-    meta: [
-      { title: "Help Center & FAQ — SmartTrip Support" },
-      {
-        name: "description",
-        content:
-          "Find instant answers to questions regarding AI trip generation, booking modifications, refunds, Trip Fund milestones, and 24/7 traveler emergency support.",
+  head: () =>
+    createSeoHead({
+      title: "Help Center & FAQ — Travel Support",
+      description:
+        "Find instant answers to questions regarding AI trip generation, booking modifications, refunds, Trip Fund milestones, and 24/7 traveler emergency support.",
+      path: "/faq",
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: [
+          {
+            "@type": "Question",
+            name: "How does SmartTrip AI plan my itinerary?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "SmartTrip analyzes your destination, budget in INR, group size, and interests to craft a complete day-by-day plan with attractions, verified stays, and local tips.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Are the bookings real or demo?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "All bookings run in a high-fidelity DEMO mode for simulation and portfolio purposes. No real credit card charges are processed.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Is SmartTrip free to use?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Yes, SmartTrip is 100% free with key-less open data integrations including Open-Meteo weather and Frankfurter currency conversions.",
+            },
+          },
+        ],
       },
-    ],
-  }),
+    }),
   component: FaqPage,
 });
 
@@ -414,10 +442,15 @@ function FaqPage() {
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                    <label
+                      htmlFor="issue-category"
+                      className="text-xs font-semibold text-muted-foreground block mb-1"
+                    >
                       Issue Category
                     </label>
                     <select
+                      id="issue-category"
+                      aria-label="Issue Category"
                       value={category}
                       onChange={(e) =>
                         setCategory(

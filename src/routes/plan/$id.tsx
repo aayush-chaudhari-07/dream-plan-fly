@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/smarttrip/Navbar";
 import { Footer } from "@/components/smarttrip/Footer";
 import { QuickTravelGuide } from "@/components/smarttrip/QuickTravelGuide";
-import { inr } from "@/data/travel";
+import { WeatherForecastCard } from "@/components/smarttrip/WeatherForecastCard";
+import { inr, destinations } from "@/data/travel";
 import { smartTrip } from "@/lib/smarttrip-store";
 import { getPublicPlanFn } from "@/server/generate-plan";
+
+import { createSeoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/plan/$id")({
   loader: async ({ params }) => {
@@ -18,20 +21,14 @@ export const Route = createFileRoute("/plan/$id")({
       return { plan: null, id: params.id };
     }
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: loaderData?.plan
-          ? `${loaderData.plan.title} — SmartTrip AI Plan`
-          : "Shared Travel Plan — SmartTrip",
-      },
-      {
-        name: "description",
-        content:
-          loaderData?.plan?.summary || "View this shared AI-generated travel plan on SmartTrip.",
-      },
-    ],
-  }),
+  head: ({ loaderData }) =>
+    createSeoHead({
+      title: loaderData?.plan?.title || "Shared Travel Plan",
+      description:
+        loaderData?.plan?.summary ||
+        "Explore this detailed day-by-day AI travel itinerary on SmartTrip.",
+      path: `/plan/${loaderData?.id || ""}`,
+    }),
   component: PublicPlanPage,
 });
 
@@ -143,14 +140,14 @@ function PublicPlanPage() {
               Day-by-Day Itinerary
             </h2>
             <ol className="space-y-4 border-l border-dashed border-border/80 pl-6 ml-2">
-              {plan.days.map((d) => (
+              {plan.days.map((d: { day: string | number; title: string; items: string[] }) => (
                 <li key={d.day} className="relative">
                   <span className="absolute -left-[31px] top-1.5 size-3 rounded-full bg-gradient-brand shadow-soft" />
                   <p className="font-display text-base font-semibold text-foreground">
                     {d.day} — {d.title}
                   </p>
                   <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                    {d.items.map((item, idx) => (
+                    {d.items.map((item: string, idx: number) => (
                       <li key={idx} className="flex items-start gap-2">
                         <span className="text-primary mt-1">•</span>
                         <span>{item}</span>
@@ -169,7 +166,7 @@ function PublicPlanPage() {
                 🏨 Stays & Lodging
               </p>
               <ul className="space-y-1 text-sm text-foreground/80">
-                {plan.stays.map((s, i) => (
+                {plan.stays.map((s: string, i: number) => (
                   <li key={i}>{s}</li>
                 ))}
               </ul>
@@ -187,7 +184,7 @@ function PublicPlanPage() {
                 🍽 Food Recommendations
               </p>
               <ul className="space-y-1 text-sm text-foreground/80">
-                {plan.food.map((f, i) => (
+                {plan.food.map((f: string, i: number) => (
                   <li key={i}>{f}</li>
                 ))}
               </ul>
@@ -209,7 +206,7 @@ function PublicPlanPage() {
                 💰 Budget Breakdown
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-sm">
-                {plan.breakdown.map((b) => (
+                {plan.breakdown.map((b: { label: string; amount: number }) => (
                   <div key={b.label} className="bg-secondary/40 p-2.5 rounded-xl">
                     <p className="text-xs text-muted-foreground">{b.label}</p>
                     <p className="font-semibold text-foreground mt-0.5">{inr(b.amount)}</p>
@@ -228,6 +225,32 @@ function PublicPlanPage() {
               <span className="text-[11px] text-muted-foreground">ID: {id}</span>
             </div>
           </div>
+
+          {/* Live Open-Meteo 7-Day Forecast & Destination Weather */}
+          {(() => {
+            const matchedDest = destinations.find(
+              (d) =>
+                plan.title.toLowerCase().includes(d.name.toLowerCase()) ||
+                plan.summary.toLowerCase().includes(d.name.toLowerCase()),
+            );
+            const planLat = matchedDest ? matchedDest.lat : 28.6139;
+            const planLng = matchedDest ? matchedDest.lng : 77.209;
+            const destName = matchedDest
+              ? matchedDest.name
+              : plan.title.replace(/ trip plan/i, "").slice(0, 20);
+
+            return (
+              <div className="mt-10 print:hidden">
+                <WeatherForecastCard
+                  lat={planLat}
+                  lng={planLng}
+                  destinationName={destName}
+                  bestTimeToVisit={matchedDest?.bestTimeToVisit}
+                  basePrice={plan.budget}
+                />
+              </div>
+            );
+          })()}
 
           {/* Quick Travel Guide (Before You Go, During Your Trip, Smart Tips) */}
           <div className="mt-12 pt-8 border-t border-border/60 print:hidden">

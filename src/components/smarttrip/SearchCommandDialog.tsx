@@ -113,6 +113,7 @@ export function SearchCommandDialog({ open, onOpenChange }: SearchCommandDialogP
         placeholder="Search destinations, trips, bookings or quick links..."
         value={search}
         onValueChange={setSearch}
+        data-testid="search-input"
       />
       <CommandList className="max-h-[380px] p-2">
         <CommandEmpty className="py-8 text-center text-sm text-muted-foreground">
@@ -185,6 +186,10 @@ export function SearchCommandDialog({ open, onOpenChange }: SearchCommandDialogP
                 <img
                   src={dest.image}
                   alt={dest.name}
+                  loading="lazy"
+                  decoding="async"
+                  width={32}
+                  height={32}
                   className="size-8 rounded-lg object-cover shrink-0 shadow-sm"
                 />
                 <div className="truncate">

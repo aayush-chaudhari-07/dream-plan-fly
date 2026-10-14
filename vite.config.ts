@@ -10,6 +10,10 @@ import { nitro } from "nitro/vite";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const nitroPreset =
+  process.env["NITRO_PRESET"] ||
+  (process.env["VERCEL"] ? "vercel" : process.env["NETLIFY"] ? "netlify" : undefined);
+
 export default defineConfig(({ command }) => ({
   plugins: [
     tailwindcss(),
@@ -17,7 +21,13 @@ export default defineConfig(({ command }) => ({
     tanstackStart({
       server: { entry: "server" },
     }),
-    ...(command === "build" ? [nitro()] : []),
+    ...(command === "build"
+      ? [
+          nitro({
+            ...(nitroPreset ? { preset: nitroPreset } : {}),
+          }),
+        ]
+      : []),
     viteReact(),
   ],
   resolve: {

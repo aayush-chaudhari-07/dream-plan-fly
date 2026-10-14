@@ -15,28 +15,56 @@ import { Footer } from "@/components/smarttrip/Footer";
 import { Navbar } from "@/components/smarttrip/Navbar";
 import { SupportDock } from "@/components/smarttrip/SupportDock";
 import { InteractiveMap } from "@/components/smarttrip/InteractiveMap";
+import { WeatherForecastCard } from "@/components/smarttrip/WeatherForecastCard";
 import { destinations, inr } from "@/data/travel";
+import { createSeoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/destination/$id")({
   loader: ({ params }) => {
     const destination = destinations.find((d) => d.id === params.id) || null;
     return { destination, id: params.id };
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: loaderData?.destination
-          ? `${loaderData.destination.name}, ${loaderData.destination.region} — SmartTrip`
-          : "Destination — SmartTrip",
-      },
-      {
-        name: "description",
-        content:
-          loaderData?.destination?.blurb ||
-          "Explore travel destinations, weather, itineraries and map sights on SmartTrip.",
-      },
-    ],
-  }),
+  head: ({ loaderData }) => {
+    const dest = loaderData?.destination;
+    const title = dest ? `${dest.name}, ${dest.region} Travel Guide` : "Destination";
+    const description =
+      dest?.blurb ||
+      "Explore travel destinations, weather forecasts, curated itineraries and local sights on SmartTrip.";
+
+    const jsonLd = dest
+      ? {
+          "@context": "https://schema.org",
+          "@type": "TouristDestination",
+          name: dest.name,
+          description: dest.blurb,
+          image: dest.image,
+          touristType: dest.category,
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: dest.lat,
+            longitude: dest.lng,
+          },
+          address: {
+            "@type": "PostalAddress",
+            addressRegion: dest.region,
+            addressCountry: "IN",
+          },
+          includesAttraction: {
+            "@type": "TouristAttraction",
+            name: `${dest.name} Highlights`,
+            description: `Best time to visit: ${dest.bestTimeToVisit}. Daily starting rates from ₹${dest.price.toLocaleString("en-IN")}.`,
+          },
+        }
+      : undefined;
+
+    return createSeoHead({
+      title,
+      description,
+      path: dest ? `/destination/${dest.id}` : "/destination",
+      image: dest?.image,
+      jsonLd,
+    });
+  },
   component: DestinationDetailPage,
 });
 
@@ -81,6 +109,8 @@ function DestinationDetailPage() {
             src={destination.image}
             alt={`${destination.name}, ${destination.region}`}
             className="size-full object-cover object-center brightness-90"
+            loading="eager"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-ink/40 to-ink/20" />
 
@@ -121,56 +151,14 @@ function DestinationDetailPage() {
 
         {/* Content Body */}
         <div className="container-page mt-8 space-y-12">
-          {/* Key Facts Cards (Weather & Best Time) */}
-          <div className="grid gap-5 md:grid-cols-2">
-            {/* Weather Card */}
-            <div className="surface-card p-6 rounded-3xl border border-border shadow-soft">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="size-11 rounded-2xl bg-sky-500/10 text-sky-500 flex items-center justify-center">
-                  <CloudSun className="size-6" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Current Season & Weather
-                  </p>
-                  <h3 className="font-display font-bold text-lg text-foreground">
-                    {destination.weather.temp} · {destination.weather.condition}
-                  </h3>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {destination.weather.summary}
-              </p>
-              <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
-                <span>Climate Cycle: {destination.weather.season}</span>
-                <span className="font-medium text-foreground">Live Season Advice</span>
-              </div>
-            </div>
-
-            {/* Best Time to Visit Card */}
-            <div className="surface-card p-6 rounded-3xl border border-border shadow-soft">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="size-11 rounded-2xl bg-sunset/10 text-sunset flex items-center justify-center">
-                  <CalendarDays className="size-6" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Optimal Travel Window
-                  </p>
-                  <h3 className="font-display font-bold text-lg text-foreground">
-                    Best Time to Visit
-                  </h3>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {destination.bestTimeToVisit}
-              </p>
-              <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
-                <span>Recommended Stay: 4–7 Days</span>
-                <span className="font-medium text-foreground">High Season Window</span>
-              </div>
-            </div>
-          </div>
+          {/* Live Open-Meteo Weather & 7-Day Forecast */}
+          <WeatherForecastCard
+            lat={destination.lat}
+            lng={destination.lng}
+            destinationName={destination.name}
+            bestTimeToVisit={destination.bestTimeToVisit}
+            basePrice={destination.price}
+          />
 
           {/* Destination Overview & Highlights */}
           <div className="surface-card p-6 sm:p-8 rounded-3xl border border-border shadow-soft">
@@ -187,7 +175,7 @@ function DestinationDetailPage() {
                 Signature Experiences & Highlights
               </h3>
               <div className="grid gap-2.5 sm:grid-cols-2">
-                {destination.highlights.map((h) => (
+                {destination.highlights.map((h: string) => (
                   <div
                     key={h}
                     className="flex items-center gap-2.5 rounded-2xl border border-border/70 bg-card p-3 text-xs sm:text-sm font-medium text-foreground shadow-2xs"

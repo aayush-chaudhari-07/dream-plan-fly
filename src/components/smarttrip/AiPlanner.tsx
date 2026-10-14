@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, Suspense, lazy } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   AlertCircle,
@@ -25,8 +25,11 @@ import { buildPlan, type GeneratedPlan, type PlanOptions } from "@/lib/trip-plan
 import { cn } from "@/lib/utils";
 import { generatePlan, savePublicPlanFn } from "@/server/generate-plan";
 import { Reveal, SectionHeading } from "./Reveal";
-import { ItineraryEditor } from "./ItineraryEditor";
 import { QuickTravelGuide } from "./QuickTravelGuide";
+
+const ItineraryEditor = lazy(() =>
+  import("./ItineraryEditor").then((m) => ({ default: m.ItineraryEditor })),
+);
 
 const LOADING_STEPS = [
   "Analyzing destination & travel dates…",
@@ -190,6 +193,7 @@ export function AiPlanner({ compact = false }: { compact?: boolean }) {
               className="mt-1 resize-none border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
               aria-label="Describe your trip"
               placeholder="E.g., I want a 5-day trip to Himachal Pradesh for 3 people under ₹35,000 with trekking and local cafes..."
+              data-testid="planner-prompt-input"
             />
           </div>
 
@@ -229,6 +233,7 @@ export function AiPlanner({ compact = false }: { compact?: boolean }) {
             className="mt-5 w-full gap-2"
             onClick={() => run()}
             disabled={loading}
+            data-testid="generate-plan-button"
           >
             {loading ? (
               <>
@@ -459,7 +464,16 @@ function PlanView({
 
       {/* Daily Interactive Timeline (Drag & Drop Reordering, Add, Edit, Delete) */}
       <div className="mt-5">
-        <ItineraryEditor plan={plan} onPlanChange={onPlanUpdate} />
+        <Suspense
+          fallback={
+            <div className="space-y-3 py-4">
+              <div className="h-24 w-full animate-pulse rounded-2xl bg-muted/30" />
+              <div className="h-24 w-full animate-pulse rounded-2xl bg-muted/30" />
+            </div>
+          }
+        >
+          <ItineraryEditor plan={plan} onPlanChange={onPlanUpdate} />
+        </Suspense>
       </div>
 
       {/* Details Grid */}
@@ -497,6 +511,7 @@ function PlanView({
         <Button
           variant="hero"
           className="flex-1 gap-1.5"
+          data-testid="save-plan-button"
           onClick={() => {
             const trip = smartTrip.savePlan(plan);
             toast.success("Plan saved to My Trips", { description: trip.name });

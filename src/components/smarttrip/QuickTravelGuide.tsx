@@ -42,7 +42,7 @@ const STAGES = [
     title: "1. Before You Go",
     subtitle: "Documentation, medical readiness, and smart packing essentials",
     badge: "Pre-Departure",
-    badgeColor: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
+    badgeColor: "bg-sky-500/15 text-sky-800 dark:text-sky-300 border-sky-500/30",
     items: [
       {
         id: "doc-id",
@@ -99,7 +99,7 @@ const STAGES = [
     title: "2. During Your Trip",
     subtitle: "Money handling, transit security, and respecting local cultures",
     badge: "On the Ground",
-    badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+    badgeColor: "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border-emerald-500/30",
     items: [
       {
         id: "money-cards",
@@ -156,7 +156,7 @@ const STAGES = [
     title: "3. Smart Tips & Traveler Hacks",
     subtitle: "Cost-cutting secrets, transit hacks, and sustainable travel",
     badge: "Pro Secrets",
-    badgeColor: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    badgeColor: "bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-500/30",
     items: [
       {
         id: "tip-food",

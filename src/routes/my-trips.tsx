@@ -26,25 +26,17 @@ import { Reveal, SectionHeading } from "@/components/smarttrip/Reveal";
 import { destinations, inr } from "@/data/travel";
 import { smartTrip, useSmartTrip, type StoredTrip, type TripBucket } from "@/lib/smarttrip-store";
 
+import { createSeoHead } from "@/lib/seo";
+
 export const Route = createFileRoute("/my-trips")({
-  head: () => ({
-    meta: [
-      { title: "My Trips — SmartTrip" },
-      {
-        name: "description",
-        content:
-          "Track upcoming trips, past adventures, saved AI plans, bookings and your wishlist in one SmartTrip dashboard.",
-      },
-      { property: "og:title", content: "My Trips — SmartTrip" },
-      {
-        property: "og:description",
-        content:
-          "Track upcoming trips, past adventures, saved AI plans, bookings and your wishlist in one SmartTrip dashboard.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () =>
+    createSeoHead({
+      title: "My Trips & Itineraries",
+      description:
+        "Track upcoming trips, past adventures, saved AI plans, bookings and your wishlist in one SmartTrip dashboard.",
+      path: "/my-trips",
+      noindex: true,
+    }),
   component: MyTripsPage,
 });
 
@@ -63,7 +55,13 @@ function TripCard({ trip }: { trip: StoredTrip }) {
     <Reveal>
       <div className="surface-card overflow-hidden">
         <div className="relative h-48">
-          <img src={trip.image} alt={trip.name} loading="lazy" className="size-full object-cover" />
+          <img
+            src={trip.image}
+            alt={trip.name}
+            loading="lazy"
+            decoding="async"
+            className="size-full object-cover"
+          />
           <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-card/90 px-3 py-1 text-xs font-semibold">
             <Icon className="size-3" /> {trip.bucket}
           </div>
@@ -390,6 +388,7 @@ function MyTripsPage() {
                       src={d.image}
                       alt={d.name}
                       loading="lazy"
+                      decoding="async"
                       className="h-32 w-full object-cover"
                     />
                     <div className="p-4">
