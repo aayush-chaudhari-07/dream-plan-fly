@@ -809,3 +809,31 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `npm run build`: Production SSR bundle generated in `.output/`.
   - `npx playwright test`: 9/9 E2E tests passed cleanly.
 
+---
+
+## Phase 14: Client / Server / Shared Boundary Enforcement & Secret Leak Prevention
+
+- **Date**: 2026-10-14
+- **Goal**: Configure lint rules, automated CI checks, and secret hygiene validation to strictly prevent server secrets and Node APIs from leaking into the client bundle or shared modules.
+- **Key Actions**:
+  1. **ESLint Boundary Rules (`eslint.config.js`)**:
+     - Configured `no-restricted-imports` on `src/client/**/*.{ts,tsx}`: client modules are prohibited from importing directly from `@/server/services/**`, `@/server/db/**`, `@/server/config/**`, or relative equivalents. Client modules may only invoke RPC endpoints exported from `@/server/functions/*`.
+     - Configured `no-restricted-imports` on `src/shared/**/*.{ts,tsx}`: shared modules are prohibited from importing anything from `src/client/**` or `src/server/**` (`@/client/**`, `@/server/**`).
+  2. **Boundary & Secret Leak Verification Script (`scripts/check-boundaries.mjs`)**:
+     - Scans all files under `src/client/`: asserts that no imports cross into forbidden server subdirectories, and asserts that zero references to server-only env vars (`GEMINI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET`, `DEMO_PAY_SECRET`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_KEY_ID`, `NITRO_PRESET`) exist.
+     - Scans all files under `src/shared/`: asserts 100% purity with zero dependencies on client/server code and zero environment variable access (`process.env` / `import.meta.env`).
+     - Scans repository source files: asserts that no server secret uses a public prefix (`VITE_` or `NEXT_PUBLIC_`). Only genuinely public configuration (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_SITE_URL`) uses `VITE_`.
+     - Scans built production assets (`.output/public/`): verifies that service role tokens, CRON_SECRET, GEMINI_API_KEY, and private keys never exist in client-facing bundles.
+  3. **Package & CI Workflow Integration**:
+     - Added npm script `"check:boundaries": "node scripts/check-boundaries.mjs"`.
+     - Wired `npm run check:boundaries` into `.github/workflows/ci.yml` immediately following `npm run build`.
+  4. **Verification Results**:
+     - `npm run check:boundaries`: Passed with zero violations.
+     - `npm run lint`: 0 errors, 0 warnings.
+     - `npm run typecheck`: Passed with zero TypeScript errors.
+     - `npm test`: 8 test suites, 80 unit tests passed.
+     - `npm run build`: Production SSR bundle generated in `.output/`.
+     - `npx playwright test`: 9/9 E2E tests passed cleanly.
+     - `npm run scan-secrets`: 0 secrets detected across 72 client bundle assets.
+
+

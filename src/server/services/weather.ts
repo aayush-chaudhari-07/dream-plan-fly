@@ -5,7 +5,7 @@
  */
 
 export type { CurrentWeather, DailyForecast, WeatherResult } from "@/shared/types/weather";
-import type { WeatherResult } from "@/shared/types/weather";
+import type { WeatherResult, DailyForecast, CurrentWeather } from "@/shared/types/weather";
 
 // 30-minute in-memory cache
 const WEATHER_CACHE_TTL_MS = 30 * 60 * 1000;

@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "check:boundaries": "node scripts/check-boundaries.mjs",
     "scan-secrets": "node scripts/scan-client-secrets.mjs",
     "format": "prettier --write ."
   },

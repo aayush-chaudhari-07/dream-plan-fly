@@ -30,7 +30,17 @@ import {
 import { createPriceAlertFn, deletePriceAlertFn } from "@/server/functions/live-data-actions";
 
 export type { TripBucket, BookingKind, BookingStatus } from "@/shared/types/travel";
-import type { TripBucket, BookingKind } from "@/shared/types/travel";
+import type { TripBucket, BookingKind, BookingStatus } from "@/shared/types/travel";
+
+export type StoredTrip = {
+  id: string;
+  name: string;
+  dates: string;
+  status: string[];
+  image: string;
+  bucket: TripBucket;
+  plan?: GeneratedPlan;
+};
 
 export type StoredBooking = {
   id: string;
