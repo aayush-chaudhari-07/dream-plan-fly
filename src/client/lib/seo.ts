@@ -4,10 +4,25 @@
  * canonical links, and Schema.org JSON-LD across all pages.
  */
 
-export const SITE_URL = "https://dream-plan-fly.vercel.app";
+import { getClientEnv } from "@/client/lib/client-env";
+
+export function getSiteUrl(): string {
+  const env = getClientEnv();
+  if (env.VITE_SITE_URL) return env.VITE_SITE_URL.replace(/\/$/, "");
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return window.location.origin;
+  }
+  return "https://dream-plan-fly.vercel.app";
+}
+
+export const SITE_URL = getSiteUrl();
 export const SITE_NAME = "SmartTrip";
-export const DEFAULT_OG_IMAGE =
-  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80";
+
+export function getDefaultOgImage(): string {
+  return `${getSiteUrl()}/og-image.png`;
+}
+
+export const DEFAULT_OG_IMAGE = getDefaultOgImage();
 
 export interface SeoConfig {
   title: string;
@@ -23,7 +38,7 @@ export function createSeoHead({
   title,
   description,
   path = "",
-  image = DEFAULT_OG_IMAGE,
+  image = getDefaultOgImage(),
   type = "website",
   jsonLd,
   noindex = false,

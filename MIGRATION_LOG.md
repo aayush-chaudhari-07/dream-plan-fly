@@ -902,4 +902,47 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
      - `npm run check:env`: Preflight environment audit executed cleanly.
      - `npx playwright test`: 9/9 E2E tests passed across accessibility, planning, booking, funds, and auth.
 
+---
+
+## Phase 17: Complete Brand Identity Overhaul & Lovable Favicon Replacement
+
+- **Date**: 2026-10-14
+- **Goal**: Identify and purge all residual Lovable branding assets and favicons; design and generate a complete native SmartTrip icon suite (SVG, ICO, PNGs, Apple Touch, PWA Manifest, and OpenGraph social image) with Sharp; wire all head links; and verify clean zero-leak codebase status.
+- **Leftover Audit Findings**:
+  1. `public/favicon.ico`: 20,373 bytes legacy binary containing the Lovable heart logo. Replaced with custom 6,474 bytes multi-resolution SmartTrip ICO mark (16, 32, 48).
+  2. `src/routes/__root.tsx`: Document `<head>` referenced solely `/favicon.ico` without modern SVG vectors, high-res PNG fallbacks, Apple Touch icons, theme color, or PWA web manifests.
+  3. `src/client/lib/seo.ts`: Hardcoded static fallback image. Refactored to dynamically generate absolute OpenGraph share cards via `getSiteUrl() + '/og-image.png'`.
+  4. Search results for `"lovable"`, `"gptengineer"`, and `"gpt-engineer"` across all tracked codebase files (excluding historical logs and lockfile comments): **0 matches**.
+- **Key Actions**:
+  1. **Brand Mark Design (`public/favicon.svg`)**:
+     - Designed an aerodynamic paper plane ascending through an indigo/sky blue location map pin with squircle boundary matching SmartTrip's Tailwind theme tokens (`#1d4ed8` -> `#2563eb` -> `#0ea5e9`).
+  2. **Automated Asset Generator (`scripts/generate-icons.mjs`)**:
+     - Installed `sharp` as devDependency.
+     - Implemented automated multi-size pipeline:
+       - `favicon.ico` (multi-resolution 16x16, 32x32, 48x48 PNG-in-ICO header packaging).
+       - `favicon-16x16.png` and `favicon-32x32.png`.
+       - `apple-touch-icon.png` (180x180).
+       - `icon-192.png` and `icon-512.png` for PWA installation.
+       - `maskable-512.png` (512x512 with safe padding).
+       - `og-image.png` (1200x630 high-resolution social preview with brand gradient, logo, tagline "Plan Less. Travel More.", and feature badges).
+     - Added npm script `"icons:generate": "node scripts/generate-icons.mjs"`.
+  3. **PWA Manifest (`public/site.webmanifest`)**:
+     - Configured name "SmartTrip", short_name "SmartTrip", theme_color `#2563eb`, background_color `#ffffff`, and 192/512/maskable icon entries.
+  4. **Document Head Integration (`src/routes/__root.tsx`)**:
+     - Wired `<link rel="icon" href="/favicon.svg" type="image/svg+xml">`.
+     - Wired `<link rel="icon" href="/favicon.ico" sizes="any">`.
+     - Wired `<link rel="icon" href="/favicon-32x32.png">` and `16x16.png`.
+     - Wired `<link rel="apple-touch-icon" href="/apple-touch-icon.png">`.
+     - Wired `<link rel="manifest" href="/site.webmanifest">`.
+     - Added `<meta name="theme-color" content="#2563eb">`.
+     - Added `<meta property="og:image" content="/og-image.png">` and `<meta name="twitter:image" content="/og-image.png">`.
+  5. **Verification Results**:
+     - `npm run icons:generate`: Generated all 9 assets into `public/`.
+     - `npm run lint`: 0 errors, 0 warnings.
+     - `npm run typecheck`: Passed with 0 errors (`tsc --noEmit`).
+     - `npm test`: 8 test suites, 80 unit tests passed.
+     - `npm run build`: Production build succeeded; all assets copied to `.output/public/`.
+     - `npm run check:boundaries`: Passed with 0 violations.
+     - `npm run scan-secrets`: 0 secrets detected.
+     - `npx playwright test`: 9/9 E2E tests passed cleanly.
 
