@@ -12,6 +12,7 @@
     "build:dev": "vite build --mode development",
     "preview": "node .output/server/index.mjs",
     "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -20,7 +21,8 @@
     "check:env": "node scripts/check-env.mjs",
     "icons:generate": "node scripts/generate-icons.mjs",
     "scan-secrets": "node scripts/scan-client-secrets.mjs",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "overrides": {
     "rolldown": "1.2.1"

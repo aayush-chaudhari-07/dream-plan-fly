@@ -9,12 +9,16 @@ export default tseslint.config(
   {
     ignores: [
       "dist",
+      "build",
       ".output",
       ".vinxi",
       ".vercel",
       "playwright-report",
       "test-results",
       "coverage",
+      "routeTree.gen.ts",
+      "src/routeTree.gen.ts",
+      "package-lock.json",
     ],
   },
   {

@@ -1007,3 +1007,48 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `npm run scan-secrets`: 0 secrets detected.
   - `npm test`: 9 test suites, 85 unit tests passed.
   - `npx playwright test`: 12/12 E2E tests passed.
+
+---
+
+## Phase 19: CI Prettier Lint Fix & Formatting Recurrence Prevention
+
+- **Date**: 2026-10-14
+- **Goal**: Fix CI lint failure on `src/server.ts:45:23` (`prettier/prettier`), format entire repository, align ESLint and Prettier configs, and add automated formatting checks in npm scripts and CI pipeline to prevent recurrence.
+- **Problem & Root Cause**:
+  - The CI lint job (`eslint .`) failed with:
+    `src/server.ts:45:23 error Delete '␍⏎···' prettier/prettier`
+  - Cause: A line break inside the `lastErrorMsg` assignment expression in `src/server.ts` that Prettier required on a single line.
+- **Key Actions & Fixes**:
+  1. **Tool-Driven Formatting Fix (`src/server.ts`)**:
+     - Executed `npx prettier --write src/server.ts` followed by `npx eslint --fix src/server.ts`.
+     - Committed as `style: fix Prettier error in server entry`.
+  2. **Whole-Repository Prettier Sweep**:
+     - Audited entire repository using `npx prettier --check .`.
+     - Formatted repo with `npx prettier --write .`. Only markdown formatting adjustments in `MIGRATION_LOG.md` were modified.
+     - Committed as `style: format repo with Prettier`.
+  3. **Config Consistency & Ignore Alignment**:
+     - Updated `.prettierignore` to exclude build artifacts and generated test reports: `build`, `playwright-report`, `test-results`, `coverage`, and `src/routeTree.gen.ts`.
+     - Updated `eslint.config.js` `ignores` list to exclude `build`, `routeTree.gen.ts`, `src/routeTree.gen.ts`, and `package-lock.json`.
+     - Verified single Prettier config (`.prettierrc`) with `endOfLine: "auto"`, `singleQuote: false`, `trailingComma: "all"`, `printWidth: 100`, and `semi: true`.
+     - Verified `eslint-plugin-prettier/recommended` is applied in `eslint.config.js` to ensure zero conflicts between ESLint and Prettier.
+  4. **NPM Scripts & CI Pipeline Hardening**:
+     - Added npm scripts to `package.json`:
+       - `"format:check": "prettier --check ."`
+       - `"lint:fix": "eslint --fix ."`
+       - `"format": "prettier --write ."`
+     - Updated `.github/workflows/ci.yml` to run `npm run format:check` immediately before `npm run lint`, ensuring formatting violations fail fast with explicit diagnostic messages.
+- **Files Touched**:
+  - `src/server.ts` (formatted line 45)
+  - `MIGRATION_LOG.md` (formatted & updated)
+  - `.prettierignore` (added build artifacts & routeTree)
+  - `eslint.config.js` (added build artifacts & routeTree to ignores)
+  - `package.json` (added format:check and lint:fix scripts)
+  - `.github/workflows/ci.yml` (added format:check step)
+- **Verification Results**:
+  - `npm ci`: Executed cleanly, 0 vulnerabilities.
+  - `npm run format:check`: All matched files use Prettier code style (exit code 0).
+  - `npm run lint`: Clean, 0 errors, 0 warnings (exit code 0).
+  - `npm run typecheck`: Passed cleanly (`tsc --noEmit`).
+  - `npm test`: 9 test suites, 85 unit tests passed.
+  - `npm run build`: Production bundle and Nitro server built cleanly in 490ms.
+  - `npx playwright test`: 12/12 E2E tests passed across accessibility, flow, and SSR resilience.
