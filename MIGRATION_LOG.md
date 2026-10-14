@@ -706,3 +706,46 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `src/components/smarttrip/booking/ETicketView.tsx`
   - `MIGRATION_LOG.md`
 
+---
+
+## Phase 11: Fix Vercel Deploy Block (TanStack Start Security Upgrade - CVE-2026-102989)
+
+- **Date**: 2026-10-14
+- **Goal**: Resolve Vercel build block caused by CVE-2026-102989 in `@tanstack/react-start@1.168.32` by upgrading the TanStack ecosystem to the latest stable release (>= 1.168.60) without using any `DANGEROUSLY_` bypass flags.
+- **Dependency Version Matrix**:
+  | Package | Old Version | New Version | Status |
+  |---|---|---|---|
+  | `@tanstack/react-start` | `1.168.32` | `1.169.2` | Upgraded (Patched CVE-2026-102989) |
+  | `@tanstack/react-router` | `1.170.18` | `1.170.44` | Upgraded (Coordinated) |
+  | `@tanstack/router-plugin` | `1.168.23` | `1.168.46` | Upgraded (Coordinated) |
+  | `@tanstack/react-query` | `5.104.2` | `5.104.2` | Unchanged (Compatible) |
+  | `nitro` | `3.0.260603-beta` | `3.0.260603-beta` | Unchanged |
+  | `vite` | `8.1.5` | `8.1.5` | Unchanged |
+  | `rolldown` (override) | `1.2.1` | `1.2.1` | Unchanged |
+- **Breaking Changes Handled**:
+  1. **Router `ErrorComponentProps` Type Alignment**:
+     - *Change*: TanStack Router's `ErrorComponent` now types `error` as `unknown` rather than `Error`.
+     - *Fix*: Imported `ErrorComponentProps` in `src/routes/__root.tsx` and handled both `Error` instances and string error values safely before rendering and reporting.
+  2. **ESLint Ignore Configuration**:
+     - *Change*: Ignored test and report artifacts (`playwright-report`, `test-results`, `coverage`) in `eslint.config.js`.
+  3. **Vercel Output Compatibility**:
+     - *Verified*: `vite.config.ts` auto-detects `VERCEL=1` and applies Nitro's `vercel` preset to output to `.vercel/output`.
+  4. **Security & Environment Hygiene**:
+     - *Verified*: Confirmed zero occurrences of `DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS` across code, docs, and configs.
+     - *Docs*: Added clear "Deploying to Vercel" section in `README.md` listing environment variables with no secret values.
+- **Verification Results**:
+  - `npm run lint`: 0 errors, 0 warnings.
+  - `npm run typecheck`: Passed cleanly with zero TypeScript errors.
+  - `npm test`: 8 test suites, 80 unit tests passed.
+  - `npm run build`: Production bundle succeeded with Nitro SSR.
+  - `npm audit --omit=dev`: `found 0 vulnerabilities`.
+  - `npm audit`: `found 0 vulnerabilities`.
+- **Files Touched**:
+  - `package.json`
+  - `package-lock.json`
+  - `src/routes/__root.tsx`
+  - `eslint.config.js`
+  - `README.md`
+  - `MIGRATION_LOG.md`
+
+
