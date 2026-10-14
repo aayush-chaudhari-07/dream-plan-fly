@@ -2,17 +2,17 @@ import { useState, useMemo } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { CheckCircle2, ArrowLeft, AlertCircle, Ban } from "lucide-react";
 import { toast } from "sonner";
-import { Navbar } from "@/components/smarttrip/Navbar";
-import { Footer } from "@/components/smarttrip/Footer";
-import { PageHeader } from "@/components/smarttrip/PageHeader";
-import { SupportDock } from "@/components/smarttrip/SupportDock";
-import { Button } from "@/components/ui/button";
-import { ETicketView } from "@/components/smarttrip/booking/ETicketView";
-import { useSmartTrip, smartTrip, type StoredBooking } from "@/lib/smarttrip-store";
-import { cancelBookingWithRefundFn } from "@/lib/server/booking-actions";
-import { inr } from "@/data/travel";
+import { Navbar } from "@/client/components/Navbar";
+import { Footer } from "@/client/components/Footer";
+import { PageHeader } from "@/client/components/PageHeader";
+import { SupportDock } from "@/client/features/support/SupportDock";
+import { Button } from "@/client/components/ui/button";
+import { ETicketView } from "@/client/features/bookings/ETicketView";
+import { useSmartTrip, smartTrip, type StoredBooking } from "@/client/lib/smarttrip-store";
+import { cancelBookingWithRefundFn } from "@/server/functions/booking-actions";
+import { inr } from "@/shared/types/travel";
 
-import { createSeoHead } from "@/lib/seo";
+import { createSeoHead } from "@/client/lib/seo";
 
 export const Route = createFileRoute("/booking-confirmation/$id")({
   head: ({ params }) =>

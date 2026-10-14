@@ -1,7 +1,7 @@
-import "./lib/error-capture";
+import "@/client/lib/error-capture";
 
-import { consumeLastCapturedError } from "./lib/error-capture";
-import { renderErrorPage } from "./lib/error-page";
+import { consumeLastCapturedError } from "@/client/lib/error-capture";
+import { renderErrorPage } from "@/client/lib/error-page";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -19,8 +19,12 @@ async function getServerEntry(): Promise<ServerEntry> {
 }
 
 // h3 swallows in-handler throws into a normal 500 Response with body
-// {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
-async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
+// {"error":true,"status":500,"unhandled":true} or {"unhandled":true,"message":"HTTPError"}.
+// For browser requests, normalize to the app's styled error page. For API requests, return JSON.
+async function normalizeCatastrophicSsrResponse(
+  response: Response,
+  request?: Request,
+): Promise<Response> {
   if (response.status < 500) return response;
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) return response;
@@ -28,7 +32,43 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   const body = await response.clone().text();
   if (!isH3SwallowedErrorBody(body)) return response;
 
-  console.error(consumeLastCapturedError() ?? new Error(`h3 swallowed SSR error: ${body}`));
+  const url = request ? new URL(request.url) : null;
+  const pathname = url?.pathname ?? "/";
+  const accept = request?.headers.get("accept") ?? "";
+  const isApi =
+    pathname.startsWith("/api/") ||
+    pathname.includes("/_serverFn/") ||
+    (accept.includes("application/json") && !accept.includes("text/html"));
+
+  const lastErr = consumeLastCapturedError();
+  const lastErrorObj = lastErr instanceof Error ? lastErr : null;
+  const lastErrorMsg = lastErrorObj?.message ?? (typeof lastErr === "string" ? lastErr : undefined);
+  const isAborted =
+    lastErrorMsg === "aborted" ||
+    (lastErr as { code?: string })?.code === "ECONNRESET" ||
+    (lastErr as { name?: string })?.name === "AbortError";
+
+  if (!isAborted) {
+    console.error(
+      `[Server SSR Error] ${request?.method ?? "GET"} ${pathname}:`,
+      lastErrorObj?.stack ?? lastErrorMsg ?? `Nitro SSR unhandled error: ${body}`,
+    );
+  }
+
+  if (isApi) {
+    return new Response(
+      JSON.stringify({
+        error: true,
+        status: 500,
+        message: "Internal Server Error",
+      }),
+      {
+        status: 500,
+        headers: { "content-type": "application/json; charset=utf-8" },
+      },
+    );
+  }
+
   return new Response(renderErrorPage(), {
     status: 500,
     headers: { "content-type": "text/html; charset=utf-8" },
@@ -37,8 +77,18 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 function isH3SwallowedErrorBody(body: string): boolean {
   try {
-    const payload = JSON.parse(body) as { unhandled?: unknown; message?: unknown };
-    return payload.unhandled === true && payload.message === "HTTPError";
+    const payload = JSON.parse(body) as {
+      unhandled?: unknown;
+      message?: unknown;
+      status?: unknown;
+      error?: unknown;
+    };
+    return Boolean(
+      payload.unhandled === true ||
+      payload.status === 500 ||
+      payload.message === "HTTPError" ||
+      payload.error === true,
+    );
   } catch {
     return false;
   }
@@ -91,6 +141,50 @@ async function handleKeepAlive(): Promise<Response> {
   });
 }
 
+async function handleHealthCheck(): Promise<Response> {
+  const isProd =
+    (typeof process !== "undefined" ? process.env?.["NODE_ENV"] : undefined) === "production";
+
+  // Check which variables are missing by NAME only (never secret values)
+  const expectedPublicVars = ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY"] as const;
+  const expectedServerVars = ["GEMINI_API_KEY", "CRON_SECRET"] as const;
+
+  const missingVariables: string[] = [];
+  if (typeof process !== "undefined" && process.env) {
+    for (const v of expectedPublicVars) {
+      const val = process.env[v];
+      if (!val || val.trim() === "" || val.includes("placeholder")) {
+        missingVariables.push(v);
+      }
+    }
+    for (const v of expectedServerVars) {
+      const val = process.env[v];
+      if (!val || val.trim() === "" || val.includes("placeholder")) {
+        missingVariables.push(v);
+      }
+    }
+  }
+
+  const payload: Record<string, unknown> = {
+    ok: true,
+    status: missingVariables.includes("VITE_SUPABASE_URL") ? "degraded" : "healthy",
+    timestamp: new Date().toISOString(),
+  };
+
+  if (!isProd) {
+    payload["missingVariables"] = missingVariables;
+    payload["environment"] = process.env?.["NODE_ENV"] || "development";
+  }
+
+  return new Response(JSON.stringify(payload, null, 2), {
+    status: 200,
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "no-store, no-cache, must-revalidate",
+    },
+  });
+}
+
 function applySecurityHeaders(res: Response): Response {
   const headers = new Headers(res.headers);
   headers.set("X-Frame-Options", "DENY");
@@ -122,7 +216,7 @@ function applySecurityHeaders(res: Response): Response {
   });
 }
 
-import { handlePriceFluctuationsCron } from "./server/price-fluctuations";
+import { handlePriceFluctuationsCron } from "@/server/services/price-fluctuations";
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
@@ -140,6 +234,10 @@ export default {
         );
       }
 
+      if (url.pathname === "/api/health") {
+        return applySecurityHeaders(await handleHealthCheck());
+      }
+
       if (url.pathname === "/api/keep-alive") {
         return applySecurityHeaders(await handleKeepAlive());
       }
@@ -153,10 +251,36 @@ export default {
 
       const handler = await getServerEntry();
       const rawResponse = await handler.fetch(request, env, ctx);
-      const normalized = await normalizeCatastrophicSsrResponse(rawResponse);
+      const normalized = await normalizeCatastrophicSsrResponse(rawResponse, request);
       return applySecurityHeaders(normalized);
     } catch (error) {
-      console.error(error);
+      const url = new URL(request.url);
+      const accept = request.headers.get("accept") ?? "";
+      const isApi =
+        url.pathname.startsWith("/api/") ||
+        url.pathname.includes("/_serverFn/") ||
+        (accept.includes("application/json") && !accept.includes("text/html"));
+
+      console.error(
+        `[Server Error] ${request.method} ${url.pathname}:`,
+        error instanceof Error ? (error.stack ?? error.message) : error,
+      );
+
+      if (isApi) {
+        const errJson = new Response(
+          JSON.stringify({
+            error: true,
+            status: 500,
+            message: "Internal Server Error",
+          }),
+          {
+            status: 500,
+            headers: { "content-type": "application/json; charset=utf-8" },
+          },
+        );
+        return applySecurityHeaders(errJson);
+      }
+
       const errRes = new Response(renderErrorPage(), {
         status: 500,
         headers: { "content-type": "text/html; charset=utf-8" },

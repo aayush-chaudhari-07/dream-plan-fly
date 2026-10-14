@@ -5,15 +5,15 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Navbar } from "@/components/smarttrip/Navbar";
-import { Footer } from "@/components/smarttrip/Footer";
-import { SupportDock } from "@/components/smarttrip/SupportDock";
-import { submitSupportTicketFn } from "@/lib/server/trip-actions";
+} from "@/client/components/ui/accordion";
+import { Button } from "@/client/components/ui/button";
+import { Input } from "@/client/components/ui/input";
+import { Textarea } from "@/client/components/ui/textarea";
+import { Badge } from "@/client/components/ui/badge";
+import { Navbar } from "@/client/components/Navbar";
+import { Footer } from "@/client/components/Footer";
+import { SupportDock } from "@/client/features/support/SupportDock";
+import { submitSupportTicketFn } from "@/server/functions/trip-actions";
 import {
   AlertCircle,
   CheckCircle2,
@@ -30,8 +30,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-import { createSeoHead } from "@/lib/seo";
+import { cn } from "@/client/lib/utils";
+import { createSeoHead } from "@/client/lib/seo";
 
 export const Route = createFileRoute("/faq")({
   head: () =>

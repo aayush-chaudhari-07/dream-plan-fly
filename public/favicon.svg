@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="smarttrip-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1d4ed8" />
+      <stop offset="50%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#0ea5e9" />
+    </linearGradient>
+    <linearGradient id="plane-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e0f2fe" />
+    </linearGradient>
+    <filter id="soft-shadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Squircle Brand Container -->
+  <rect width="512" height="512" rx="116" fill="url(#smarttrip-grad)" />
+
+  <!-- Subtle Inner Ring -->
+  <rect x="16" y="16" width="480" height="480" rx="100" fill="none" stroke="#ffffff" stroke-width="6" stroke-opacity="0.15" />
+
+  <!-- Map Pin Background Shape -->
+  <g filter="url(#soft-shadow)">
+    <!-- Location Pin -->
+    <path
+      d="M256 96 C185 96 128 153 128 224 C128 316 236 404 248 413 C252 417 260 417 264 413 C276 404 384 316 384 224 C384 153 327 96 256 96 Z"
+      fill="#ffffff"
+      fill-opacity="0.22"
+      stroke="#ffffff"
+      stroke-width="14"
+      stroke-linejoin="round"
+    />
+    <!-- Pin Core Center -->
+    <circle cx="256" cy="224" r="44" fill="#ffffff" fill-opacity="0.35" />
+
+    <!-- Ascending Airplane / Paper Plane -->
+    <path
+      d="M374 154 L170 236 C154 242 156 264 172 268 L236 284 L276 348 C284 360 302 358 306 344 L378 172 C384 158 370 144 374 154 Z"
+      fill="url(#plane-grad)"
+      stroke="#ffffff"
+      stroke-width="8"
+      stroke-linejoin="round"
+    />
+
+    <!-- Fold Crease Detail on Plane -->
+    <path
+      d="M374 154 L236 284"
+      stroke="#2563eb"
+      stroke-width="7"
+      stroke-linecap="round"
+    />
+  </g>
+</svg>

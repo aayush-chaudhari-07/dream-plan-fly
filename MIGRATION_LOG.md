@@ -652,33 +652,33 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
 - **Goal**: Resolve all 7 reported Playwright E2E test failures, eliminate CI flakiness, ensure production SSR server readiness, establish clean deterministic state isolation, and replace fragile locators with stable `data-testid` attributes without loosening assertions or skipping tests.
 - **Root Cause & Fix Breakdown**:
   1. **Production Server 500 Crash on Startup (`__commonJSMin is not a function`)**:
-     - *Root Cause*: In the production Nitro/Rolldown build, `@supabase/ssr` imported CommonJS `cookie`, which created a circular module dependency where `__commonJSMin` was referenced before initialization in `_ssr/ssr.mjs`, causing immediate HTTP 500 on all server requests.
-     - *Fix*: Replaced `@supabase/ssr` with standard `@supabase/supabase-js` client in `src/lib/supabase/client.ts` and `src/lib/supabase/server.ts`. Configured `playwright.config.ts` `webServer` to serve `node .output/server/index.mjs` with `timeout: 120000` and `reuseExistingServer: !process.env.CI`.
-     - *App Change*: Updated `src/lib/supabase/client.ts` and `src/lib/supabase/server.ts`.
+     - _Root Cause_: In the production Nitro/Rolldown build, `@supabase/ssr` imported CommonJS `cookie`, which created a circular module dependency where `__commonJSMin` was referenced before initialization in `_ssr/ssr.mjs`, causing immediate HTTP 500 on all server requests.
+     - _Fix_: Replaced `@supabase/ssr` with standard `@supabase/supabase-js` client in `src/lib/supabase/client.ts` and `src/lib/supabase/server.ts`. Configured `playwright.config.ts` `webServer` to serve `node .output/server/index.mjs` with `timeout: 120000` and `reuseExistingServer: !process.env.CI`.
+     - _App Change_: Updated `src/lib/supabase/client.ts` and `src/lib/supabase/server.ts`.
   2. **`signup.spec.ts`: Strict-Mode Violation (`input[type="email"]` matched 2 elements)**:
-     - *Root Cause*: `input[type="email"]` matched both `#signup-email` inside the signup form and the newsletter input in `<Footer />`.
-     - *Fix*: Scoped test locators strictly to `page.getByTestId("signup-form")` (`page.getByTestId("signup-form").getByTestId("signup-email")`) without using `.first()`.
-     - *App Change*: Added `data-testid="signup-form"`, `data-testid="signup-name"`, `data-testid="signup-email"`, `data-testid="signup-password"`, `data-testid="signup-submit"` to `src/routes/signup.tsx`.
+     - _Root Cause_: `input[type="email"]` matched both `#signup-email` inside the signup form and the newsletter input in `<Footer />`.
+     - _Fix_: Scoped test locators strictly to `page.getByTestId("signup-form")` (`page.getByTestId("signup-form").getByTestId("signup-email")`) without using `.first()`.
+     - _App Change_: Added `data-testid="signup-form"`, `data-testid="signup-name"`, `data-testid="signup-email"`, `data-testid="signup-password"`, `data-testid="signup-submit"` to `src/routes/signup.tsx`.
   3. **`signup.spec.ts`: Header Text Mismatch**:
-     - *Root Cause*: Test asserted `/Join SmartTrip/i`, whereas the production UI design uses the heading "Plan Less. Travel More." with subtext "Create your free account...".
-     - *Fix*: Updated test assertion to verify `page.getByTestId("signup-heading")` contains `/Plan Less\. Travel More\./`.
-     - *App Change*: Added `data-testid="signup-heading"` to `src/routes/signup.tsx`.
+     - _Root Cause_: Test asserted `/Join SmartTrip/i`, whereas the production UI design uses the heading "Plan Less. Travel More." with subtext "Create your free account...".
+     - _Fix_: Updated test assertion to verify `page.getByTestId("signup-heading")` contains `/Plan Less\. Travel More\./`.
+     - _App Change_: Added `data-testid="signup-heading"` to `src/routes/signup.tsx`.
   4. **`fund-and-wishlist.spec.ts`: Wishlist Button / Sheet Not Visible**:
-     - *Root Cause*: CSS selector `button:has(svg.lucide-heart)` was brittle and raced layout/hydration.
-     - *Fix*: Added explicit testids. Test toggles wishlist on destination card `data-testid="wishlist-toggle-d1"`, opens navbar `data-testid="wishlist-button"`, and asserts `data-testid="wishlist-sheet"` visibility using auto-retrying web-first assertions.
-     - *App Change*: Added `data-testid="wishlist-button"` in `Navbar.tsx`, `data-testid="wishlist-sheet"` in `WishlistSheet.tsx`, and `data-testid="wishlist-toggle-${d.id}"` in `ExploreDestinations.tsx`.
+     - _Root Cause_: CSS selector `button:has(svg.lucide-heart)` was brittle and raced layout/hydration.
+     - _Fix_: Added explicit testids. Test toggles wishlist on destination card `data-testid="wishlist-toggle-d1"`, opens navbar `data-testid="wishlist-button"`, and asserts `data-testid="wishlist-sheet"` visibility using auto-retrying web-first assertions.
+     - _App Change_: Added `data-testid="wishlist-button"` in `Navbar.tsx`, `data-testid="wishlist-sheet"` in `WishlistSheet.tsx`, and `data-testid="wishlist-toggle-${d.id}"` in `ExploreDestinations.tsx`.
   5. **`fund-and-wishlist.spec.ts`: Trip Fund Dialog / "Contribute" Button Not Found**:
-     - *Root Cause*: Fragile text matching and card selection raced hydration of the fund section.
-     - *Fix*: Scoped to `data-testid="fund-card-ft1"`, clicked `data-testid="trip-fund-open"`, awaited `data-testid="trip-fund-dialog"`, and submitted via `data-testid="contribute-dialog-submit"`.
-     - *App Change*: Added `data-testid="trip-fund-section"`, `data-testid="fund-card-${trip.id}"`, `data-testid="trip-fund-open"`, `data-testid="trip-fund-dialog"`, `data-testid="contribute-input"`, and `data-testid="contribute-dialog-submit"` in `TripFund.tsx`.
+     - _Root Cause_: Fragile text matching and card selection raced hydration of the fund section.
+     - _Fix_: Scoped to `data-testid="fund-card-ft1"`, clicked `data-testid="trip-fund-open"`, awaited `data-testid="trip-fund-dialog"`, and submitted via `data-testid="contribute-dialog-submit"`.
+     - _App Change_: Added `data-testid="trip-fund-section"`, `data-testid="fund-card-${trip.id}"`, `data-testid="trip-fund-open"`, `data-testid="trip-fund-dialog"`, `data-testid="contribute-input"`, and `data-testid="contribute-dialog-submit"` in `TripFund.tsx`.
   6. **`plan-and-save.spec.ts`: "Generate Plan" Button Not Found**:
-     - *Root Cause*: Divergence in button text ("Generate My Trip" vs "Generate Plan") combined with text selector fragility.
-     - *Fix*: Replaced text-based locators with `data-testid="generate-plan-button"`, `data-testid="planner-prompt-input"`, and `data-testid="save-plan-button"`.
-     - *App Change*: Added `data-testid` attributes to `AiPlanner.tsx`.
+     - _Root Cause_: Divergence in button text ("Generate My Trip" vs "Generate Plan") combined with text selector fragility.
+     - _Fix_: Replaced text-based locators with `data-testid="generate-plan-button"`, `data-testid="planner-prompt-input"`, and `data-testid="save-plan-button"`.
+     - _App Change_: Added `data-testid` attributes to `AiPlanner.tsx`.
   7. **`search-and-book.spec.ts`: Expected Checkout/Confirmation URL Navigation Race**:
-     - *Root Cause*: Fast clicking on flight cards asserted URLs before client-side TanStack Router transitions settled, causing race conditions.
-     - *Fix*: Coupled user actions with explicit URL waits using `Promise.all([page.waitForURL(/\/checkout/), button.click()])` and `Promise.all([page.waitForURL(/\/booking-confirmation\//), button.click()])`. Added stable testids for flight cards, booking triggers, and e-ticket confirmations.
-     - *App Change*: Added `data-testid="first-flight-card"`, `data-testid="book-flight-btn"` in `bookings.tsx`, `data-testid="checkout-continue"` in `checkout.tsx`, and `data-testid="booking-confirmation"` in `ETicketView.tsx`.
+     - _Root Cause_: Fast clicking on flight cards asserted URLs before client-side TanStack Router transitions settled, causing race conditions.
+     - _Fix_: Coupled user actions with explicit URL waits using `Promise.all([page.waitForURL(/\/checkout/), button.click()])` and `Promise.all([page.waitForURL(/\/booking-confirmation\//), button.click()])`. Added stable testids for flight cards, booking triggers, and e-ticket confirmations.
+     - _App Change_: Added `data-testid="first-flight-card"`, `data-testid="book-flight-btn"` in `bookings.tsx`, `data-testid="checkout-continue"` in `checkout.tsx`, and `data-testid="booking-confirmation"` in `ETicketView.tsx`.
 - **Deterministic State & CI Workflow Updates**:
   - Created `e2e/test-helpers.ts` providing `setupIsolatedTestPage`: clears `localStorage`/`sessionStorage` before each test and routes external network requests (Open-Meteo, Frankfurter, OpenStreetMap tiles) to deterministic mock payloads so tests run 100% offline and free of rate limits.
   - Updated `playwright.config.ts`: single worker in CI (`workers: 1`), 1 retry in CI (`retries: 1`), 120s timeout, production server preview command (`node .output/server/index.mjs`).
@@ -713,26 +713,26 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
 - **Date**: 2026-10-14
 - **Goal**: Resolve Vercel build block caused by CVE-2026-102989 in `@tanstack/react-start@1.168.32` by upgrading the TanStack ecosystem to the latest stable release (>= 1.168.60) without using any `DANGEROUSLY_` bypass flags.
 - **Dependency Version Matrix**:
-  | Package | Old Version | New Version | Status |
-  |---|---|---|---|
-  | `@tanstack/react-start` | `1.168.32` | `1.169.2` | Upgraded (Patched CVE-2026-102989) |
-  | `@tanstack/react-router` | `1.170.18` | `1.170.44` | Upgraded (Coordinated) |
-  | `@tanstack/router-plugin` | `1.168.23` | `1.168.46` | Upgraded (Coordinated) |
-  | `@tanstack/react-query` | `5.104.2` | `5.104.2` | Unchanged (Compatible) |
-  | `nitro` | `3.0.260603-beta` | `3.0.260603-beta` | Unchanged |
-  | `vite` | `8.1.5` | `8.1.5` | Unchanged |
-  | `rolldown` (override) | `1.2.1` | `1.2.1` | Unchanged |
+  | Package                   | Old Version       | New Version       | Status                             |
+  | ------------------------- | ----------------- | ----------------- | ---------------------------------- |
+  | `@tanstack/react-start`   | `1.168.32`        | `1.169.2`         | Upgraded (Patched CVE-2026-102989) |
+  | `@tanstack/react-router`  | `1.170.18`        | `1.170.44`        | Upgraded (Coordinated)             |
+  | `@tanstack/router-plugin` | `1.168.23`        | `1.168.46`        | Upgraded (Coordinated)             |
+  | `@tanstack/react-query`   | `5.104.2`         | `5.104.2`         | Unchanged (Compatible)             |
+  | `nitro`                   | `3.0.260603-beta` | `3.0.260603-beta` | Unchanged                          |
+  | `vite`                    | `8.1.5`           | `8.1.5`           | Unchanged                          |
+  | `rolldown` (override)     | `1.2.1`           | `1.2.1`           | Unchanged                          |
 - **Breaking Changes Handled**:
   1. **Router `ErrorComponentProps` Type Alignment**:
-     - *Change*: TanStack Router's `ErrorComponent` now types `error` as `unknown` rather than `Error`.
-     - *Fix*: Imported `ErrorComponentProps` in `src/routes/__root.tsx` and handled both `Error` instances and string error values safely before rendering and reporting.
+     - _Change_: TanStack Router's `ErrorComponent` now types `error` as `unknown` rather than `Error`.
+     - _Fix_: Imported `ErrorComponentProps` in `src/routes/__root.tsx` and handled both `Error` instances and string error values safely before rendering and reporting.
   2. **ESLint Ignore Configuration**:
-     - *Change*: Ignored test and report artifacts (`playwright-report`, `test-results`, `coverage`) in `eslint.config.js`.
+     - _Change_: Ignored test and report artifacts (`playwright-report`, `test-results`, `coverage`) in `eslint.config.js`.
   3. **Vercel Output Compatibility**:
-     - *Verified*: `vite.config.ts` auto-detects `VERCEL=1` and applies Nitro's `vercel` preset to output to `.vercel/output`.
+     - _Verified_: `vite.config.ts` auto-detects `VERCEL=1` and applies Nitro's `vercel` preset to output to `.vercel/output`.
   4. **Security & Environment Hygiene**:
-     - *Verified*: Confirmed zero occurrences of `DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS` across code, docs, and configs.
-     - *Docs*: Added clear "Deploying to Vercel" section in `README.md` listing environment variables with no secret values.
+     - _Verified_: Confirmed zero occurrences of `DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS` across code, docs, and configs.
+     - _Docs_: Added clear "Deploying to Vercel" section in `README.md` listing environment variables with no secret values.
 - **Verification Results**:
   - `npm run lint`: 0 errors, 0 warnings.
   - `npm run typecheck`: Passed cleanly with zero TypeScript errors.
@@ -776,5 +776,338 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `npx playwright test`: 9/9 E2E tests passed cleanly across accessibility, booking, fund, planning, and signup.
 - **Baseline Failures**: 0 failures (clean green baseline).
 
+---
 
+## Phase 13: Architectural Restructuring (Client / Server / Shared Layout)
 
+- **Date**: 2026-10-14
+- **Goal**: Reorganize codebase into clean `client/`, `server/`, and `shared/` architecture using `git mv` to preserve git history, maintain thin file routes, and prevent server-only code from leaking into the browser.
+- **New Structure**:
+  - `src/routes/`: Thin TanStack file routes composing client features and calling server functions.
+  - `src/client/`:
+    - `components/`: Core UI components (`Navbar`, `Footer`, `PageHeader`, `Reveal`, `EscapeHills`, `Hero`, `HowItWorks`, `Testimonials`, `TravelSafe`) and Radix UI primitives (`components/ui/`).
+    - `features/`: Domain feature folders (`planner/`, `bookings/`, `trips/`, `map/`, `destinations/`, `fund/`, `wishlist/`, `search/`, `reviews/`, `support/`).
+    - `hooks/`: Browser hooks (`use-mobile.tsx`).
+    - `lib/`: Browser utilities (`smarttrip-store.ts`, `auth-context.tsx`, `query-client.ts`, `seo.ts`, `utils.ts`, `error-report.ts`, `supabase/client.ts`).
+  - `src/server/`:
+    - `functions/`: `createServerFn` RPC endpoints (`booking-actions.ts`, `live-data-actions.ts`, `trip-actions.ts`, `planner-actions.ts`).
+    - `services/`: Server-only implementations (`gemini-planner.ts`, `weather.ts`, `currency.ts`, `rate-limiter.ts`, `rate-limit-guard.ts`, `price-fluctuations.ts`, `payments/demo-provider.ts`, `payments/razorpay-provider.ts`).
+    - `db/`: Server Supabase client (`supabase-server.ts`).
+    - `config/`: Reserved for validated server environment config.
+  - `src/shared/`:
+    - `types/`: Domain models and contracts (`travel.ts`, `trip-plan.ts`, `weather.ts`).
+    - `constants/`: Reference data (`airports.ts`, `inventory-data.ts`, `flight-generator.ts`).
+    - `utils/`: Universal utilities (`card-validator.ts`).
+- **Path Aliases & Tooling**:
+  - Updated `tsconfig.json` paths with explicit `@/client/*`, `@/server/*`, `@/shared/*`.
+  - Updated `components.json` shadcn aliases to `@/client/components`, `@/client/components/ui`, `@/client/lib`.
+  - Added `.vercel` to `.prettierignore`.
+- **Verification Results**:
+  - `npm run lint`: 0 errors, 0 warnings.
+  - `npm run typecheck`: Passed (`tsc --noEmit`).
+  - `npm test`: 8 test suites, 80 unit tests passed.
+  - `npm run build`: Production SSR bundle generated in `.output/`.
+  - `npx playwright test`: 9/9 E2E tests passed cleanly.
+
+---
+
+## Phase 14: Client / Server / Shared Boundary Enforcement & Secret Leak Prevention
+
+- **Date**: 2026-10-14
+- **Goal**: Configure lint rules, automated CI checks, and secret hygiene validation to strictly prevent server secrets and Node APIs from leaking into the client bundle or shared modules.
+- **Key Actions**:
+  1. **ESLint Boundary Rules (`eslint.config.js`)**:
+     - Configured `no-restricted-imports` on `src/client/**/*.{ts,tsx}`: client modules are prohibited from importing directly from `@/server/services/**`, `@/server/db/**`, `@/server/config/**`, or relative equivalents. Client modules may only invoke RPC endpoints exported from `@/server/functions/*`.
+     - Configured `no-restricted-imports` on `src/shared/**/*.{ts,tsx}`: shared modules are prohibited from importing anything from `src/client/**` or `src/server/**` (`@/client/**`, `@/server/**`).
+  2. **Boundary & Secret Leak Verification Script (`scripts/check-boundaries.mjs`)**:
+     - Scans all files under `src/client/`: asserts that no imports cross into forbidden server subdirectories, and asserts that zero references to server-only env vars (`GEMINI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET`, `DEMO_PAY_SECRET`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_KEY_ID`, `NITRO_PRESET`) exist.
+     - Scans all files under `src/shared/`: asserts 100% purity with zero dependencies on client/server code and zero environment variable access (`process.env` / `import.meta.env`).
+     - Scans repository source files: asserts that no server secret uses a public prefix (`VITE_` or `NEXT_PUBLIC_`). Only genuinely public configuration (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_SITE_URL`) uses `VITE_`.
+     - Scans built production assets (`.output/public/`): verifies that service role tokens, CRON_SECRET, GEMINI_API_KEY, and private keys never exist in client-facing bundles.
+  3. **Package & CI Workflow Integration**:
+     - Added npm script `"check:boundaries": "node scripts/check-boundaries.mjs"`.
+     - Wired `npm run check:boundaries` into `.github/workflows/ci.yml` immediately following `npm run build`.
+  4. **Verification Results**:
+     - `npm run check:boundaries`: Passed with zero violations.
+     - `npm run lint`: 0 errors, 0 warnings.
+     - `npm run typecheck`: Passed with zero TypeScript errors.
+     - `npm test`: 8 test suites, 80 unit tests passed.
+     - `npm run build`: Production SSR bundle generated in `.output/`.
+     - `npx playwright test`: 9/9 E2E tests passed cleanly.
+     - `npm run scan-secrets`: 0 secrets detected across 72 client bundle assets.
+
+---
+
+## Phase 15: Environment Template, Typed Validation, and Preflight Checks
+
+- **Date**: 2026-10-14
+- **Goal**: Rebuild `.env.example` with clear groupings and documentation, implement typed runtime validation with Zod on client and server boundaries, ensure complete git safety with `.gitignore`, and provide a privacy-preserving preflight CLI checker (`npm run check:env`).
+- **Key Actions**:
+  1. **Comprehensive Environment Template (`.env.example`)**:
+     - Organized into 3 clear sections:
+       1. Public / Client variables (`VITE_SITE_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_SENTRY_DSN`).
+       2. Server-Only variables (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, `DEMO_PAY_SECRET`, `CRON_SECRET`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`).
+       3. CI / Deployment variables (`NITRO_PRESET`, `CI`).
+     - Documented purpose, required vs optional tier, free source URL, and graceful fallback behavior for each variable.
+     - Guaranteed 0 real secrets; safe dummy placeholders only.
+  2. **Typed Server Validator (`src/server/config/env.server.ts`)**:
+     - Uses Zod to parse and validate `process.env` on the server.
+     - Implements `MissingEnvironmentVariableError` providing human-friendly diagnostic messages naming the missing variable, the affected feature, and where to obtain a free key.
+     - Implements safe resolvers: `getResolvedSupabaseUrl()`, `getResolvedSupabaseAnonKey()`, and `getResolvedCronSecret()`.
+     - Integrated with `src/server/db/supabase-server.ts`.
+  3. **Typed Client Validator (`src/client/lib/env.client.ts`)**:
+     - Safely parses public browser variables using `zod`.
+     - Exports `isSupabaseConfigured()` to check whether real cloud credentials are present without crashing on template/placeholder strings.
+     - Integrated with `src/client/lib/supabase/client.ts`.
+  4. **Preflight Environment Checker (`scripts/check-env.mjs`)**:
+     - Reads `.env` and environment state without printing real secret values.
+     - Inspects each variable and displays status: `SET`, `PLACEHOLDER`, or `UNSET`, with fallback details and free key URLs.
+     - Prints a high-level runtime summary (Cloud backend status, AI planner status, Demo payment status, Weather, Currency).
+     - Added npm script `"check:env": "node scripts/check-env.mjs"`.
+  5. **Git Safety & `.env` Initialization**:
+     - Verified `.gitignore` ignores all `.env*` except `.env.example`.
+     - Verified `git ls-files .env*` returns only `.env.example`.
+     - Copied `.env.example` to local `.env`.
+  6. **Verification Results**:
+     - `npm run check:boundaries`: Passed with 0 violations.
+     - `npm run check:env`: Executed cleanly, displaying privacy-preserving configuration report.
+     - `npm run lint`: 0 errors, 0 warnings.
+     - `npm run typecheck`: Passed cleanly (`tsc --noEmit`).
+     - `npm test`: 8 test suites, 80 unit tests passed.
+
+---
+
+## Phase 16: Architecture and Environment Guide Verification
+
+- **Date**: 2026-10-14
+- **Goal**: Document the architecture, boundary rules, path migrations, and complete environment configuration audit; verify the full test and build suite.
+- **Key Actions**:
+  1. **Architecture Documentation (`docs/ARCHITECTURE.md`)**:
+     - Documented the 3-tier presentation, client, server, and shared layers.
+     - Documented ESLint, AST boundary checks, and production bundle scanning.
+     - Included historical path migration table mapping legacy locations to the new layout.
+  2. **Environment & Setup Reference (`docs/ENVIRONMENT.md`)**:
+     - Full reference matrix covering all environment variables with scopes, required/optional tiers, free sources, fallbacks, and deployment targets.
+     - Detailed manual setup checklists for Supabase SQL migrations (001–007), Auth redirect URLs, Google AI Studio key generation, Vercel environment setup, and GitHub Actions cron secrets.
+     - Included quick "Do This Now" summary with exact verification commands.
+  3. **README.md Modernization**:
+     - Updated scripts table with `npm run check:boundaries` and `npm run check:env`.
+     - Updated project structure diagram and added architectural boundary rules.
+  4. **Full Verification Suite**:
+     - `npm run lint`: 0 errors, 0 warnings.
+     - `npm run typecheck`: Passed with 0 errors (`tsc --noEmit`).
+     - `npm test`: 8 test suites, 80 unit tests passed.
+     - `npm run build`: Production SSR and client bundle built cleanly with Nitro.
+     - `npm run check:boundaries`: 0 boundary or secret leak violations.
+     - `npm run check:env`: Preflight environment audit executed cleanly.
+     - `npx playwright test`: 9/9 E2E tests passed across accessibility, planning, booking, funds, and auth.
+
+---
+
+## Phase 17: Complete Brand Identity Overhaul & Lovable Favicon Replacement
+
+- **Date**: 2026-10-14
+- **Goal**: Identify and purge all residual Lovable branding assets and favicons; design and generate a complete native SmartTrip icon suite (SVG, ICO, PNGs, Apple Touch, PWA Manifest, and OpenGraph social image) with Sharp; wire all head links; and verify clean zero-leak codebase status.
+- **Leftover Audit Findings**:
+  1. `public/favicon.ico`: 20,373 bytes legacy binary containing the Lovable heart logo. Replaced with custom 6,474 bytes multi-resolution SmartTrip ICO mark (16, 32, 48).
+  2. `src/routes/__root.tsx`: Document `<head>` referenced solely `/favicon.ico` without modern SVG vectors, high-res PNG fallbacks, Apple Touch icons, theme color, or PWA web manifests.
+  3. `src/client/lib/seo.ts`: Hardcoded static fallback image. Refactored to dynamically generate absolute OpenGraph share cards via `getSiteUrl() + '/og-image.png'`.
+  4. Search results for `"lovable"`, `"gptengineer"`, and `"gpt-engineer"` across all tracked codebase files (excluding historical logs and lockfile comments): **0 matches**.
+- **Key Actions**:
+  1. **Brand Mark Design (`public/favicon.svg`)**:
+     - Designed an aerodynamic paper plane ascending through an indigo/sky blue location map pin with squircle boundary matching SmartTrip's Tailwind theme tokens (`#1d4ed8` -> `#2563eb` -> `#0ea5e9`).
+  2. **Automated Asset Generator (`scripts/generate-icons.mjs`)**:
+     - Installed `sharp` as devDependency.
+     - Implemented automated multi-size pipeline:
+       - `favicon.ico` (multi-resolution 16x16, 32x32, 48x48 PNG-in-ICO header packaging).
+       - `favicon-16x16.png` and `favicon-32x32.png`.
+       - `apple-touch-icon.png` (180x180).
+       - `icon-192.png` and `icon-512.png` for PWA installation.
+       - `maskable-512.png` (512x512 with safe padding).
+       - `og-image.png` (1200x630 high-resolution social preview with brand gradient, logo, tagline "Plan Less. Travel More.", and feature badges).
+     - Added npm script `"icons:generate": "node scripts/generate-icons.mjs"`.
+  3. **PWA Manifest (`public/site.webmanifest`)**:
+     - Configured name "SmartTrip", short_name "SmartTrip", theme_color `#2563eb`, background_color `#ffffff`, and 192/512/maskable icon entries.
+  4. **Document Head Integration (`src/routes/__root.tsx`)**:
+     - Wired `<link rel="icon" href="/favicon.svg" type="image/svg+xml">`.
+     - Wired `<link rel="icon" href="/favicon.ico" sizes="any">`.
+     - Wired `<link rel="icon" href="/favicon-32x32.png">` and `16x16.png`.
+     - Wired `<link rel="apple-touch-icon" href="/apple-touch-icon.png">`.
+     - Wired `<link rel="manifest" href="/site.webmanifest">`.
+     - Added `<meta name="theme-color" content="#2563eb">`.
+     - Added `<meta property="og:image" content="/og-image.png">` and `<meta name="twitter:image" content="/og-image.png">`.
+  5. **Verification Results**:
+     - `npm run icons:generate`: Generated all 9 assets into `public/`.
+     - `npm run lint`: 0 errors, 0 warnings.
+     - `npm run typecheck`: Passed with 0 errors (`tsc --noEmit`).
+     - `npm test`: 8 test suites, 80 unit tests passed.
+     - `npm run build`: Production build succeeded; all assets copied to `.output/public/`.
+     - `npm run check:boundaries`: Passed with 0 violations.
+     - `npm run scan-secrets`: 0 secrets detected.
+     - `npx playwright test`: 9/9 E2E tests passed cleanly.
+
+---
+
+## Phase 18: Resolution of Vercel SSR 500 Error, Runtime Hardening & Health Monitoring
+
+- **Date**: 2026-10-14
+- **Goal**: Reproduce and resolve the Vercel branch preview deployment 500 unhandled SSR crash (`{"error":true,"status":500,"unhandled":true}`), ensure public routes render without environment variables, configure the correct Nitro preset and Node runtime, implement user-friendly styled error responses for browser requests versus JSON for APIs, and add diagnostic `/api/health`.
+- **Root Cause Analysis (Empirical Proof)**:
+  1. **Accidental Git-Tracked Prebuilt Output (`.vercel/output/`)**:
+     - Git commit `0aa0fc4` previously committed 118 build files under `.vercel/output/`.
+     - Inside `.vercel/output/functions/__server.func/.vc-config.json`, the generated lambda runtime was `"nodejs24.x"` (derived from the local build machine's Node 24 binary).
+     - Vercel Serverless Functions do not support `nodejs24.x` (AWS Lambda supports `nodejs20.x` and `nodejs22.x`). When Vercel clones a git repository that contains a pre-existing `.vercel/output/` directory, it deploys the prebuilt output directly (`--prebuilt` behavior) without running the standard build command. The resulting serverless function fails to boot on Vercel's infrastructure, triggering Nitro's generic 500 crash handler.
+  2. **Nitro Production Error JSON Passthrough**:
+     - In `src/server.ts`, `isH3SwallowedErrorBody()` checked specifically for `payload.unhandled === true && payload.message === "HTTPError"`.
+     - In Nitro's production Vercel bundle, unhandled exceptions produce `{"error":true,"status":500,"unhandled":true}` (omitting the `"message"` key). Because `payload.message === "HTTPError"` was false, `normalizeCatastrophicSsrResponse()` returned false, allowing the raw Nitro JSON crash payload to leak directly into the browser tab instead of rendering the styled error recovery template.
+  3. **Empty String Environment Variables on Vercel Dashboard**:
+     - When optional environment variables (such as `VITE_SUPABASE_URL=""` or `VITE_SITE_URL=""`) are added as empty values in Vercel's Project Settings, Zod's `z.string().url().optional()` failed validation because `""` is not a valid URL.
+- **Key Actions & Fixes**:
+  1. **Untrack Prebuilt Output & Enforce Node 22 Runtime**:
+     - Added `.vercel` to `.gitignore` and removed all 118 files from Git index via `git rm -r --cached .vercel`.
+     - Added `"engines": { "node": "^20.0.0 || ^22.0.0" }` to `package.json`.
+     - Configured Nitro's Vercel runtime explicitly in `vite.config.ts`:
+       ```ts
+       nitro({
+         ...(nitroPreset ? { preset: nitroPreset } : {}),
+         vercel: { functions: { runtime: "nodejs22.x" } },
+       });
+       ```
+  2. **Zod Environment Preprocessing for Empty Strings**:
+     - Updated `src/server/config/env.server.ts` and `src/client/lib/client-env.ts` with `emptyStringToUndefined` preprocessor. Any variable configured as empty string or whitespace in Vercel or `.env` automatically falls back to `undefined` without throwing validation errors.
+  3. **Browser vs API Error Normalization (`src/server.ts`)**:
+     - Updated `isH3SwallowedErrorBody()` to detect any unhandled Nitro/H3 500 payload (`unhandled === true || status === 500 || error === true || message === "HTTPError"`).
+     - Differentiated browser vs API requests using `Accept` header and pathname (`/api/*`, `/_serverFn/*`). Browser requests receive the styled, branded HTML error recovery screen with HTTP 500; API calls receive clean JSON `{ error: true, status: 500, message: "Internal Server Error" }`.
+     - Filtered benign client disconnect errors (`aborted`, `ECONNRESET`, `AbortError`) from server console error logs.
+  4. **Diagnostic `/api/health` Endpoint**:
+     - Implemented `/api/health` in `src/server.ts` returning `{ ok: true, status: "healthy" | "degraded", timestamp: string }`.
+     - In non-production environments (`development`, `test`), returns `missingVariables` array containing variable **NAMES ONLY** (never values). In production, returns generic status only to prevent environment disclosure.
+  5. **Regression & Resilience Testing**:
+     - Added unit tests in `src/server/__tests__/ssr-production.test.ts` covering `/api/health` behavior across production and non-production modes, and empty string sanitization.
+     - Added Playwright E2E suite in `e2e/ssr-resilience.spec.ts` asserting that `/`, `/explore`, `/ai-planner`, `/my-trips`, `/bookings`, `/save`, and `/api/health` return HTTP 200 without environment variables.
+     - Added reproduction scripts `scripts/test-prod-ssr.mjs` and `scripts/test-vercel-handler.mjs` to execute direct Vercel serverless function entry points across NO-ENV, PUBLIC-ONLY, FULL-ENV, and EMPTY-STRINGS states.
+- **Files Touched**:
+  - `package.json` (added node 20/22 engines)
+  - `vite.config.ts` (configured nitro vercel functions runtime nodejs22.x)
+  - `.gitignore` (added .vercel)
+  - `.vercel/` (untracked 118 build files)
+  - `src/server.ts` (error normalization for browser vs API, /api/health endpoint, error filtering)
+  - `src/server/config/env.server.ts` (empty string sanitization)
+  - `src/client/lib/client-env.ts` (empty string sanitization)
+  - `src/server/__tests__/ssr-production.test.ts` (created)
+  - `e2e/ssr-resilience.spec.ts` (created)
+  - `scripts/test-prod-ssr.mjs` (created)
+  - `scripts/test-vercel-handler.mjs` (created)
+  - `MIGRATION_LOG.md` (updated)
+- **Verification Results**:
+  - Direct Vercel Function Simulation (`node scripts/test-vercel-handler.mjs`): 100% passed across all 4 environments (NO-ENV, PUBLIC-ONLY, FULL-ENV, EMPTY-STRINGS).
+  - `npm run lint`: 0 errors, 0 warnings.
+  - `npm run typecheck`: Passed with 0 errors (`tsc --noEmit`).
+  - `npm run check:boundaries`: Passed with 0 violations.
+  - `npm run scan-secrets`: 0 secrets detected.
+  - `npm test`: 9 test suites, 85 unit tests passed.
+  - `npx playwright test`: 12/12 E2E tests passed.
+
+---
+
+## Phase 19: CI Prettier Lint Fix & Formatting Recurrence Prevention
+
+- **Date**: 2026-10-14
+- **Goal**: Fix CI lint failure on `src/server.ts:45:23` (`prettier/prettier`), format entire repository, align ESLint and Prettier configs, and add automated formatting checks in npm scripts and CI pipeline to prevent recurrence.
+- **Problem & Root Cause**:
+  - The CI lint job (`eslint .`) failed with:
+    `src/server.ts:45:23 error Delete '␍⏎···' prettier/prettier`
+  - Cause: A line break inside the `lastErrorMsg` assignment expression in `src/server.ts` that Prettier required on a single line.
+- **Key Actions & Fixes**:
+  1. **Tool-Driven Formatting Fix (`src/server.ts`)**:
+     - Executed `npx prettier --write src/server.ts` followed by `npx eslint --fix src/server.ts`.
+     - Committed as `style: fix Prettier error in server entry`.
+  2. **Whole-Repository Prettier Sweep**:
+     - Audited entire repository using `npx prettier --check .`.
+     - Formatted repo with `npx prettier --write .`. Only markdown formatting adjustments in `MIGRATION_LOG.md` were modified.
+     - Committed as `style: format repo with Prettier`.
+  3. **Config Consistency & Ignore Alignment**:
+     - Updated `.prettierignore` to exclude build artifacts and generated test reports: `build`, `playwright-report`, `test-results`, `coverage`, and `src/routeTree.gen.ts`.
+     - Updated `eslint.config.js` `ignores` list to exclude `build`, `routeTree.gen.ts`, `src/routeTree.gen.ts`, and `package-lock.json`.
+     - Verified single Prettier config (`.prettierrc`) with `endOfLine: "auto"`, `singleQuote: false`, `trailingComma: "all"`, `printWidth: 100`, and `semi: true`.
+     - Verified `eslint-plugin-prettier/recommended` is applied in `eslint.config.js` to ensure zero conflicts between ESLint and Prettier.
+  4. **NPM Scripts & CI Pipeline Hardening**:
+     - Added npm scripts to `package.json`:
+       - `"format:check": "prettier --check ."`
+       - `"lint:fix": "eslint --fix ."`
+       - `"format": "prettier --write ."`
+     - Updated `.github/workflows/ci.yml` to run `npm run format:check` immediately before `npm run lint`, ensuring formatting violations fail fast with explicit diagnostic messages.
+- **Files Touched**:
+  - `src/server.ts` (formatted line 45)
+  - `MIGRATION_LOG.md` (formatted & updated)
+  - `.prettierignore` (added build artifacts & routeTree)
+  - `eslint.config.js` (added build artifacts & routeTree to ignores)
+  - `package.json` (added format:check and lint:fix scripts)
+  - `.github/workflows/ci.yml` (added format:check step)
+- **Verification Results**:
+  - `npm ci`: Executed cleanly, 0 vulnerabilities.
+  - `npm run format:check`: All matched files use Prettier code style (exit code 0).
+  - `npm run lint`: Clean, 0 errors, 0 warnings (exit code 0).
+  - `npm run typecheck`: Passed cleanly (`tsc --noEmit`).
+  - `npm test`: 9 test suites, 85 unit tests passed.
+  - `npm run build`: Production bundle and Nitro server built cleanly in 490ms.
+  - `npx playwright test`: 12/12 E2E tests passed across accessibility, flow, and SSR resilience.
+
+---
+
+## Phase 20: Price Alert Job Hardening, Timeout Bounding & Unmocked Network Guard
+
+- **Date**: 2026-10-14
+- **Goal**: Identify and resolve the Vitest CI timeout ("Test timed out in 5000ms") in `src/server/services/__tests__/live-data.test.ts` for "evaluates price alerts and detects when a fluctuated price drops below the target"; bound all external calls; isolate per-alert failures; separate pure threshold logic; inject dependencies; add deterministic tests; and install an unmocked network guard across the test suite.
+- **Root Cause Analysis (Empirical Proof)**:
+  - **Failing Test**: `src/server/services/__tests__/live-data.test.ts:249`.
+  - **Exact Lines Awaited**:
+    1. `src/server/services/price-fluctuations.ts:142`: `await supabase.from("notifications").insert(...)`
+    2. `src/server/services/price-fluctuations.ts:150`: `await supabase.from("price_alerts").update(...)`
+  - **Mechanism**:
+    In `live-data.test.ts`, earlier tests mocked `globalThis.fetch` and restored it in `afterEach`. When the price alert test ran, `globalThis.fetch` was restored to Node's real fetch. Because `alt-1` had `targetPrice: 6000 >= basePrice: 5500`, the drop condition triggered. Line 140 called `getSupabaseServerClient()`, which connected to `getResolvedSupabaseUrl()` (`https://your-project-ref.supabase.co` or placeholder). The Supabase client initiated an outbound HTTPS request using real fetch with no timeout. On Linux CI runners without external connectivity, DNS resolution (`getaddrinfo`) hung until Vitest's 5000ms runner timeout killed the test.
+- **Key Actions & Code Fixes**:
+  1. **Bounded Asynchronous Execution (`withTimeout`)**:
+     - Implemented `withTimeout<T>(promise, ms, operationName)` in `src/server/services/price-fluctuations.ts`. Every price lookup, DB query, notification dispatch, and alert update is strictly bounded (default 2500ms).
+  2. **Failure Isolation Per Alert**:
+     - Alert evaluation now isolates errors with per-alert `try/catch`.
+     - Failing alert operations are recorded in `failedAlerts` and increment `failedCount`.
+     - The job returns a structured summary (`{ status: "ok" | "degraded" | "error", checkedCount, alertsTriggered, failedCount, triggeredAlerts, failedAlerts, durationMs, timestamp, message }`) so downstream callers and cron jobs have complete visibility.
+  3. **Pure Logic Separation (`evaluateAlertThreshold`)**:
+     - Extracted threshold logic into a pure, side-effect-free function:
+       ```ts
+       export function evaluateAlertThreshold(
+         alert: PriceAlertRecord,
+         currentPrice: number,
+       ): { shouldTrigger: boolean; savings: number };
+       ```
+  4. **Dependency Injection (`PriceAlertDependencies`)**:
+     - Extended `evaluatePriceAlertsJob(customAlerts?, deps?)` with an optional `PriceAlertDependencies` contract (`priceSource`, `notify`, `updateAlert`, `fetchAlerts`, `now`, `logger`, `timeoutMs`).
+     - Backwards-compatible call signature ensures existing cron handlers and callers function seamlessly.
+     - Added `isRealSupabaseConfigured()` guard preventing network calls when placeholder URLs are present.
+  5. **Deterministic Test Suite & Test Additions**:
+     - Refactored `live-data.test.ts` to pass deterministic dependencies (`priceSource`, `notify: vi.fn()`, `now: () => fixedDate`).
+     - Added unit tests for:
+       - Pure threshold evaluation (`evaluateAlertThreshold`).
+       - Price above target means no trigger.
+       - Price below target triggers exactly once with notification and savings.
+       - Failure isolation: downstream notification error does not abort subsequent alerts.
+       - Timeout cutoff: hung price source is cut off by timeout without hanging the test suite.
+  6. **Global Unmocked Network Guard**:
+     - Installed `unmockedFetchGuard` in `src/test/setup.ts`. Any unmocked `fetch()` call in any unit test immediately throws `Unmocked network call in test: <url>`, preventing silent network hangs.
+     - Configured `testTimeout: 10000` in `vitest.config.ts`.
+- **Files Touched**:
+  - `src/server/services/price-fluctuations.ts` (bounded calls, failure isolation, DI, pure logic)
+  - `src/server/services/__tests__/live-data.test.ts` (deterministic test suite & new edge cases)
+  - `src/test/setup.ts` (installed unmocked fetch guard)
+  - `vitest.config.ts` (added testTimeout)
+  - `MIGRATION_LOG.md` (updated)
+- **Verification Results**:
+  - Target test repeated 20 times (`--repeats 20`): 20/20 passed in 9ms (0 flakiness).
+  - Shuffled test suite (`--sequence.shuffle`): 9/9 test suites, 90/90 tests passed.
+  - CI environment simulation (`CI=true`): 90/90 unit tests passed.
+  - `npm run format:check`: 100% compliant with Prettier.
+  - `npm run lint`: Clean, 0 errors, 0 warnings.
+  - `npm run typecheck`: Passed cleanly.
+  - `npm run build`: Production bundle and Nitro server built cleanly in 490ms.
+  - `npx playwright test`: 12/12 E2E tests passed cleanly.

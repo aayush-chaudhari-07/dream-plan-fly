@@ -10,11 +10,11 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
-import { Toaster } from "@/components/ui/sonner";
-import { AuthProvider } from "@/lib/auth-context";
+import { Toaster } from "@/client/components/ui/sonner";
+import { AuthProvider } from "@/client/lib/auth-context";
 import appCss from "../styles.css?url";
 import { AlertTriangle, Compass, Home, MapPin, RefreshCw, Sparkles, Wand2 } from "lucide-react";
-import { reportError } from "../lib/error-report";
+import { reportError } from "@/client/lib/error-report";
 
 function NotFoundComponent() {
   return (
@@ -141,6 +141,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Plan less, travel more. SmartTrip is your AI-powered companion for discovering destinations, building itineraries, saving for trips and booking travel.",
       },
       { name: "author", content: "SmartTrip" },
+      { name: "theme-color", content: "#2563eb" },
       { property: "og:title", content: "SmartTrip — AI Travel Planner & Booking" },
       {
         property: "og:description",
@@ -148,7 +149,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Plan less, travel more. SmartTrip is your AI-powered companion for discovering destinations, building itineraries, saving for trips and booking travel.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "SmartTrip — AI Travel Planner & Booking" },
+      {
+        name: "twitter:description",
+        content:
+          "Plan less, travel more. SmartTrip is your AI-powered companion for discovering destinations, building itineraries, saving for trips and booking travel.",
+      },
+      { name: "twitter:image", content: "/og-image.png" },
       { name: "twitter:site", content: "@smarttrip" },
     ],
     links: [
@@ -162,7 +171,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      // SmartTrip Brand Favicons & Icons
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "icon", href: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { rel: "icon", href: "/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
+      { rel: "manifest", href: "/site.webmanifest" },
     ],
   }),
   shellComponent: RootShell,

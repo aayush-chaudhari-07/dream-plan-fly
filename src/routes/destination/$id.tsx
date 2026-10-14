@@ -9,15 +9,15 @@ import {
   Star,
   Wand2,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Footer } from "@/components/smarttrip/Footer";
-import { Navbar } from "@/components/smarttrip/Navbar";
-import { SupportDock } from "@/components/smarttrip/SupportDock";
-import { InteractiveMap } from "@/components/smarttrip/InteractiveMap";
-import { WeatherForecastCard } from "@/components/smarttrip/WeatherForecastCard";
-import { destinations, inr } from "@/data/travel";
-import { createSeoHead } from "@/lib/seo";
+import { Badge } from "@/client/components/ui/badge";
+import { Button } from "@/client/components/ui/button";
+import { Footer } from "@/client/components/Footer";
+import { Navbar } from "@/client/components/Navbar";
+import { SupportDock } from "@/client/features/support/SupportDock";
+import { InteractiveMap } from "@/client/features/map/InteractiveMap";
+import { WeatherForecastCard } from "@/client/features/destinations/WeatherForecastCard";
+import { destinations, inr } from "@/shared/types/travel";
+import { createSeoHead } from "@/client/lib/seo";
 
 export const Route = createFileRoute("/destination/$id")({
   loader: ({ params }) => {

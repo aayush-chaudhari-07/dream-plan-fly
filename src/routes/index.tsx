@@ -1,22 +1,22 @@
 import React, { Suspense } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Hero } from "@/components/smarttrip/Hero";
-import { QuickBooking } from "@/components/smarttrip/QuickBooking";
-import { ExploreDestinations } from "@/components/smarttrip/ExploreDestinations";
-import { HowItWorks } from "@/components/smarttrip/HowItWorks";
-import { EscapeHills } from "@/components/smarttrip/EscapeHills";
-import { AiPlanner } from "@/components/smarttrip/AiPlanner";
-import { TripFund } from "@/components/smarttrip/TripFund";
-import { ReviewsSection } from "@/components/smarttrip/ReviewsSection";
-import { QuickTravelGuide } from "@/components/smarttrip/QuickTravelGuide";
-import { TravelSafe } from "@/components/smarttrip/TravelSafe";
-import { Footer } from "@/components/smarttrip/Footer";
-import { Navbar } from "@/components/smarttrip/Navbar";
-import { SupportDock } from "@/components/smarttrip/SupportDock";
-import { createSeoHead } from "@/lib/seo";
+import { Hero } from "@/client/components/Hero";
+import { QuickBooking } from "@/client/features/bookings/QuickBooking";
+import { ExploreDestinations } from "@/client/features/destinations/ExploreDestinations";
+import { HowItWorks } from "@/client/components/HowItWorks";
+import { EscapeHills } from "@/client/components/EscapeHills";
+import { AiPlanner } from "@/client/features/planner/AiPlanner";
+import { TripFund } from "@/client/features/fund/TripFund";
+import { ReviewsSection } from "@/client/features/reviews/ReviewsSection";
+import { QuickTravelGuide } from "@/client/features/planner/QuickTravelGuide";
+import { TravelSafe } from "@/client/components/TravelSafe";
+import { Footer } from "@/client/components/Footer";
+import { Navbar } from "@/client/components/Navbar";
+import { SupportDock } from "@/client/features/support/SupportDock";
+import { createSeoHead } from "@/client/lib/seo";
 
 const InteractiveMap = React.lazy(() =>
-  import("@/components/smarttrip/InteractiveMap").then((m) => ({ default: m.InteractiveMap })),
+  import("@/client/features/map/InteractiveMap").then((m) => ({ default: m.InteractiveMap })),
 );
 
 export const Route = createFileRoute("/")({

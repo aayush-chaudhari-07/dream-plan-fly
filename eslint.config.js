@@ -9,12 +9,16 @@ export default tseslint.config(
   {
     ignores: [
       "dist",
+      "build",
       ".output",
       ".vinxi",
       ".vercel",
       "playwright-report",
       "test-results",
       "coverage",
+      "routeTree.gen.ts",
+      "src/routeTree.gen.ts",
+      "package-lock.json",
     ],
   },
   {
@@ -47,7 +51,63 @@ export default tseslint.config(
     },
   },
   {
-    files: ["src/components/ui/**/*.{ts,tsx}", "src/lib/auth-context.tsx"],
+    files: ["src/client/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "@/server/services/**",
+                "@/server/services",
+                "@/server/db/**",
+                "@/server/db",
+                "@/server/config/**",
+                "@/server/config",
+                "**/server/services/**",
+                "**/server/services",
+                "**/server/db/**",
+                "**/server/db",
+                "**/server/config/**",
+                "**/server/config",
+              ],
+              message:
+                "Client code must never import directly from server services, database, or config. Import RPC wrappers from '@/server/functions/*' instead.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/shared/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "@/client/**",
+                "@/client",
+                "**/client/**",
+                "**/client",
+                "@/server/**",
+                "@/server",
+                "**/server/**",
+                "**/server",
+              ],
+              message:
+                "Shared modules must be pure and cannot import from client or server directories.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/client/components/ui/**/*.{ts,tsx}", "src/client/lib/auth-context.tsx"],
     rules: {
       "react-refresh/only-export-components": "off",
     },
