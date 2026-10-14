@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -68,12 +69,15 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
     reportError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
+
+  const errorMessage =
+    error instanceof Error ? error.message : typeof error === "string" ? error : undefined;
 
   return (
     <main
@@ -96,9 +100,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           our free error monitoring system.
         </p>
 
-        {error?.message && (
+        {errorMessage && (
           <div className="mt-4 rounded-xl bg-muted/60 p-3 text-left font-mono text-xs text-muted-foreground overflow-x-auto max-h-24">
-            {error.message}
+            {errorMessage}
           </div>
         )}
 

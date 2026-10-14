@@ -221,17 +221,23 @@ Deploying SmartTrip to a free hobby tier requires **no custom domain** and **no 
 
 ### Step 2: Deploy to Vercel (Hobby Tier)
 
+#### Deploying to Vercel
+
 1. Push your repository to GitHub.
 2. Sign in to [Vercel](https://vercel.com) using your GitHub account.
 3. Click **Add New... → Project** and import your `dream-plan-fly` repository.
-4. Set the **Framework Preset** to **Other** (Nitro will automatically generate `.vercel/output`).
-5. In **Environment Variables**, add:
-   - `VITE_SUPABASE_URL`: Your Supabase project URL
-   - `VITE_SUPABASE_ANON_KEY`: Your Supabase anon public key
-   - `GEMINI_API_KEY`: Your Google Gemini API key
-   - `CRON_SECRET`: A secure random string (e.g. `openssl rand -hex 16`)
-   - `NITRO_PRESET`: `vercel`
-6. Click **Deploy**. Vercel will build the application and assign a free subdomain:
+4. Set the **Framework Preset** to **Other** (Nitro will automatically output to `.vercel/output` via `NITRO_PRESET=vercel` or auto-detection when `VERCEL=1`).
+5. In **Environment Variables**, configure the following variables (all on free tiers, without any secret values checked into source):
+   - `VITE_SITE_URL`: Base deployment URL (e.g. `https://your-app.vercel.app`)
+   - `VITE_SUPABASE_URL`: Your Supabase project URL (e.g. `https://<project-ref>.supabase.co`; also accepts `SUPABASE_URL`)
+   - `VITE_SUPABASE_ANON_KEY`: Your Supabase anon public key (also accepts `VITE_SUPABASE_PUBLISHABLE_KEY`)
+   - `GEMINI_API_KEY`: Server-side Google Gemini Flash API key (free tier, used for AI itinerary generation)
+   - `DEMO_PAY_SECRET`: Secure random string used as salt for HMAC signing in simulated demo bookings
+   - `CRON_SECRET`: Random secret token to authorize scheduled cron endpoints (`/api/cron/price-fluctuations`)
+   - `NITRO_PRESET`: Set to `vercel` (optional, auto-detected when `VERCEL=1` is present)
+   - `RAZORPAY_KEY_ID`: Optional, test key ID if testing Razorpay payment integration
+   - `RAZORPAY_KEY_SECRET`: Optional, test key secret if testing Razorpay payment integration
+6. Click **Deploy**. Vercel will build the application using `npm run build` and assign a free subdomain:
    `https://dream-plan-fly.vercel.app`
 
 ### Step 3: Configure GitHub Actions Cron Secrets
