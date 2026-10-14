@@ -108,6 +108,10 @@ export function WishlistSheet({ open, onOpenChange }: WishlistSheetProps) {
                   <img
                     src={dest.image}
                     alt={dest.name}
+                    loading="lazy"
+                    decoding="async"
+                    width={80}
+                    height={80}
                     className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </Link>

@@ -202,6 +202,9 @@ export function ETicketView({ booking, onCancel }: ETicketViewProps) {
               <img
                 src={qrDataUrl}
                 alt={`QR Verification for PNR ${booking.reference}`}
+                width={144}
+                height={144}
+                decoding="async"
                 className="size-36 rounded-xl object-contain bg-white p-1"
                 data-testid="eticket-qr-code"
               />

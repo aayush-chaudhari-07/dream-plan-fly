@@ -94,6 +94,7 @@ export function EscapeHills() {
                       src={h.image}
                       alt={`${h.name}, ${h.state}`}
                       loading="lazy"
+                      decoding="async"
                       width={1024}
                       height={768}
                       className="size-full object-cover transition-transform duration-[900ms] group-hover:scale-110"

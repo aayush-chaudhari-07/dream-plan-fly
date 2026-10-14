@@ -52,18 +52,17 @@ const bookingsSearchSchema = z.object({
   cabinClass: z.enum(["economy", "premium_economy", "business", "first"]).optional(),
 });
 
+import { createSeoHead } from "@/lib/seo";
+
 export const Route = createFileRoute("/bookings")({
   validateSearch: (search) => bookingsSearchSchema.parse(search),
-  head: () => ({
-    meta: [
-      { title: "Book Flights, Hotels, Rentals & Trains — SmartTrip" },
-      {
-        name: "description",
-        content:
-          "Search and book flights, hotels, rentals, and trains in a production-like free demo environment.",
-      },
-    ],
-  }),
+  head: () =>
+    createSeoHead({
+      title: "Book Flights, Hotels, Rentals & Rail",
+      description:
+        "Search real Indian routes, compare airline fares, view verified hotels and reserve travel tickets in our demo booking engine.",
+      path: "/bookings",
+    }),
   component: BookingsPage,
 });
 
@@ -762,7 +761,13 @@ function BookingsPage() {
                   >
                     <div>
                       <div className="relative h-48">
-                        <img src={stay.image} alt={stay.name} className="size-full object-cover" />
+                        <img
+                          src={stay.image}
+                          alt={stay.name}
+                          loading="lazy"
+                          decoding="async"
+                          className="size-full object-cover"
+                        />
                         <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-card/90 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm">
                           <Star className="size-3 fill-sunset text-sunset" /> {stay.rating} (
                           {stay.reviewsCount})
@@ -844,6 +849,8 @@ function BookingsPage() {
                       <img
                         src={r.image}
                         alt={r.name}
+                        loading="lazy"
+                        decoding="async"
                         className="h-40 w-full object-cover rounded-2xl mb-3"
                       />
                       <div className="flex items-center justify-between">
@@ -942,7 +949,13 @@ function BookingsPage() {
                   >
                     <div>
                       <div className="relative h-48">
-                        <img src={pkg.image} alt={pkg.name} className="size-full object-cover" />
+                        <img
+                          src={pkg.image}
+                          alt={pkg.name}
+                          loading="lazy"
+                          decoding="async"
+                          className="size-full object-cover"
+                        />
                         <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-card/90 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm">
                           <Star className="size-3 fill-sunset text-sunset" /> {pkg.rating}
                         </span>

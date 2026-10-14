@@ -19,6 +19,7 @@ import {
 } from "@/server/price-fluctuations";
 import { destinations } from "@/data/travel";
 import { getServerUser, getSupabaseServerClient } from "@/lib/supabase/server";
+import { assertServerFnRateLimit } from "@/server/rate-limit-guard";
 
 // Coordinates for the 8 hill stations
 const HILL_STATION_COORDS: Record<string, { lat: number; lng: number }> = {
@@ -42,6 +43,7 @@ const weatherCoordsSchema = z.object({
 export const getWeatherForecastFn = createServerFn({ method: "GET" })
   .validator((data: unknown) => weatherCoordsSchema.parse(data))
   .handler(async ({ data }): Promise<WeatherResult> => {
+    assertServerFnRateLimit("weather_forecast", 120);
     return await fetchWeatherForecast(data.lat, data.lng);
   });
 
@@ -60,6 +62,7 @@ export const getDestinationWeatherFn = createServerFn({ method: "GET" })
       region: string;
       bestTimeToVisit: string;
     }> => {
+      assertServerFnRateLimit("destination_weather", 120);
       const match = destinations.find(
         (d) => d.id.toLowerCase() === data.destinationId.toLowerCase(),
       );
@@ -90,6 +93,7 @@ export const getHillStationsWeatherFn = createServerFn({ method: "GET" }).handle
       }
     >
   > => {
+    assertServerFnRateLimit("hills_weather", 60);
     const results: Record<
       string,
       { temp: string; condition: string; isLive: boolean; fetchedAt: number }
@@ -124,6 +128,7 @@ export const getHillStationsWeatherFn = createServerFn({ method: "GET" }).handle
 
 export const getExchangeRatesFn = createServerFn({ method: "GET" }).handler(
   async (): Promise<ExchangeRates> => {
+    assertServerFnRateLimit("exchange_rates", 120);
     return await fetchExchangeRates();
   },
 );
@@ -136,6 +141,7 @@ const convertCurrencySchema = z.object({
 export const convertCurrencyFn = createServerFn({ method: "POST" })
   .validator((data: unknown) => convertCurrencySchema.parse(data))
   .handler(async ({ data }): Promise<ConversionResult> => {
+    assertServerFnRateLimit("currency_convert", 120);
     return await convertCurrency(data.amount, data.targetCurrency);
   });
 
@@ -152,6 +158,7 @@ const createPriceAlertSchema = z.object({
 export const createPriceAlertFn = createServerFn({ method: "POST" })
   .validator((data: unknown) => createPriceAlertSchema.parse(data))
   .handler(async ({ data }): Promise<{ success: boolean; alert: PriceAlertRecord }> => {
+    assertServerFnRateLimit("create_price_alert", 30);
     const user = await getServerUser();
     const currentPrice = getFluctuatedPrice(data.basePrice, data.itemId);
 
@@ -201,6 +208,7 @@ export const createPriceAlertFn = createServerFn({ method: "POST" })
 
 export const fetchPriceAlertsFn = createServerFn({ method: "GET" }).handler(
   async (): Promise<PriceAlertRecord[]> => {
+    assertServerFnRateLimit("fetch_price_alerts", 60);
     const user = await getServerUser();
     if (!user) return [];
 
@@ -245,6 +253,7 @@ const deletePriceAlertSchema = z.object({
 export const deletePriceAlertFn = createServerFn({ method: "POST" })
   .validator((data: unknown) => deletePriceAlertSchema.parse(data))
   .handler(async ({ data }): Promise<{ success: boolean }> => {
+    assertServerFnRateLimit("delete_price_alert", 30);
     const user = await getServerUser();
     if (user) {
       try {
@@ -262,6 +271,7 @@ export const deletePriceAlertFn = createServerFn({ method: "POST" })
 export const getDemoFluctuationInfoFn = createServerFn({ method: "GET" })
   .validator((data: unknown) => z.object({ itemId: z.string() }).parse(data))
   .handler(async ({ data }) => {
+    assertServerFnRateLimit("fluctuation_info", 120);
     const percent = getDailyFluctuationPercent(data.itemId);
     return {
       itemId: data.itemId,

@@ -26,12 +26,12 @@ const columns = [
     ],
   },
   {
-    title: "Support",
+    title: "Support & Legal",
     items: [
       { label: "Help Center & FAQ", href: "/faq" },
-      { label: "Emergency Hotline", href: "/faq" },
+      { label: "Terms & Disclaimers", href: "/terms" },
+      { label: "Privacy Policy", href: "/privacy" },
       { label: "Safety Guide", href: "/#guide" },
-      { label: "Terms & Privacy", href: "/faq" },
     ],
   },
 ];
@@ -151,13 +151,23 @@ export function Footer() {
             </Button>
           </div>
         </form>
-        <p className="mt-8 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} SmartTrip. Built for travellers who plan less and travel
-          more.{" "}
-          <Link to="/save" className="text-primary hover:underline">
-            Start a trip fund
-          </Link>
-        </p>
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
+          <p>
+            © {new Date().getFullYear()} SmartTrip. All booking engines and fares operate in demo
+            simulation mode.
+          </p>
+          <div className="flex gap-4">
+            <Link to="/terms" className="hover:text-primary transition-colors">
+              Terms & Disclaimers
+            </Link>
+            <Link to="/privacy" className="hover:text-primary transition-colors">
+              Privacy Policy
+            </Link>
+            <Link to="/save" className="hover:text-primary transition-colors">
+              Start Trip Fund
+            </Link>
+          </div>
+        </div>
       </div>
     </footer>
   );

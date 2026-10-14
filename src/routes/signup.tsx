@@ -21,19 +21,18 @@ type SignupSearch = {
   redirect?: string | undefined;
 };
 
+import { createSeoHead } from "@/lib/seo";
+
 export const Route = createFileRoute("/signup")({
   validateSearch: (search: Record<string, unknown>): SignupSearch => ({
     redirect: typeof search["redirect"] === "string" ? (search["redirect"] as string) : undefined,
   }),
-  head: () => ({
-    meta: [
-      { title: "Create Account — SmartTrip" },
-      {
-        name: "description",
-        content: "Join SmartTrip to generate AI itineraries, save trips, and track travel funds.",
-      },
-    ],
-  }),
+  head: () =>
+    createSeoHead({
+      title: "Create Account",
+      description: "Join SmartTrip to generate AI itineraries, save trips, and track travel funds.",
+      path: "/signup",
+    }),
   component: SignUpPage,
 });
 

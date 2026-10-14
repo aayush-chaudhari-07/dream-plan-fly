@@ -180,6 +180,10 @@ export function ReviewsSection() {
                         <img
                           src={review.authorAvatar}
                           alt={review.authorName}
+                          loading="lazy"
+                          decoding="async"
+                          width={44}
+                          height={44}
                           className="size-11 rounded-full object-cover ring-2 ring-primary/20"
                         />
                       ) : (

@@ -59,17 +59,17 @@ type TravelerFormData = {
   notes?: string | undefined;
 };
 
+import { createSeoHead } from "@/lib/seo";
+
 export const Route = createFileRoute("/checkout")({
   validateSearch: (search) => checkoutSearchSchema.parse(search),
-  head: () => ({
-    meta: [
-      { title: "Demo Checkout — SmartTrip" },
-      {
-        name: "description",
-        content: "Simulated zero-cost demo checkout with test payment gateway.",
-      },
-    ],
-  }),
+  head: () =>
+    createSeoHead({
+      title: "Secure Demo Checkout",
+      description: "Simulated zero-cost demo checkout with test payment gateway.",
+      path: "/checkout",
+      noindex: true,
+    }),
   component: CheckoutPage,
 });
 

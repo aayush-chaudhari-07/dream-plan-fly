@@ -17,27 +17,54 @@ import { SupportDock } from "@/components/smarttrip/SupportDock";
 import { InteractiveMap } from "@/components/smarttrip/InteractiveMap";
 import { WeatherForecastCard } from "@/components/smarttrip/WeatherForecastCard";
 import { destinations, inr } from "@/data/travel";
+import { createSeoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/destination/$id")({
   loader: ({ params }) => {
     const destination = destinations.find((d) => d.id === params.id) || null;
     return { destination, id: params.id };
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: loaderData?.destination
-          ? `${loaderData.destination.name}, ${loaderData.destination.region} — SmartTrip`
-          : "Destination — SmartTrip",
-      },
-      {
-        name: "description",
-        content:
-          loaderData?.destination?.blurb ||
-          "Explore travel destinations, weather, itineraries and map sights on SmartTrip.",
-      },
-    ],
-  }),
+  head: ({ loaderData }) => {
+    const dest = loaderData?.destination;
+    const title = dest ? `${dest.name}, ${dest.region} Travel Guide` : "Destination";
+    const description =
+      dest?.blurb ||
+      "Explore travel destinations, weather forecasts, curated itineraries and local sights on SmartTrip.";
+
+    const jsonLd = dest
+      ? {
+          "@context": "https://schema.org",
+          "@type": "TouristDestination",
+          name: dest.name,
+          description: dest.blurb,
+          image: dest.image,
+          touristType: dest.category,
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: dest.lat,
+            longitude: dest.lng,
+          },
+          address: {
+            "@type": "PostalAddress",
+            addressRegion: dest.region,
+            addressCountry: "IN",
+          },
+          includesAttraction: {
+            "@type": "TouristAttraction",
+            name: `${dest.name} Highlights`,
+            description: `Best time to visit: ${dest.bestTimeToVisit}. Daily starting rates from ₹${dest.price.toLocaleString("en-IN")}.`,
+          },
+        }
+      : undefined;
+
+    return createSeoHead({
+      title,
+      description,
+      path: dest ? `/destination/${dest.id}` : "/destination",
+      image: dest?.image,
+      jsonLd,
+    });
+  },
   component: DestinationDetailPage,
 });
 
@@ -82,6 +109,8 @@ function DestinationDetailPage() {
             src={destination.image}
             alt={`${destination.name}, ${destination.region}`}
             className="size-full object-cover object-center brightness-90"
+            loading="eager"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-ink/40 to-ink/20" />
 
@@ -146,7 +175,7 @@ function DestinationDetailPage() {
                 Signature Experiences & Highlights
               </h3>
               <div className="grid gap-2.5 sm:grid-cols-2">
-                {destination.highlights.map((h) => (
+                {destination.highlights.map((h: string) => (
                   <div
                     key={h}
                     className="flex items-center gap-2.5 rounded-2xl border border-border/70 bg-card p-3 text-xs sm:text-sm font-medium text-foreground shadow-2xs"

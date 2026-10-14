@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, Suspense, lazy } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   AlertCircle,
@@ -25,8 +25,11 @@ import { buildPlan, type GeneratedPlan, type PlanOptions } from "@/lib/trip-plan
 import { cn } from "@/lib/utils";
 import { generatePlan, savePublicPlanFn } from "@/server/generate-plan";
 import { Reveal, SectionHeading } from "./Reveal";
-import { ItineraryEditor } from "./ItineraryEditor";
 import { QuickTravelGuide } from "./QuickTravelGuide";
+
+const ItineraryEditor = lazy(() =>
+  import("./ItineraryEditor").then((m) => ({ default: m.ItineraryEditor })),
+);
 
 const LOADING_STEPS = [
   "Analyzing destination & travel dates…",
@@ -459,7 +462,16 @@ function PlanView({
 
       {/* Daily Interactive Timeline (Drag & Drop Reordering, Add, Edit, Delete) */}
       <div className="mt-5">
-        <ItineraryEditor plan={plan} onPlanChange={onPlanUpdate} />
+        <Suspense
+          fallback={
+            <div className="space-y-3 py-4">
+              <div className="h-24 w-full animate-pulse rounded-2xl bg-muted/30" />
+              <div className="h-24 w-full animate-pulse rounded-2xl bg-muted/30" />
+            </div>
+          }
+        >
+          <ItineraryEditor plan={plan} onPlanChange={onPlanUpdate} />
+        </Suspense>
       </div>
 
       {/* Details Grid */}

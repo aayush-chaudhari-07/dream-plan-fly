@@ -35,3 +35,12 @@ jobs:
 
       - name: Build production bundle
         run: npm run build
+
+      - name: Scan client bundle for secret leaks
+        run: npm run scan-secrets
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright E2E tests
+        run: npm run test:e2e

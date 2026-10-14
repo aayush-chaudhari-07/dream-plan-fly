@@ -530,3 +530,93 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `src/server/__tests__/live-data.test.ts` (created)
   - `MIGRATION_LOG.md` (updated)
 
+---
+
+## [Task 11] - Production Readiness on Free Infrastructure
+
+- **Goal**: Prepare the entire application for zero-cost production hosting on Vercel/Netlify free hobby tier:
+  1. **SEO & Metadata**:
+     - Built `src/lib/seo.ts` with `createSeoHead` standardizing titles, descriptions, Open Graph, Twitter cards, and canonical tags across all routes.
+     - Added Schema.org `TouristDestination` JSON-LD to destination pages (`/destination/$id`), `WebSite` SearchAction schema to `/`, and `FAQPage` schema to `/faq`.
+     - Generated `public/robots.txt` and `public/sitemap.xml` with all 9 destinations and primary routes, plus `/robots.txt` server-side fallback.
+  2. **Security & Protection**:
+     - Configured production security headers in `src/server.ts`: Content Security Policy (CSP), HSTS, X-Frame-Options (DENY), X-Content-Type-Options (nosniff), Referrer-Policy, and Permissions-Policy.
+     - Implemented in-memory sliding-window rate limiting guard (`src/server/rate-limit-guard.ts`) and applied it across all server functions (`live-data-actions.ts`, `booking-actions.ts`, `trip-actions.ts`, `generate-plan.ts`).
+     - Strict Zod validation on every server function parameter.
+     - Created `scripts/scan-client-secrets.mjs` and npm script `npm run scan-secrets` scanning `.output/public` to guarantee zero private keys or server secrets appear in client bundles. Added to CI.
+  3. **Performance Optimization**:
+     - Added `loading="lazy"` and `decoding="async"` to all non-critical images across all views; set `fetchPriority="high"` on above-the-fold hero image.
+     - Code-split `@dnd-kit` drag-and-drop itinerary editor in `AiPlanner.tsx` via `React.lazy()` and `<Suspense>`.
+     - Code-split Leaflet interactive map in `src/routes/index.tsx` via `React.lazy()` and `<Suspense>`.
+  4. **Accessibility (WCAG 2.1 AA & Axe-Core)**:
+     - Verified accessible form labels, aria-labels on icon buttons, keyboard navigation, and focus rings.
+     - Created `e2e/accessibility.spec.ts` using `@axe-core/playwright` verifying zero critical or serious WCAG accessibility violations on key pages.
+  5. **Error Handling & Free Telemetry**:
+     - Upgraded custom branded 404 ("Off the Map") and 500 error pages in `src/routes/__root.tsx` and `src/lib/error-page.ts`.
+     - Created Supabase migration `supabase/migrations/007_error_logs.sql` with Row Level Security and automatic retention pruning trigger.
+     - Updated `src/lib/error-report.ts` to log errors to console and asynchronously insert telemetry into `error_logs` without third-party paid monitoring.
+  6. **End-to-End Testing (Playwright)**:
+     - Configured `playwright.config.ts` targeting local dev server.
+     - Added E2E tests:
+       - `e2e/signup.spec.ts`: Sign up form validation and submission.
+       - `e2e/plan-and-save.spec.ts`: AI itinerary generation and saving to My Trips.
+       - `e2e/search-and-book.spec.ts`: Search command dialog, demo booking, and E-ticket QR verification.
+       - `e2e/fund-and-wishlist.spec.ts`: Trip fund contribution and wishlist sheet toggle.
+       - `e2e/accessibility.spec.ts`: Axe-core accessibility test suite.
+     - Added `"test:e2e"` script to `package.json` and `.github/workflows/ci.yml`.
+  7. **Deployment & Documentation**:
+     - Configured Nitro preset in `vite.config.ts` (`NITRO_PRESET=vercel` or auto-detection).
+     - Fully rewrote `README.md` with overview, features, tech stack, free-stack table, setup, environment variable documentation, npm scripts, project structure, step-by-step Vercel hobby deployment guide (using provider subdomains), and legal disclaimers.
+  8. **Legal Pages**:
+     - Created `/terms` (`src/routes/terms.tsx`) featuring explicit **AI-Advice Disclaimer** and **Demo-Booking Simulation Disclaimer**.
+     - Created `/privacy` (`src/routes/privacy.tsx`) detailing zero-tracking practices, local storage usage, and Google Gemini Flash data handling.
+     - Linked legal pages in `Footer.tsx`.
+- **Files Touched**:
+  - `src/lib/seo.ts` (created)
+  - `src/server/rate-limit-guard.ts` (created)
+  - `scripts/scan-client-secrets.mjs` (created)
+  - `playwright.config.ts` (created)
+  - `e2e/signup.spec.ts` (created)
+  - `e2e/plan-and-save.spec.ts` (created)
+  - `e2e/search-and-book.spec.ts` (created)
+  - `e2e/fund-and-wishlist.spec.ts` (created)
+  - `e2e/accessibility.spec.ts` (created)
+  - `src/routes/terms.tsx` (created)
+  - `src/routes/privacy.tsx` (created)
+  - `supabase/migrations/007_error_logs.sql` (created)
+  - `public/robots.txt` (updated)
+  - `public/sitemap.xml` (created)
+  - `src/lib/error-report.ts` (updated)
+  - `src/lib/error-page.ts` (updated)
+  - `src/routes/__root.tsx` (updated)
+  - `src/routes/index.tsx` (updated)
+  - `src/routes/explore.tsx` (updated)
+  - `src/routes/ai-planner.tsx` (updated)
+  - `src/routes/bookings.tsx` (updated)
+  - `src/routes/checkout.tsx` (updated)
+  - `src/routes/my-trips.tsx` (updated)
+  - `src/routes/faq.tsx` (updated)
+  - `src/routes/settings.tsx` (updated)
+  - `src/routes/destination/$id.tsx` (updated)
+  - `src/routes/plan/$id.tsx` (updated)
+  - `src/routes/booking-confirmation/$id.tsx` (updated)
+  - `src/components/smarttrip/Footer.tsx` (updated)
+  - `src/components/smarttrip/AiPlanner.tsx` (updated)
+  - `src/components/smarttrip/Hero.tsx` (updated)
+  - `src/components/smarttrip/ExploreDestinations.tsx` (updated)
+  - `src/components/smarttrip/EscapeHills.tsx` (updated)
+  - `src/components/smarttrip/TripFund.tsx` (updated)
+  - `src/components/smarttrip/ReviewsSection.tsx` (updated)
+  - `src/components/smarttrip/SearchCommandDialog.tsx` (updated)
+  - `src/components/smarttrip/WishlistSheet.tsx` (updated)
+  - `src/components/smarttrip/booking/ETicketView.tsx` (updated)
+  - `src/lib/server/live-data-actions.ts` (updated)
+  - `src/lib/server/booking-actions.ts` (updated)
+  - `src/lib/server/trip-actions.ts` (updated)
+  - `src/server.ts` (updated)
+  - `vite.config.ts` (updated)
+  - `.github/workflows/ci.yml` (updated)
+  - `.env.example` (updated)
+  - `README.md` (completely rewritten)
+  - `package.json` (updated)
+  - `MIGRATION_LOG.md` (updated)

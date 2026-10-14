@@ -28,6 +28,7 @@ export function DestinationCard({
           src={d.image}
           alt={`${d.name}, ${d.region}`}
           loading="lazy"
+          decoding="async"
           width={1024}
           height={768}
           className="size-full object-cover transition-transform duration-700 group-hover:scale-110"

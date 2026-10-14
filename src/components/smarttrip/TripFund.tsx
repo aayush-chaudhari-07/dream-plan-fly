@@ -141,6 +141,7 @@ function FundCard({ trip }: { trip: FutureTrip }) {
             src={trip.image}
             alt={trip.name}
             loading="lazy"
+            decoding="async"
             width={1024}
             height={768}
             className="size-full object-cover"

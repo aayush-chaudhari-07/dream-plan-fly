@@ -55,6 +55,9 @@ export function Hero() {
         alt="Sunrise over misty green hills and a mountain lake"
         width={1920}
         height={1088}
+        fetchPriority="high"
+        loading="eager"
+        decoding="async"
         className="absolute inset-0 size-full scale-105 object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/45 to-background" />

@@ -17,9 +17,11 @@ import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MyTripsRouteImport } from './routes/my-trips'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SaveRouteImport } from './routes/save'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as BookingConfirmationIdRouteImport } from './routes/booking-confirmation/$id'
 import { Route as DestinationIdRouteImport } from './routes/destination/$id'
@@ -65,6 +67,11 @@ const MyTripsRoute = MyTripsRouteImport.update({
   path: '/my-trips',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SaveRoute = SaveRouteImport.update({
   id: '/save',
   path: '/save',
@@ -78,6 +85,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -110,9 +122,11 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/my-trips': typeof MyTripsRoute
+  '/privacy': typeof PrivacyRoute
   '/save': typeof SaveRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/booking-confirmation/$id': typeof BookingConfirmationIdRoute
   '/destination/$id': typeof DestinationIdRoute
@@ -127,9 +141,11 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/my-trips': typeof MyTripsRoute
+  '/privacy': typeof PrivacyRoute
   '/save': typeof SaveRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/booking-confirmation/$id': typeof BookingConfirmationIdRoute
   '/destination/$id': typeof DestinationIdRoute
@@ -145,9 +161,11 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/my-trips': typeof MyTripsRoute
+  '/privacy': typeof PrivacyRoute
   '/save': typeof SaveRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/booking-confirmation/$id': typeof BookingConfirmationIdRoute
   '/destination/$id': typeof DestinationIdRoute
@@ -164,9 +182,11 @@ export interface FileRouteTypes {
     | '/faq'
     | '/login'
     | '/my-trips'
+    | '/privacy'
     | '/save'
     | '/settings'
     | '/signup'
+    | '/terms'
     | '/auth/callback'
     | '/booking-confirmation/$id'
     | '/destination/$id'
@@ -181,9 +201,11 @@ export interface FileRouteTypes {
     | '/faq'
     | '/login'
     | '/my-trips'
+    | '/privacy'
     | '/save'
     | '/settings'
     | '/signup'
+    | '/terms'
     | '/auth/callback'
     | '/booking-confirmation/$id'
     | '/destination/$id'
@@ -198,9 +220,11 @@ export interface FileRouteTypes {
     | '/faq'
     | '/login'
     | '/my-trips'
+    | '/privacy'
     | '/save'
     | '/settings'
     | '/signup'
+    | '/terms'
     | '/auth/callback'
     | '/booking-confirmation/$id'
     | '/destination/$id'
@@ -216,9 +240,11 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   LoginRoute: typeof LoginRoute
   MyTripsRoute: typeof MyTripsRoute
+  PrivacyRoute: typeof PrivacyRoute
   SaveRoute: typeof SaveRoute
   SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
+  TermsRoute: typeof TermsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   BookingConfirmationIdRoute: typeof BookingConfirmationIdRoute
   DestinationIdRoute: typeof DestinationIdRoute
@@ -283,6 +309,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyTripsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/save': {
       id: '/save'
       path: '/save'
@@ -302,6 +335,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/callback': {
@@ -344,9 +384,11 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   LoginRoute: LoginRoute,
   MyTripsRoute: MyTripsRoute,
+  PrivacyRoute: PrivacyRoute,
   SaveRoute: SaveRoute,
   SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
+  TermsRoute: TermsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   BookingConfirmationIdRoute: BookingConfirmationIdRoute,
   DestinationIdRoute: DestinationIdRoute,

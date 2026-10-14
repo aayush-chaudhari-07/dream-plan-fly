@@ -91,32 +91,77 @@ async function handleKeepAlive(): Promise<Response> {
   });
 }
 
+function applySecurityHeaders(res: Response): Response {
+  const headers = new Headers(res.headers);
+  headers.set("X-Frame-Options", "DENY");
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(self)");
+  headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
+
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
+    "font-src 'self' https://fonts.gstatic.com data:",
+    "img-src 'self' data: blob: https://images.unsplash.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com",
+    "connect-src 'self' https://*.supabase.co https://api.open-meteo.com https://api.frankfurter.app https://generativelanguage.googleapis.com",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join("; ");
+
+  if (!headers.has("Content-Security-Policy")) {
+    headers.set("Content-Security-Policy", csp);
+  }
+
+  return new Response(res.body, {
+    status: res.status,
+    statusText: res.statusText,
+    headers,
+  });
+}
+
 import { handlePriceFluctuationsCron } from "./server/price-fluctuations";
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const url = new URL(request.url);
+      if (url.pathname === "/robots.txt") {
+        return new Response(
+          `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /settings\nDisallow: /checkout\nDisallow: /booking-confirmation/\nDisallow: /my-trips\n\nSitemap: https://dream-plan-fly.vercel.app/sitemap.xml`,
+          {
+            headers: {
+              "content-type": "text/plain; charset=utf-8",
+              "cache-control": "public, max-age=86400",
+            },
+          },
+        );
+      }
+
       if (url.pathname === "/api/keep-alive") {
-        return await handleKeepAlive();
+        return applySecurityHeaders(await handleKeepAlive());
       }
 
       if (
         url.pathname === "/api/cron/price-fluctuations" ||
         url.pathname === "/api/cron/daily-price-alerts"
       ) {
-        return await handlePriceFluctuationsCron(request);
+        return applySecurityHeaders(await handlePriceFluctuationsCron(request));
       }
 
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const rawResponse = await handler.fetch(request, env, ctx);
+      const normalized = await normalizeCatastrophicSsrResponse(rawResponse);
+      return applySecurityHeaders(normalized);
     } catch (error) {
       console.error(error);
-      return new Response(renderErrorPage(), {
+      const errRes = new Response(renderErrorPage(), {
         status: 500,
         headers: { "content-type": "text/html; charset=utf-8" },
       });
+      return applySecurityHeaders(errRes);
     }
   },
 };

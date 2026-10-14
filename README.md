@@ -1,1491 +1,265 @@
-# SmartTrip Planner
-
-Redesign my existing travel website into a modern, premium and highly interactive travel platform called SmartTrip.
-
-IMPORTANT:
-Do NOT make it look like a generic AI-generated website or a simple template. The design should feel like a real startup product created by a professional UI/UX designer.
-
-Use the attached Travelora screenshot as the main inspiration for the overall layout, travel-focused visual hierarchy, booking/search card, destination cards, spacing and polished appearance, but create a completely DISTINCT SmartTrip identity.
-
-The SmartTrip concept is:
-
-Dream → Ask AI → Plan → Save → Book → Travel
-
-The website should combine AI trip planning, travel booking, destination exploration and both short-term and future-trip savings.
-
-1. OVERALL DESIGN
-
-Create a beautiful travel-tech startup interface with:
-
-Premium but friendly appearance
-
-Modern travel-tech aesthetic
-
-White/light background
-
-Deep blue primary brand color
-
-Sky blue, turquoise, green and subtle orange accents
-
-Large rounded cards
-
-Soft shadows
-
-Smooth gradients
-
-Clean typography
-
-Subtle glassmorphism
-
-High-quality destination photography
-
-Travel illustrations
-
-Smooth micro-interactions
-
-Excellent spacing
-
-Responsive design
-
-The website should feel:
-
-Smart + Adventurous + Reliable + Friendly + Modern
-
-Avoid:
-
-Generic AI dashboard appearance
-
-Excessive gradients
-
-Excessive animations
-
-Huge text everywhere
-
-Too many floating elements
-
-Childish UI
-
-Random icons
-
-Empty sections
-
-Make it look like a real travel startup.
-
-2. HERO SECTION — MOST IMPORTANT
-
-Create a visually impressive hero section.
-
-Main heading:
-
-Plan Less. Travel More.
-
-Subheading:
-
-Your AI-powered travel companion for planning, booking, saving and enjoying every journey.
-
-Add a large destination search interface:
-
-Where do you want to go?
-
-Fields:
-
-Destination
-
-Travel dates
-
-Number of travelers
-
-Budget
-
-Primary button:
-
-Search
-
-Secondary button:
-
-Ask AI to Plan My Trip
-
-3. HERO BACKGROUND VIDEO / ANIMATION
-
-The hero background should be immersive and nature/travel focused.
-
-Use the supplied travel video as the hero background if it can be used.
-
-If the video cannot be imported, create a high-quality fallback image/background that can easily be replaced later.
-
-The background should contain or suggest:
-
-Beautiful mountains
-
-Green hills
-
-Lakes
-
-Forests
-
-Clouds
-
-Sunrise/sunset
-
-Birds flying over mountains
-
-Small airplane flying across the sky
-
-Beautiful hill stations
-
-Natural scenery
-
-Add subtle animation:
-
-Birds slowly flying
-
-Clouds moving
-
-Airplane crossing the sky
-
-Gentle parallax
-
-Very subtle nature movement
-
-Do NOT make the animation distracting.
-
-Add a transparent overlay so the hero text remains readable.
-
-Use lazy loading/poster fallback and optimize the video for performance.
-
-On mobile, use an optimized image fallback if needed.
-
-4. TOP NAVIGATION
-
-Create a clean sticky navigation bar.
-
-Logo:
-
-SmartTrip
-
-Tagline:
-
-Travel smarter. Explore more.
-
-Navigation:
-
-Home
-
-Explore
-
-AI Trip Planner
-
-Bookings
-
-My Trips
-
-Save & Dream
-
-Right side:
-
-Search
-
-Wishlist
-
-Notifications
-
-Profile
-
-Plan My Trip
-
-When scrolling, the navbar should become slightly glassy/blurred.
-
-5. QUICK BOOKING SECTION
-
-Immediately below the hero create a floating booking panel inspired by the attached Travelora design.
-
-Tabs:
-
-✈ Flights
-
-🏨 Stay
-
-🚗 Car / Bike Rental
-
-🚆 Train / Bus
-
-🎒 Packages
-
-Each tab should dynamically change its fields.
-
-Flights
-
-From
-
-To
-
-Departure
-
-Return
-
-Travelers
-
-Class
-
-Search Flights
-
-Stay
-
-Destination
-
-Check-in
-
-Check-out
-
-Guests
-
-Rooms
-
-Search Hotels
-
-Car / Bike
-
-Location
-
-Pick-up
-
-Return
-
-Vehicle type
-
-Search Rentals
-
-Train / Bus
-
-From
-
-To
-
-Date
-
-Travelers
-
-Search
-
-Add smooth tab transitions.
-
-6. ASK AI — MAIN WOW FEATURE
-
-Create a major section:
-
-Meet Your AI Travel Planner
-
-Subtitle:
-
-Tell us your dream trip. SmartTrip will build the plan for you.
-
-Create an attractive AI planner/chat interface.
-
-Example:
-
-User:
-
-"I want a 5-day trip to Himachal Pradesh for 3 people under ₹35,000."
-
-AI generates:
-
-Destination suggestions
-
-Day-by-day itinerary
-
-Estimated budget
-
-Hotels
-
-Transportation
-
-Restaurants
-
-Activities
-
-Weather considerations
-
-Packing suggestions
-
-Travel tips
-
-Quick prompts:
-
-Weekend trip
-
-Budget trip
-
-Family vacation
-
-Adventure trip
-
-Solo trip
-
-Hill station
-
-Beach vacation
-
-International trip
-
-Add a subtle animated AI assistant.
-
-Include:
-
-Generate My Trip
-
-The AI planner should feel like an actual useful product, not a fake chatbot.
-
-7. EXPLORE DESTINATIONS
-
-Create:
-
-Explore Your Next Adventure
-
-Categories:
-
-Hill Stations
-
-Beaches
-
-Adventure
-
-Heritage
-
-Nature
-
-International
-
-Weekend Getaways
-
-Destination cards should include:
-
-Image
-
-Destination
-
-State/country
-
-Starting price
-
-Rating
-
-Short description
-
-Explore button
-
-Hover effects:
-
-Slight image zoom
-
-Card rises
-
-Overlay appears
-
-Button becomes visible
-
-Use a smooth carousel/horizontal scroll.
-
-8. ESCAPE TO THE HILLS
-
-Create a dedicated nature section:
-
-Escape to the Hills
-
-Destinations:
-
-Manali
-
-Shimla
-
-Munnar
-
-Ooty
-
-Lonavala
-
-Mahabaleshwar
-
-Darjeeling
-
-Kashmir
-
-Use large landscape cards.
-
-Add very subtle:
-
-Birds
-
-Clouds
-
-Wind/nature animations
-
-This section should create an emotional travel feeling.
-
-9. INTERACTIVE MAP / EXPLORE AROUND YOU
-
-Create a large interactive map section.
-
-Title:
-
-Explore Around You
-
-Left:
-
-Interactive map.
-
-Right:
-
-Nearby places.
-
-Map markers:
-
-Attractions
-
-Hotels
-
-Restaurants
-
-Hospitals
-
-Transport
-
-Tourist places
-
-Filters:
-
-All | Attractions | Hotels | Restaurants | Activities
-
-Clicking a marker opens an information card.
-
-Example:
-
-Lonavala
-
-⭐ 4.8
-
-"Beautiful hill station surrounded by waterfalls and greenery."
-
-Buttons:
-
-View Details
-
-Add to Trip
-
-Make the map feel integrated into SmartTrip, not just a simple embedded map.
-
-10. QUICK TRAVEL GUIDE
-
-Create:
-
-Quick Travel Guide
-
-Three categories:
-
-Before You Go
-
-Documents
-
-Weather
-
-Packing
-
-Currency
-
-Local transport
-
-During Your Trip
-
-Places to visit
-
-Food
-
-Local experiences
-
-Safety
-
-Emergency contacts
-
-Smart Tips
-
-Best time to visit
-
-Budget tips
-
-Hidden gems
-
-Local recommendations
-
-Use attractive icons and illustrations.
-
-11. SAVE FOR YOUR TRIP
-
-Create a major feature:
-
-Your Dream Trip Starts With Saving
-
-Subtitle:
-
-Set a goal today. We'll help you reach it.
-
-Create a savings card.
-
-Example:
-
-Trip Goal
-
-Manali Trip
-
-Target: ₹30,000
-
-Saved: ₹18,500
-
-Progress: 62%
-
-Show animated progress bar.
-
-Calculate:
-
-Save ₹1,250/week to reach your goal by December 15
-
-Features:
-
-Goal-based saving
-
-Weekly/monthly target
-
-Progress tracking
-
-AI savings plan
-
-Smart reminders
-
-Group trip savings
-
-Contribution tracking
-
-Price-drop suggestions
-
-Milestone rewards
-
-CTA:
-
-Create Trip Fund
-
-This feature should make SmartTrip different from ordinary booking websites.
-
-12. SAVE FOR YOUR FUTURE TRIP — UNIQUE SMARTTRIP FEATURE
-
-Create a separate feature called:
-
-Save for Your Future Trip
-
-Subtitle:
-
-Dream about it today. Save for it little by little. Travel tomorrow.
-
-This allows users to create savings goals for trips that may happen months or years in the future.
-
-FUTURE TRIP STEP 1 — CHOOSE DESTINATION
-
-Allow users to search for a dream destination.
-
-Examples:
-
-Kashmir
-
-Manali
-
-Goa
-
-Dubai
-
-Europe
-
-Japan
-
-Maldives
-
-Button:
-
-Choose My Dream Trip
-
-FUTURE TRIP STEP 2 — SET GOAL
-
-Ask for:
-
-Destination
-
-Estimated trip cost
-
-Expected travel month/year
-
-Number of travelers
-
-Travel style
-
-Example:
-
-🇯🇵 Japan 2027
-
-Estimated Cost:
-
-₹1,20,000
-
-Travel Target:
-
-December 2027
-
-Travelers:
-
-2
-
-FUTURE TRIP STEP 3 — AI SAVING PLAN
-
-SmartTrip automatically calculates:
-
-Weekly saving target
-
-Monthly saving target
-
-Remaining amount
-
-Months remaining
-
-Current savings
-
-Progress percentage
-
-Example:
-
-You need to save ₹3,000/month
-
-₹36,000 saved of ₹1,20,000
-
-████████░░░░ 30%
-
-₹84,000 remaining
-
-Make the progress animation smooth.
-
-13. MY FUTURE TRIPS
-
-Create a dashboard:
-
-My Travel Dreams
-
-Example:
-
-🇯🇵 Japan 2027
-
-₹36,000 / ₹1,20,000
-
-30% complete
-
-₹3,000/month
-
-🏔 Kashmir
-
-₹15,000 / ₹50,000
-
-30% complete
-
-🌴 Maldives
-
-₹22,000 / ₹80,000
-
-27% complete
-
-Each future trip card should contain:
-
-Destination image
-
-Goal amount
-
-Current savings
-
-Progress
-
-Target date
-
-Monthly target
-
-View Plan button
-
-Add Savings button
-
-Allow users to create multiple future-trip goals.
-
-14. AI SMART SAVING TIPS
-
-Connect AI with future-trip savings.
-
-Example:
-
-AI Smart Tip
-
-"Your Japan trip is 16 months away. Saving ₹3,000 every month will help you reach your target comfortably."
-
-Other examples:
-
-"You're ahead of your target 🎉"
-
-"Save ₹500 extra this month to stay on track."
-
-"Your estimated hotel cost has decreased."
-
-"You've reached 50% of your travel goal!"
-
-Keep suggestions friendly and encouraging.
-
-Do not make it look like a banking/financial app.
-
-15. FUTURE TRIP PRICE TRACKING
-
-Connect travel prices with the savings goal.
-
-Show:
-
-Estimated Trip Cost
-
-₹1,20,000
-
-Current Estimated Cost
-
-₹1,08,000
-
-Message:
-
-Good news! Your estimated trip cost has decreased.
-
-Allow:
-
-Track Price
-
-If prices change, suggest adjusting the savings goal.
-
-16. FUTURE TRIP REMINDERS
-
-Allow optional:
-
-Monthly saving reminder
-
-Goal progress reminder
-
-Price-drop alert
-
-Travel date approaching reminder
-
-Milestone notification
-
-Example:
-
-🔔
-
-Your Japan adventure is getting closer!
-
-"Add ₹3,000 to your trip fund this month."
-
-17. DREAM TRIP VISUALIZATION
-
-Create an emotional visual journey:
-
-Dream → Plan → Save → Book → Travel
-
-Animate the journey as users scroll.
-
-Show:
-
-🌄 Dream destination
-
-↓
-
-🤖 AI Plan
-
-↓
-
-💰 Save
-
-↓
-
-✈️ Book
-
-↓
-
-🧳 Travel
-
-At 100% savings:
-
-🎉 Your Trip Fund Is Ready!
-
-Then show:
-
-Start Planning
-
-Use a subtle celebratory animation with:
-
-Confetti
-
-Airplane
-
-Destination imagery
-
-18. AI + FUTURE TRIP CONNECTION
-
-This is very important.
-
-When a user creates:
-
-Japan — December 2027
-
-SmartTrip should allow:
-
-Plan My Future Trip
-
-AI estimates:
-
-Flights
-
-Hotels
-
-Transportation
-
-Food
-
-Activities
-
-Total budget
-
-Example:
-
-Estimated total:
-
-₹1,35,000
-
-Recommended saving:
-
-₹8,400/month
-
-Then automatically update the future savings goal.
-
-The complete SmartTrip journey should be:
-
-Dream → AI Plan → Budget → Save → Track → Book → Travel
-
-19. SMART TRIP ITINERARY
-
-Create a beautiful itinerary interface.
-
-Example:
-
-Day 1 — Arrival
-
-✈ Airport → Hotel
-
-🏨 Check-in
-
-🍽 Local dinner
-
-Day 2 — Explore
-
-📍 Tourist attraction
-
-🏔 Nature activity
-
-🍴 Restaurant
-
-Use a timeline layout.
-
-Allow:
-
-Add activity
-
-Remove activity
-
-Change time
-
-Drag and drop
-
-AI optimize itinerary
-
-Button:
-
-Optimize My Trip with AI
-
-20. MY TRIPS
-
-Create:
-
-My Trips
-
-Tabs:
-
-Upcoming
-
-Past
-
-Saved
-
-Trip cards show:
-
-Destination
-
-Date
-
-Flight
-
-Hotel
-
-Transport
-
-Booking status
-
-Example:
-
-Goa Trip
-
-12 Dec – 17 Dec
-
-✈ Flight booked
-
-🏨 Hotel booked
-
-🚗 Car booked
-
-Button:
-
-Open Trip
-
-21. WISHLIST
-
-Create:
-
-My Wishlist
-
-Allow users to save:
-
-Destinations
-
-Hotels
-
-Flights
-
-Activities
-
-Packages
-
-Add:
-
-Price Alert
-
-Allow users to remove saved items.
-
-22. BOOKING EXPERIENCE
-
-Create polished booking interfaces for:
-
-Flights
-
-Show:
-
-Airline
-
-Departure
-
-Arrival
-
-Duration
-
-Stops
-
-Price
-
-Select
-
-Hotels
-
-Show:
-
-Photos
-
-Rating
-
-Amenities
-
-Location
-
-Price/night
-
-Book Now
-
-Cars/Bikes
-
-Show:
-
-Vehicle
-
-Type
-
-Seats
-
-Price/day
-
-Rent Now
-
-Train/Bus
-
-Show:
-
-Operator
-
-Departure
-
-Arrival
-
-Duration
-
-Price
-
-Book
-
-For the hackathon/demo, mock data is acceptable.
-
-However, buttons, filters, searches and interactions should actually work.
-
-Structure the code so real APIs can be connected later.
-
-23. TRAVEL ANIMATIONS
-
-Add tasteful travel animations throughout the website:
-
-Airplane moving across hero
-
-Birds flying across mountains
-
-Clouds moving
-
-Floating travel icons
-
-Suitcase animation
-
-Location pin animation
-
-Map route animation
-
-Map markers appearing
-
-Destination image zoom
-
-Scroll reveal
-
-AI typing animation
-
-Savings progress animation
-
-Booking success animation
-
-Smooth card entrance
-
-Animations must be subtle and smooth.
-
-Do not sacrifice performance.
-
-24. MICRO-INTERACTIONS
-
-Add:
-
-Button hover effects
-
-Smooth transitions
-
-Card hover
-
-Loading skeletons
-
-Toast notifications
-
-Modal animations
-
-Smooth scrolling
-
-Dropdown animations
-
-Active navigation states
-
-The website should feel alive without feeling overloaded.
-
-25. TRAVEL SAFETY
-
-Add:
-
-Travel Safe
-
-Features:
-
-Emergency contacts
-
-Nearby hospitals
-
-Nearby police stations
-
-Location sharing
-
-Important travel alerts
-
-Keep it simple and accessible.
-
-26. CUSTOMER SUPPORT
-
-Create:
-
-Need Help?
-
-Options:
-
-Ask AI
-
-Help Center
-
-Contact Support
-
-Add a floating support button at bottom-right.
-
-27. FOOTER
-
-Create a professional footer.
-
-SmartTrip
-
-Travel smarter. Explore more.
-
-Explore
-
-Destinations
-
-Hotels
-
-Flights
-
-Packages
-
-Plan
-
-AI Trip Planner
-
-My Trips
-
-Wishlist
-
-Save for Trip
-
-Future Trip Fund
-
-Support
-
-Help Center
-
-Contact
-
-Safety
-
-Terms
-
-Follow
-
-Instagram
-
-YouTube
-
-LinkedIn
-
-Newsletter:
-
-Get travel inspiration in your inbox.
-
-Email input + Subscribe.
-
-28. RESPONSIVE DESIGN
-
-The website must work perfectly on:
-
-Desktop
-
-Laptop
-
-Tablet
-
-Mobile
-
-Mobile requirements:
-
-Hamburger menu
-
-Horizontal booking tabs
-
-Vertical cards
-
-Touch-friendly buttons
-
-Optimized hero video
-
-Reduced animations
-
-Responsive map
-
-Easy-to-use AI planner
-
-29. FUNCTIONALITY
-
-Do NOT create only a visual mockup.
-
-Make the frontend interactive.
-
-Implement:
-
-Destination search
-
-Booking tabs
-
-Filters
-
-Wishlist
-
-Save trip
-
-Future trip creation
-
-Savings progress
-
-Monthly saving calculation
-
-AI planner UI
-
-Itinerary generation UI
-
-Map markers
-
-Quick guide
-
-My Trips
-
-Future Trips
-
-Trip Fund
-
-Modals
-
-Toast notifications
-
-Responsive navigation
-
-Use mock data where APIs are unavailable.
-
-Keep the architecture ready for real APIs.
-
-30. PERFORMANCE
-
-Website must be smooth and fast.
-
-For background video:
-
-Optimize/compress video
-
-Lazy load where appropriate
-
-Use poster image
-
-Use mobile fallback
-
-Avoid unnecessary libraries
-
-Use GPU-friendly animations
-
-Do not autoplay heavy video on mobile if it affects performance
-
-Animations should never make scrolling laggy.
-
-31. VISUAL PRIORITY
-
-Prioritize the sections in this order:
-
-Hero + Destination Search
-
-Ask AI
-
-Quick Booking
-
-Explore Destinations
-
-Save for Your Trip
-
-Save for Your Future Trip
-
-Interactive Map
-
-Smart Itinerary
-
-My Trips
-
-Quick Guide
-
-Safety
-
-Footer
-
-32. FINAL BRAND EXPERIENCE
-
-SmartTrip should communicate:
-
-"Planning a trip shouldn't be stressful. SmartTrip handles the complicated parts so I can enjoy the journey."
-
-The complete product experience should feel like:
-
-🌍 Dream
-
-🤖 Ask AI
-
-🗺️ Plan
-
-💰 Save
-
-📉 Track Prices
-
-✈️ Book
-
-🧳 Travel
-
-⭐ Remember
-
-33. VERY IMPORTANT FINAL INSTRUCTION
-
-Do NOT simply modify the existing Travelora homepage.
-
-Rebuild it into a cohesive SmartTrip product.
-
-Use the Travelora screenshot only as visual inspiration for:
-
-Travel website composition
-
-Search/booking panel
-
-Destination cards
-
-Deals
-
-Testimonials
-
-Professional spacing
-
-Visual hierarchy
-
-SmartTrip must have its own identity.
-
-The strongest unique features should be:
-
-1. AI Trip Planner
-
-2. Save for Your Trip
-
-3. Save for Your Future Trip
-
-4. Interactive Travel Map
-
-5. Smart Itinerary
-
-6. Complete Booking Experience
-
-The Save for Your Future Trip feature should NOT look like a banking application.
-
-It should feel like a travel dream tracker that motivates users to make their future trips possible.
-
-The final website should look polished enough for a college hackathon demo and real travel startup, with beautiful UI, smooth animations, functional interactions and a strong visual identity.
-
-Make it look human-designed, premium, creative and practical — NOT AI-generated.
-
-**Live app**: https://your-domain.com
-
-## Standalone Development
-
-SmartTrip is built with TanStack Start, React 19, Vite, and Tailwind CSS.
+# SmartTrip — AI Travel Planner & Booking Platform
+
+> **Dream → Ask AI → Plan → Save → Book → Travel**
+> A modern, production-grade travel platform engineered to run **100% permanently free** on zero-cost infrastructure.
+
+[![CI](https://github.com/aayush-chaudhari-07/dream-plan-fly/actions/workflows/ci.yml/badge.svg)](https://github.com/aayush-chaudhari-07/dream-plan-fly/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Nitro Engine](https://img.shields.io/badge/SSR-TanStack%20Start%20%2B%20Nitro-orange)](https://tanstack.com/start)
+[![Supabase](https://img.shields.io/badge/Database-Supabase%20Postgres-emerald)](https://supabase.com)
+[![Key-less APIs](https://img.shields.io/badge/Open%20Data-Open--Meteo%20%7C%20Frankfurter%20%7C%20OSM-blue)](https://open-meteo.com)
+
+---
+
+## 📖 Overview
+
+**SmartTrip** is an all-in-one travel technology platform that combines real-time AI itinerary planning, interactive cartography, collaborative travel funds, live weather forecasts, foreign exchange conversions, and an end-to-end simulated booking engine.
+
+Every architectural layer is specifically designed to operate indefinitely within **permanent free tiers** without requiring a credit card, trial expiration, or paid third-party add-ons.
+
+---
+
+## ✨ Features
+
+- 🤖 **AI Trip Planner**: Generates personalized, paced daily itineraries, verified accommodations, transit options, and packing lists powered by **Google Gemini 2.5 Flash**, backed by an intelligent offline heuristic generator (`buildPlan`) with automatic retry and rate-limiting safeguards.
+- 🗺️ **Interactive Explore Map**: Code-split Leaflet map powered by OpenStreetMap tiles featuring categorized filters (Attractions, Hotels, Restaurants, Activities), real coordinate geocoding across 9 major destinations, and browser geolocation with proximity sorting.
+- ✈️ **Demo Booking Engine**: Production-like booking workflows for Flights (deterministic multi-flight daily schedules for any Indian route), Stays, Car Rentals, Rail, and Packages. Includes a simulated payment gateway (Card, UPI, Net Banking), cryptographic HMAC verification, cancellation refunds, and printable E-Tickets with QR code verification.
+- 🌦️ **Live Weather & 7-Day Forecast**: Real-time hourly and weekly forecasts powered by the key-less **Open-Meteo API** with 30-minute server caching, WMO weather descriptions, hill-station temperatures, and graceful seasonal fallbacks.
+- 💱 **Live Currency Conversion**: Real-time European Central Bank rates via the free, key-less **Frankfurter API**, cached daily with automatic fallback to INR for unsupported currencies.
+- 🔔 **Deterministic Price Alerts & Scheduled Cron**: Watch any travel route or destination with a target price. A daily scheduled GitHub Actions cron job triggers deterministic market price fluctuations and sends notifications on price drops.
+- 💰 **Trip Savings Fund**: Target-based group travel fund with deposit history, visual milestone tracking, and a canvas-confetti celebration at 100% completion.
+- 🧭 **Quick Travel Guide**: 3-stage interactive checklist ("Before You Go", "During Your Trip", "Smart Tips") covering documentation, health, packing, money, and local etiquette.
+- 🛡️ **Free-Tier Inactivity Guard**: Automated twice-weekly keep-alive GitHub Actions cron calling `/api/keep-alive` to prevent Supabase database pausing.
+- 🔒 **Security & Production Hardening**: Strict Content Security Policy (CSP), HSTS, X-Frame-Options, in-memory sliding-window server function rate limiting, strict Zod validation on every input, and automated CI client secret scanning.
+
+---
+
+## 🛠️ Tech Stack
+
+| Category            | Technology                                                                                                                            |
+| :------------------ | :------------------------------------------------------------------------------------------------------------------------------------ |
+| **Framework**       | [TanStack Start](https://tanstack.com/start) (Full-stack SSR with React 19)                                                           |
+| **Server Engine**   | [Nitro](https://nitro.unjs.io) (Universal server engine supporting Node, Vercel, Netlify)                                             |
+| **Routing**         | [TanStack Router](https://tanstack.com/router) (Type-safe client & server routing)                                                    |
+| **State & Cache**   | [TanStack Query](https://tanstack.com/query) & Zustand-inspired local persistence                                                     |
+| **Styling**         | [Tailwind CSS v4](https://tailwindcss.com) with custom glassmorphism and modern UI tokens                                             |
+| **Icons & Motion**  | [Lucide React](https://lucide.dev) & CSS hardware-accelerated animations                                                              |
+| **Database & Auth** | [Supabase](https://supabase.com) (PostgreSQL, Row Level Security, SSR Cookie Sessions)                                                |
+| **AI Intelligence** | [Google Gemini 2.5 Flash](https://ai.google.dev) (`@google/genai` free tier)                                                          |
+| **Maps**            | [Leaflet](https://leafletjs.com) & [OpenStreetMap](https://www.openstreetmap.org)                                                     |
+| **Live Data**       | [Open-Meteo](https://open-meteo.com) & [Frankfurter API](https://www.frankfurter.app)                                                 |
+| **Testing**         | [Vitest](https://vitest.dev), [Playwright](https://playwright.dev), [@axe-core/playwright](https://github.com/dequelabs/axe-core-npm) |
+
+---
+
+## 💸 Free-Stack Architecture
+
+| Service                 | Role                        | Free Tier Quota                   | Quota Protection Mechanism                                              |
+| :---------------------- | :-------------------------- | :-------------------------------- | :---------------------------------------------------------------------- |
+| **Google Gemini Flash** | AI Itinerary Synthesis      | 1,500 requests / day (15 RPM)     | Server-side 24h cache, 1000 daily safety cap, fallback to `buildPlan()` |
+| **Supabase**            | Postgres DB, Auth & Storage | 500 MB DB, 50,000 MAU             | RLS policies, connection reuse, twice-weekly keep-alive cron            |
+| **Open-Meteo**          | Weather Forecasts           | 10,000 calls / day (Free, No Key) | 30-min in-memory server cache per coordinate, seasonal fallback         |
+| **Frankfurter**         | Currency Exchange           | Unlimited public access (ECB)     | 24-hour daily server cache, strict INR fallback                         |
+| **OpenStreetMap**       | Map Cartography             | Tile usage policy compliant       | Client-side lazy-load, no preloading, proper user-agent attribution     |
+| **Vercel / Netlify**    | Edge Hosting                | 100 GB bandwidth, 300 build mins  | Client code-splitting, static asset caching, asset compression          |
+| **GitHub Actions**      | CI & Scheduled Cron         | 2,000 minutes / month             | Lightweight curl triggers running in <10 seconds                        |
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
-Node.js (v20+ recommended) and npm.
+- **Node.js**: `v20.x` or `v22.x` (LTS recommended)
+- **npm**: `v10.x` or newer
+- **Supabase Account** (free tier at [supabase.com](https://supabase.com))
+- **Google AI Studio Key** (free key at [aistudio.google.com](https://aistudio.google.com))
 
-### Getting Started
+### 1. Clone & Install
 
-```sh
-# Install dependencies
+```bash
+git clone https://github.com/aayush-chaudhari-07/dream-plan-fly.git
+cd dream-plan-fly
 npm install
-
-# Start local development server
-npm run dev
-
-# Run unit tests
-npm run test
-
-# Typecheck TypeScript
-npm run typecheck
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
 ```
 
-## Backend Setup (Supabase)
+### 2. Configure Environment
 
-SmartTrip uses Supabase (PostgreSQL + Auth) for persistent user accounts, cloud-synced trips, bookings, dream funds, and wishlist storage with strict Row Level Security (RLS). Guests continue using localStorage seamlessly until they create an account, at which point local data is automatically migrated into their account.
+Copy `.env.example` to `.env`:
 
-### 1. Create a Supabase Project
-
-1. Go to [supabase.com](https://supabase.com) and create an account or sign in.
-2. Click **New project** and configure your project name and database password.
-3. Once provisioned, navigate to **Project Settings > API** to find your **Project URL** and **anon/public API key**.
-
-### 2. Run Database Migrations
-
-1. In your Supabase dashboard, navigate to the **SQL Editor** in the left sidebar.
-2. Open the migration file in this repository: [`supabase/migrations/001_init.sql`](file:///c:/Users/Ayush/Desktop/Mini%20Project/dream-plan-fly/supabase/migrations/001_init.sql).
-3. Copy its entire content into the SQL Editor and click **Run**.
-4. This creates:
-   - `profiles` (with an automatic user creation trigger on `auth.users`)
-   - `trips` (with `bucket` enum `Upcoming` / `Past` / `Saved` and JSONB `plan`)
-   - `bookings` (with reference tracking and price checks)
-   - `funds` (trip dream funds with target, saved, and months left)
-   - `fund_contributions` (deposit history for funds)
-   - `wishlist` (unique destinations per user)
-   - `notifications`
-   - Strict Row Level Security (RLS) policies ensuring users can only read, insert, update, and delete their own data.
-
-### 3. Configure Authentication Providers
-
-1. In the Supabase dashboard, go to **Authentication > Providers**.
-2. **Email**: Ensure Email is enabled. (For development, you can disable "Confirm email" if you want instant test logins).
-3. **Google OAuth (Optional)**:
-   - Enable Google provider.
-   - Add your Google Client ID and Secret from the Google Cloud Console.
-   - Add your Redirect URL: `https://<your-project-ref>.supabase.co/auth/v1/callback` and `http://localhost:3000/auth/callback` to Google's authorized redirect URIs.
-
-### 4. Configure Environment Variables
-
-Copy `.env.example` to `.env` and fill in your Supabase credentials:
-
-```sh
+```bash
 cp .env.example .env
 ```
 
-Set the following variables:
+Set your values in `.env`:
 
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
-- `GEMINI_API_KEY` (Server-side Google Gemini API key for AI Trip Planner; kept private on server)
+```env
+VITE_SITE_URL=http://localhost:3000
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+GEMINI_API_KEY=your-gemini-api-key
+CRON_SECRET=your-random-cron-secret
+DEMO_PAY_SECRET=your-random-payment-hmac-secret
+NITRO_PRESET=vercel
+```
 
-### 5. Google Gemini AI Trip Planner Setup
+_(Note: The application includes full offline fallbacks — if `GEMINI_API_KEY` or `VITE_SUPABASE_URL` are not provided, it gracefully defaults to local rule-based generation and `localStorage` persistence!)_
 
-To enable real-time generative itineraries powered by Gemini:
+### 3. Run Database Migrations
 
-1. Obtain an API key from [Google AI Studio](https://aistudio.google.com/).
-2. Add `GEMINI_API_KEY=your_gemini_api_key` to your `.env` file (server-only, never prefixed with `VITE_` to prevent leaking to the client).
-3. If no key is provided, the planner automatically falls back to the deterministic SmartTrip rule-based engine.
-4. To enable shared public links (`/plan/$id`), also run [`supabase/migrations/002_shared_plans.sql`](file:///c:/Users/Ayush/Desktop/Mini%20Project/dream-plan-fly/supabase/migrations/002_shared_plans.sql) in your Supabase SQL editor.
+Apply the SQL migration scripts in your Supabase SQL Editor in numerical order:
+
+1. `supabase/migrations/001_init.sql`
+2. `supabase/migrations/002_shared_plans.sql`
+3. `supabase/migrations/003_features.sql`
+4. `supabase/migrations/004_free_tier_optimizations.sql`
+5. `supabase/migrations/005_booking_system.sql`
+6. `supabase/migrations/006_price_alerts.sql`
+7. `supabase/migrations/007_error_logs.sql`
+
+### 4. Start Development Server
+
+```bash
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 🔑 Environment Variables
+
+| Variable Name            |  Required   | Description                                                                   |
+| :----------------------- | :---------: | :---------------------------------------------------------------------------- |
+| `VITE_SITE_URL`          |     No      | Base application URL (default: `https://dream-plan-fly.vercel.app`)           |
+| `VITE_SUPABASE_URL`      |     Yes     | Supabase project URL (`https://xyz.supabase.co`)                              |
+| `VITE_SUPABASE_ANON_KEY` |     Yes     | Supabase public anonymous client key                                          |
+| `GEMINI_API_KEY`         | Recommended | Google Gemini Flash API key (server-only, never exposed to client)            |
+| `CRON_SECRET`            | Recommended | Shared secret header (`x-cron-secret`) for scheduled GitHub Actions cron jobs |
+| `DEMO_PAY_SECRET`        |     No      | HMAC key for demo payment signature generation                                |
+| `NITRO_PRESET`           |     No      | Deployment server target (`vercel`, `netlify`, or `node-server`)              |
+
+---
+
+## 📜 Available Scripts
+
+| Command                | Action                                                                          |
+| :--------------------- | :------------------------------------------------------------------------------ |
+| `npm run dev`          | Launches Vite local development server on port 3000 with HMR                    |
+| `npm run build`        | Compiles client and SSR bundles with Nitro production output                    |
+| `npm run preview`      | Runs the compiled Nitro production server locally                               |
+| `npm run lint`         | Runs ESLint across all codebase files                                           |
+| `npm run typecheck`    | Runs TypeScript compiler checks without emitting code (`tsc --noEmit`)          |
+| `npm test`             | Executes unit tests with Vitest (80+ test cases)                                |
+| `npm run test:watch`   | Runs Vitest in interactive watch mode                                           |
+| `npm run test:e2e`     | Runs Playwright end-to-end tests (auth, planner, booking, funds, accessibility) |
+| `npm run scan-secrets` | Inspects `.output/public` to confirm zero secrets are leaked in client bundles  |
+| `npm run format`       | Formats all source files using Prettier                                         |
+
+---
+
+## 📂 Project Structure
+
+```
+dream-plan-fly/
+├── .github/
+│   └── workflows/
+│       ├── ci.yml                    # Automated lint, typecheck, unit test, build, secret scan & e2e
+│       ├── keep-alive.yml            # Twice-weekly Supabase inactivity pause prevention
+│       └── daily-price-alerts.yml    # Daily cron job triggering demo price fluctuations
+├── e2e/                              # Playwright end-to-end and accessibility test suites
+│   ├── accessibility.spec.ts         # Axe-core WCAG 2.1 AA automated compliance tests
+│   ├── fund-and-wishlist.spec.ts     # Collaborative fund and wishlist drawer tests
+│   ├── plan-and-save.spec.ts         # AI itinerary generator and save tests
+│   ├── search-and-book.spec.ts       # Command search dialog and demo booking flow
+│   └── signup.spec.ts                # User registration form and validation tests
+├── public/                           # Static assets, robots.txt, and sitemap.xml
+├── scripts/                          # Client bundle secret scanner
+├── src/
+│   ├── components/                   # UI primitives and domain components
+│   │   ├── smarttrip/                # SmartTrip widgets (Hero, AiPlanner, Map, Fund, etc.)
+│   │   │   ├── booking/              # Airport search, E-ticket view, payment modal
+│   │   │   └── map/                  # Code-split Leaflet map client
+│   │   └── ui/                       # Accessible Radix UI primitives
+│   ├── data/                         # Static datasets (airports, flight generator, inventory)
+│   ├── lib/                          # Client utilities, Supabase client, auth context
+│   │   ├── server/                   # Typed TanStack Start server functions
+│   │   ├── smarttrip-store.ts        # Client state management & synchronization
+│   │   └── trip-plan.ts              # Heuristic offline itinerary generator & math
+│   ├── routes/                       # File-based routes with per-route SEO & JSON-LD
+│   │   ├── __root.tsx                # App shell, 404 handler, error boundary, Sonner toaster
+│   │   ├── index.tsx                 # Landing page
+│   │   ├── ai-planner.tsx            # AI trip planner route
+│   │   ├── bookings.tsx              # Flight, hotel, rental, and rail booking engine
+│   │   ├── checkout.tsx              # Demo checkout with traveler validation
+│   │   ├── destination/$id.tsx       # Destination detail with weather & TouristDestination JSON-LD
+│   │   ├── explore.tsx               # Curated destination directory
+│   │   ├── faq.tsx                   # Support center with FAQPage JSON-LD schema
+│   │   ├── my-trips.tsx              # Authenticated user dashboard (Upcoming, Past, Saved)
+│   │   ├── plan/$id.tsx              # Shared public AI trip plan route
+│   │   ├── privacy.tsx               # Privacy policy & cookie practice disclosure
+│   │   ├── settings.tsx              # Profile preferences & live currency switcher
+│   │   └── terms.tsx                 # Terms of service, AI advice & demo booking disclaimers
+│   └── server/                       # Backend services (Gemini, weather, currency, rate limiter)
+├── supabase/
+│   └── migrations/                   # SQL migrations (RLS, schema, indexes, retention triggers)
+└── vite.config.ts                    # Vite + TanStack Start + Nitro configuration
+```
+
+---
+
+## 🌐 Step-by-Step Free Deployment Guide
+
+Deploying SmartTrip to a free hobby tier requires **no custom domain** and **no credit card**. Follow these steps to deploy on Vercel:
+
+### Step 1: Set up Supabase
+
+1. Create a free organization and project on [Supabase.com](https://supabase.com).
+2. Open the **SQL Editor** in your Supabase dashboard.
+3. Run the migrations located in `supabase/migrations/` sequentially (`001_init.sql` through `007_error_logs.sql`).
+4. Note your **Project URL** and **anon public key** from _Settings → API_.
+
+### Step 2: Deploy to Vercel (Hobby Tier)
+
+1. Push your repository to GitHub.
+2. Sign in to [Vercel](https://vercel.com) using your GitHub account.
+3. Click **Add New... → Project** and import your `dream-plan-fly` repository.
+4. Set the **Framework Preset** to **Other** (Nitro will automatically generate `.vercel/output`).
+5. In **Environment Variables**, add:
+   - `VITE_SUPABASE_URL`: Your Supabase project URL
+   - `VITE_SUPABASE_ANON_KEY`: Your Supabase anon public key
+   - `GEMINI_API_KEY`: Your Google Gemini API key
+   - `CRON_SECRET`: A secure random string (e.g. `openssl rand -hex 16`)
+   - `NITRO_PRESET`: `vercel`
+6. Click **Deploy**. Vercel will build the application and assign a free subdomain:
+   `https://dream-plan-fly.vercel.app`
+
+### Step 3: Configure GitHub Actions Cron Secrets
+
+To keep your free Supabase database from pausing and to enable the daily price alerts job:
+
+1. Navigate to your GitHub repository: _Settings → Secrets and variables → Actions_.
+2. Add the following repository secrets:
+   - `VITE_SITE_URL`: `https://your-app.vercel.app`
+   - `CRON_SECRET`: The same secret string you configured in Vercel
+   - `VITE_SUPABASE_URL`: Your Supabase project URL
+   - `VITE_SUPABASE_ANON_KEY`: Your Supabase anon public key
+3. The workflows in `.github/workflows/` (`keep-alive.yml` and `daily-price-alerts.yml`) will now execute automatically on their free cron schedules.
+
+---
+
+## ⚖️ Legal & Disclaimers
+
+### 1. Simulated Demo-Booking Engine
+
+All flight listings, hotel properties, car rentals, train schedules, package tours, and checkout operations function exclusively in a **simulated demonstration mode**. No financial transactions are processed, and issued boarding passes or E-Tickets hold no legal validity with commercial carriers or travel providers.
+
+### 2. AI Travel Advice
+
+Day-by-day itineraries, estimated budgets, local recommendations, and weather insights generated by SmartTrip AI are provided as planning aids only. Travelers are advised to independently confirm attraction timings, transit schedules, health regulations, and government entry requirements before departure.
+
+---
+
+## 📄 License
+
+This project is licensed under the terms of the [MIT License](LICENSE).

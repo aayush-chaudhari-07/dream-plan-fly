@@ -185,6 +185,10 @@ export function SearchCommandDialog({ open, onOpenChange }: SearchCommandDialogP
                 <img
                   src={dest.image}
                   alt={dest.name}
+                  loading="lazy"
+                  decoding="async"
+                  width={32}
+                  height={32}
                   className="size-8 rounded-lg object-cover shrink-0 shadow-sm"
                 />
                 <div className="truncate">

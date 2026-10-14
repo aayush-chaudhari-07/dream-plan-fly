@@ -32,21 +32,16 @@ import { updateProfileFn } from "@/lib/server/trip-actions";
 import { getExchangeRatesFn } from "@/lib/server/live-data-actions";
 import type { ExchangeRates } from "@/server/currency";
 
+import { createSeoHead } from "@/lib/seo";
+
 export const Route = createFileRoute("/settings")({
-  head: () => ({
-    meta: [
-      { title: "Account Settings — SmartTrip" },
-      {
-        name: "description",
-        content: "Manage your profile, avatar, home city and preferred currency on SmartTrip.",
-      },
-      { property: "og:title", content: "Account Settings — SmartTrip" },
-      {
-        property: "og:description",
-        content: "Manage your profile, avatar, home city and preferred currency on SmartTrip.",
-      },
-    ],
-  }),
+  head: () =>
+    createSeoHead({
+      title: "Account & Travel Preferences",
+      description: "Manage your profile, avatar, home city and preferred currency on SmartTrip.",
+      path: "/settings",
+      noindex: true,
+    }),
   component: SettingsPage,
 });
 
@@ -321,6 +316,10 @@ function SettingsPage() {
                         <img
                           src={preset.url}
                           alt={preset.label}
+                          loading="lazy"
+                          decoding="async"
+                          width={48}
+                          height={48}
                           className="size-12 rounded-xl object-cover"
                         />
                         <span className="text-[10px] font-medium text-foreground text-center truncate max-w-full leading-tight">

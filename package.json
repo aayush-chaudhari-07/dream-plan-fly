@@ -12,6 +12,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "scan-secrets": "node scripts/scan-client-secrets.mjs",
     "format": "prettier --write ."
   },
   "overrides": {
@@ -84,7 +86,9 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^9.32.0",
+    "@playwright/test": "^1.64.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^22.16.5",
