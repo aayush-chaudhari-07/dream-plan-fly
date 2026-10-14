@@ -9,9 +9,11 @@ import { fetchExchangeRates, convertCurrency, clearCurrencyCache } from "../curr
 import {
   getDailyFluctuationPercent,
   getFluctuatedPrice,
+  evaluateAlertThreshold,
   evaluatePriceAlertsJob,
   handlePriceFluctuationsCron,
   type PriceAlertRecord,
+  type PriceAlertDependencies,
 } from "../price-fluctuations";
 
 describe("Live Data Services (Weather, Currency & Price Alerts)", () => {
@@ -246,8 +248,30 @@ describe("Live Data Services (Weather, Currency & Price Alerts)", () => {
       expect(fluctuated).toBeLessThan(base * 1.15);
     });
 
+    it("evaluates alert thresholds cleanly using pure function", () => {
+      const alert: PriceAlertRecord = {
+        id: "test",
+        userId: "u1",
+        itemType: "flight",
+        itemId: "DEL-GOI",
+        title: "Delhi to Goa",
+        targetPrice: 5000,
+        basePrice: 6000,
+        currentPrice: 6000,
+        isActive: true,
+        createdAt: 1000,
+      };
+
+      expect(evaluateAlertThreshold(alert, 4500)).toEqual({ shouldTrigger: true, savings: 1500 });
+      expect(evaluateAlertThreshold(alert, 5000)).toEqual({ shouldTrigger: true, savings: 1000 });
+      expect(evaluateAlertThreshold(alert, 5001)).toEqual({ shouldTrigger: false, savings: 999 });
+      expect(evaluateAlertThreshold({ ...alert, isActive: false }, 4000)).toEqual({
+        shouldTrigger: false,
+        savings: 2000,
+      });
+    });
+
     it("evaluates price alerts and detects when a fluctuated price drops below the target", async () => {
-      // Find a day or key where price drops
       const mockAlerts: PriceAlertRecord[] = [
         {
           id: "alt-1",
@@ -255,7 +279,7 @@ describe("Live Data Services (Weather, Currency & Price Alerts)", () => {
           itemType: "flight",
           itemId: "DEL-GOI",
           title: "Flight: Delhi to Goa",
-          targetPrice: 6000, // Target higher than or equal to current price
+          targetPrice: 6000,
           basePrice: 5500,
           currentPrice: 5500,
           isActive: true,
@@ -267,7 +291,7 @@ describe("Live Data Services (Weather, Currency & Price Alerts)", () => {
           itemType: "stay",
           itemId: "stay-taj",
           title: "Taj Resort Goa",
-          targetPrice: 2000, // Very low target price (should NOT trigger)
+          targetPrice: 2000,
           basePrice: 15000,
           currentPrice: 15000,
           isActive: true,
@@ -275,15 +299,172 @@ describe("Live Data Services (Weather, Currency & Price Alerts)", () => {
         },
       ];
 
-      const result = await evaluatePriceAlertsJob(mockAlerts);
+      const notifyMock = vi.fn().mockResolvedValue(undefined);
+      const updateAlertMock = vi.fn().mockResolvedValue(undefined);
+
+      const result = await evaluatePriceAlertsJob(mockAlerts, {
+        priceSource: (basePrice, itemId) => (itemId === "DEL-GOI" ? 5200 : 14000),
+        notify: notifyMock,
+        updateAlert: updateAlertMock,
+        now: () => new Date("2026-10-14T10:00:00Z"),
+      });
 
       expect(result.status).toBe("ok");
       expect(result.checkedCount).toBe(2);
-      // alt-1 should trigger because basePrice 5500 <= targetPrice 6000
-      expect(result.alertsTriggered).toBeGreaterThanOrEqual(1);
+      expect(result.alertsTriggered).toBe(1);
+      expect(result.failedCount).toBe(0);
+
       const triggered = result.triggeredAlerts.find((t) => t.alertId === "alt-1");
       expect(triggered).toBeDefined();
-      expect(triggered?.currentPrice).toBeLessThanOrEqual(6000);
+      expect(triggered?.currentPrice).toBe(5200);
+      expect(triggered?.savings).toBe(300);
+
+      expect(notifyMock).toHaveBeenCalledTimes(1);
+      expect(notifyMock).toHaveBeenCalledWith(expect.objectContaining({ id: "alt-1" }), 5200, 300);
+      expect(updateAlertMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not trigger when fluctuated price stays above target price", async () => {
+      const mockAlerts: PriceAlertRecord[] = [
+        {
+          id: "alt-above",
+          userId: "user-1",
+          itemType: "flight",
+          itemId: "DEL-BOM",
+          title: "Flight: Delhi to Mumbai",
+          targetPrice: 3000,
+          basePrice: 5000,
+          currentPrice: 5000,
+          isActive: true,
+          createdAt: Date.now(),
+        },
+      ];
+
+      const notifyMock = vi.fn();
+      const result = await evaluatePriceAlertsJob(mockAlerts, {
+        priceSource: () => 4500, // strictly above 3000
+        notify: notifyMock,
+      });
+
+      expect(result.status).toBe("ok");
+      expect(result.alertsTriggered).toBe(0);
+      expect(result.triggeredAlerts).toHaveLength(0);
+      expect(notifyMock).not.toHaveBeenCalled();
+    });
+
+    it("triggers notification exactly once when price drops below target price", async () => {
+      const mockAlerts: PriceAlertRecord[] = [
+        {
+          id: "alt-drop",
+          userId: "user-1",
+          itemType: "stay",
+          itemId: "hotel-goa",
+          title: "Goa Beachfront Villa",
+          targetPrice: 4000,
+          basePrice: 5000,
+          currentPrice: 5000,
+          isActive: true,
+          createdAt: Date.now(),
+        },
+      ];
+
+      const notifyMock = vi.fn().mockResolvedValue(undefined);
+      const updateAlertMock = vi.fn().mockResolvedValue(undefined);
+
+      const result = await evaluatePriceAlertsJob(mockAlerts, {
+        priceSource: () => 3500,
+        notify: notifyMock,
+        updateAlert: updateAlertMock,
+      });
+
+      expect(result.status).toBe("ok");
+      expect(result.alertsTriggered).toBe(1);
+      expect(notifyMock).toHaveBeenCalledTimes(1);
+      expect(notifyMock).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "alt-drop" }),
+        3500,
+        1500,
+      );
+      expect(updateAlertMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("isolates failures so one failing alert dependency does not block other alerts", async () => {
+      const mockAlerts: PriceAlertRecord[] = [
+        {
+          id: "alt-fail",
+          userId: "user-1",
+          itemType: "flight",
+          itemId: "FAIL-ITEM",
+          title: "Failing Alert",
+          targetPrice: 5000,
+          basePrice: 6000,
+          currentPrice: 6000,
+          isActive: true,
+          createdAt: Date.now(),
+        },
+        {
+          id: "alt-success",
+          userId: "user-2",
+          itemType: "flight",
+          itemId: "OK-ITEM",
+          title: "Successful Alert",
+          targetPrice: 5000,
+          basePrice: 6000,
+          currentPrice: 6000,
+          isActive: true,
+          createdAt: Date.now(),
+        },
+      ];
+
+      const notifyMock = vi.fn().mockImplementation((alert: PriceAlertRecord) => {
+        if (alert.id === "alt-fail") {
+          return Promise.reject(new Error("Downstream Notification Service Failed"));
+        }
+        return Promise.resolve();
+      });
+
+      const result = await evaluatePriceAlertsJob(mockAlerts, {
+        priceSource: () => 4000,
+        notify: notifyMock,
+        timeoutMs: 1000,
+      });
+
+      expect(result.status).toBe("degraded");
+      expect(result.checkedCount).toBe(2);
+      expect(result.alertsTriggered).toBe(2);
+      expect(result.failedCount).toBe(1);
+      expect(result.failedAlerts[0]?.alertId).toBe("alt-fail");
+      expect(result.failedAlerts[0]?.error).toContain("Downstream Notification Service Failed");
+      expect(result.triggeredAlerts.find((t) => t.alertId === "alt-success")).toBeDefined();
+    });
+
+    it("cuts off a hung price source dependency via timeout without hanging the test suite", async () => {
+      const mockAlerts: PriceAlertRecord[] = [
+        {
+          id: "alt-hung",
+          userId: "user-1",
+          itemType: "flight",
+          itemId: "HUNG-ITEM",
+          title: "Hung Alert",
+          targetPrice: 5000,
+          basePrice: 6000,
+          currentPrice: 6000,
+          isActive: true,
+          createdAt: Date.now(),
+        },
+      ];
+
+      const result = await evaluatePriceAlertsJob(mockAlerts, {
+        priceSource: () => new Promise<never>(() => {}), // never resolves
+        timeoutMs: 50, // short injected timeout
+      });
+
+      expect(result.status).toBe("error");
+      expect(result.failedCount).toBe(1);
+      expect(result.failedAlerts[0]?.alertId).toBe("alt-hung");
+      expect(result.failedAlerts[0]?.error).toContain(
+        "Operation timed out after 50ms: priceLookup:alt-hung",
+      );
     });
 
     it("rejects unauthorized cron requests without secret header with HTTP 401", async () => {

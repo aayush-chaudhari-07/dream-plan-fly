@@ -1052,3 +1052,62 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `npm test`: 9 test suites, 85 unit tests passed.
   - `npm run build`: Production bundle and Nitro server built cleanly in 490ms.
   - `npx playwright test`: 12/12 E2E tests passed across accessibility, flow, and SSR resilience.
+
+---
+
+## Phase 20: Price Alert Job Hardening, Timeout Bounding & Unmocked Network Guard
+
+- **Date**: 2026-10-14
+- **Goal**: Identify and resolve the Vitest CI timeout ("Test timed out in 5000ms") in `src/server/services/__tests__/live-data.test.ts` for "evaluates price alerts and detects when a fluctuated price drops below the target"; bound all external calls; isolate per-alert failures; separate pure threshold logic; inject dependencies; add deterministic tests; and install an unmocked network guard across the test suite.
+- **Root Cause Analysis (Empirical Proof)**:
+  - **Failing Test**: `src/server/services/__tests__/live-data.test.ts:249`.
+  - **Exact Lines Awaited**:
+    1. `src/server/services/price-fluctuations.ts:142`: `await supabase.from("notifications").insert(...)`
+    2. `src/server/services/price-fluctuations.ts:150`: `await supabase.from("price_alerts").update(...)`
+  - **Mechanism**:
+    In `live-data.test.ts`, earlier tests mocked `globalThis.fetch` and restored it in `afterEach`. When the price alert test ran, `globalThis.fetch` was restored to Node's real fetch. Because `alt-1` had `targetPrice: 6000 >= basePrice: 5500`, the drop condition triggered. Line 140 called `getSupabaseServerClient()`, which connected to `getResolvedSupabaseUrl()` (`https://your-project-ref.supabase.co` or placeholder). The Supabase client initiated an outbound HTTPS request using real fetch with no timeout. On Linux CI runners without external connectivity, DNS resolution (`getaddrinfo`) hung until Vitest's 5000ms runner timeout killed the test.
+- **Key Actions & Code Fixes**:
+  1. **Bounded Asynchronous Execution (`withTimeout`)**:
+     - Implemented `withTimeout<T>(promise, ms, operationName)` in `src/server/services/price-fluctuations.ts`. Every price lookup, DB query, notification dispatch, and alert update is strictly bounded (default 2500ms).
+  2. **Failure Isolation Per Alert**:
+     - Alert evaluation now isolates errors with per-alert `try/catch`.
+     - Failing alert operations are recorded in `failedAlerts` and increment `failedCount`.
+     - The job returns a structured summary (`{ status: "ok" | "degraded" | "error", checkedCount, alertsTriggered, failedCount, triggeredAlerts, failedAlerts, durationMs, timestamp, message }`) so downstream callers and cron jobs have complete visibility.
+  3. **Pure Logic Separation (`evaluateAlertThreshold`)**:
+     - Extracted threshold logic into a pure, side-effect-free function:
+       ```ts
+       export function evaluateAlertThreshold(
+         alert: PriceAlertRecord,
+         currentPrice: number,
+       ): { shouldTrigger: boolean; savings: number };
+       ```
+  4. **Dependency Injection (`PriceAlertDependencies`)**:
+     - Extended `evaluatePriceAlertsJob(customAlerts?, deps?)` with an optional `PriceAlertDependencies` contract (`priceSource`, `notify`, `updateAlert`, `fetchAlerts`, `now`, `logger`, `timeoutMs`).
+     - Backwards-compatible call signature ensures existing cron handlers and callers function seamlessly.
+     - Added `isRealSupabaseConfigured()` guard preventing network calls when placeholder URLs are present.
+  5. **Deterministic Test Suite & Test Additions**:
+     - Refactored `live-data.test.ts` to pass deterministic dependencies (`priceSource`, `notify: vi.fn()`, `now: () => fixedDate`).
+     - Added unit tests for:
+       - Pure threshold evaluation (`evaluateAlertThreshold`).
+       - Price above target means no trigger.
+       - Price below target triggers exactly once with notification and savings.
+       - Failure isolation: downstream notification error does not abort subsequent alerts.
+       - Timeout cutoff: hung price source is cut off by timeout without hanging the test suite.
+  6. **Global Unmocked Network Guard**:
+     - Installed `unmockedFetchGuard` in `src/test/setup.ts`. Any unmocked `fetch()` call in any unit test immediately throws `Unmocked network call in test: <url>`, preventing silent network hangs.
+     - Configured `testTimeout: 10000` in `vitest.config.ts`.
+- **Files Touched**:
+  - `src/server/services/price-fluctuations.ts` (bounded calls, failure isolation, DI, pure logic)
+  - `src/server/services/__tests__/live-data.test.ts` (deterministic test suite & new edge cases)
+  - `src/test/setup.ts` (installed unmocked fetch guard)
+  - `vitest.config.ts` (added testTimeout)
+  - `MIGRATION_LOG.md` (updated)
+- **Verification Results**:
+  - Target test repeated 20 times (`--repeats 20`): 20/20 passed in 9ms (0 flakiness).
+  - Shuffled test suite (`--sequence.shuffle`): 9/9 test suites, 90/90 tests passed.
+  - CI environment simulation (`CI=true`): 90/90 unit tests passed.
+  - `npm run format:check`: 100% compliant with Prettier.
+  - `npm run lint`: Clean, 0 errors, 0 warnings.
+  - `npm run typecheck`: Passed cleanly.
+  - `npm run build`: Production bundle and Nitro server built cleanly in 490ms.
+  - `npx playwright test`: 12/12 E2E tests passed cleanly.
