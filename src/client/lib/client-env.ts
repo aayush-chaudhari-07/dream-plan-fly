@@ -24,9 +24,10 @@ function rawClientEnv(): Record<string, unknown> {
   const metaEnv = (
     typeof import.meta !== "undefined" && import.meta.env ? import.meta.env : {}
   ) as Record<string, string | undefined>;
-  const procEnv = (
-    typeof process !== "undefined" && process.env ? process.env : {}
-  ) as Record<string, string | undefined>;
+  const procEnv = (typeof process !== "undefined" && process.env ? process.env : {}) as Record<
+    string,
+    string | undefined
+  >;
 
   return {
     VITE_SITE_URL: metaEnv["VITE_SITE_URL"] || procEnv["VITE_SITE_URL"],
@@ -73,10 +74,10 @@ export function isSupabaseConfigured(): boolean {
 
   return Boolean(
     url &&
-      key &&
-      !url.includes("placeholder") &&
-      !url.includes("your-project-ref") &&
-      !key.includes("placeholder") &&
-      !key.includes("your-supabase"),
+    key &&
+    !url.includes("placeholder") &&
+    !url.includes("your-project-ref") &&
+    !key.includes("placeholder") &&
+    !key.includes("your-supabase"),
   );
 }

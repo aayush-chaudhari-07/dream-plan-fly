@@ -875,3 +875,31 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
      - `npm run typecheck`: Passed cleanly (`tsc --noEmit`).
      - `npm test`: 8 test suites, 80 unit tests passed.
 
+---
+
+## Phase 16: Architecture and Environment Guide Verification
+
+- **Date**: 2026-10-14
+- **Goal**: Document the architecture, boundary rules, path migrations, and complete environment configuration audit; verify the full test and build suite.
+- **Key Actions**:
+  1. **Architecture Documentation (`docs/ARCHITECTURE.md`)**:
+     - Documented the 3-tier presentation, client, server, and shared layers.
+     - Documented ESLint, AST boundary checks, and production bundle scanning.
+     - Included historical path migration table mapping legacy locations to the new layout.
+  2. **Environment & Setup Reference (`docs/ENVIRONMENT.md`)**:
+     - Full reference matrix covering all environment variables with scopes, required/optional tiers, free sources, fallbacks, and deployment targets.
+     - Detailed manual setup checklists for Supabase SQL migrations (001–007), Auth redirect URLs, Google AI Studio key generation, Vercel environment setup, and GitHub Actions cron secrets.
+     - Included quick "Do This Now" summary with exact verification commands.
+  3. **README.md Modernization**:
+     - Updated scripts table with `npm run check:boundaries` and `npm run check:env`.
+     - Updated project structure diagram and added architectural boundary rules.
+  4. **Full Verification Suite**:
+     - `npm run lint`: 0 errors, 0 warnings.
+     - `npm run typecheck`: Passed with 0 errors (`tsc --noEmit`).
+     - `npm test`: 8 test suites, 80 unit tests passed.
+     - `npm run build`: Production SSR and client bundle built cleanly with Nitro.
+     - `npm run check:boundaries`: 0 boundary or secret leak violations.
+     - `npm run check:env`: Preflight environment audit executed cleanly.
+     - `npx playwright test`: 9/9 E2E tests passed across accessibility, planning, booking, funds, and auth.
+
+

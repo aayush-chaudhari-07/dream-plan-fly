@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { getClientEnv, isSupabaseConfigured } from "@/client/lib/env.client";
+import { getClientEnv, isSupabaseConfigured } from "@/client/lib/client-env";
 
 export { isSupabaseConfigured };
 

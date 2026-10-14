@@ -143,50 +143,48 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📜 Available Scripts
 
-| Command                | Action                                                                          |
-| :--------------------- | :------------------------------------------------------------------------------ |
-| `npm run dev`          | Launches Vite local development server on port 3000 with HMR                    |
-| `npm run build`        | Compiles client and SSR bundles with Nitro production output                    |
-| `npm run preview`      | Runs the compiled Nitro production server locally                               |
-| `npm run lint`         | Runs ESLint across all codebase files                                           |
-| `npm run typecheck`    | Runs TypeScript compiler checks without emitting code (`tsc --noEmit`)          |
-| `npm test`             | Executes unit tests with Vitest (80+ test cases)                                |
-| `npm run test:watch`   | Runs Vitest in interactive watch mode                                           |
-| `npm run test:e2e`     | Runs Playwright end-to-end tests (auth, planner, booking, funds, accessibility) |
-| `npm run scan-secrets` | Inspects `.output/public` to confirm zero secrets are leaked in client bundles  |
-| `npm run format`       | Formats all source files using Prettier                                         |
+| Command                    | Action                                                                          |
+| :------------------------- | :------------------------------------------------------------------------------ |
+| `npm run dev`              | Launches Vite local development server on port 3000 with HMR                    |
+| `npm run build`            | Compiles client and SSR bundles with Nitro production output                    |
+| `npm run preview`          | Runs the compiled Nitro production server locally                               |
+| `npm run lint`             | Runs ESLint across all codebase files with boundary validation                  |
+| `npm run typecheck`        | Runs TypeScript compiler checks without emitting code (`tsc --noEmit`)          |
+| `npm test`                 | Executes unit tests with Vitest (80+ test cases)                                |
+| `npm run test:watch`       | Runs Vitest in interactive watch mode                                           |
+| `npm run test:e2e`         | Runs Playwright end-to-end tests (auth, planner, booking, funds, accessibility) |
+| `npm run check:boundaries` | Asserts architectural boundary rules and secret hygiene across the codebase     |
+| `npm run check:env`        | Preflight audit of environment variables (100% privacy, zero printed secrets)   |
+| `npm run scan-secrets`     | Inspects `.output/public` to confirm zero secrets are leaked in client bundles  |
+| `npm run format`           | Formats all source files using Prettier                                         |
 
 ---
 
-## 📂 Project Structure
+## 📂 Architecture & Project Structure
+
+SmartTrip uses a strict **Client / Server / Shared** 3-tier boundary architecture to prevent secret leaks, keep browser bundles ultra-lightweight, and maintain clear separation of concerns:
 
 ```
 dream-plan-fly/
 ├── .github/
 │   └── workflows/
-│       ├── ci.yml                    # Automated lint, typecheck, unit test, build, secret scan & e2e
+│       ├── ci.yml                    # Automated lint, typecheck, test, build, boundary & secret scan
 │       ├── keep-alive.yml            # Twice-weekly Supabase inactivity pause prevention
 │       └── daily-price-alerts.yml    # Daily cron job triggering demo price fluctuations
 ├── e2e/                              # Playwright end-to-end and accessibility test suites
-│   ├── accessibility.spec.ts         # Axe-core WCAG 2.1 AA automated compliance tests
-│   ├── fund-and-wishlist.spec.ts     # Collaborative fund and wishlist drawer tests
-│   ├── plan-and-save.spec.ts         # AI itinerary generator and save tests
-│   ├── search-and-book.spec.ts       # Command search dialog and demo booking flow
-│   └── signup.spec.ts                # User registration form and validation tests
 ├── public/                           # Static assets, robots.txt, and sitemap.xml
-├── scripts/                          # Client bundle secret scanner
+├── scripts/
+│   ├── check-boundaries.mjs          # Client/server import and secret reference boundary linter
+│   ├── check-env.mjs                 # Privacy-preserving environment preflight auditor
+│   └── scan-client-secrets.mjs       # Production client bundle asset secret scanner
 ├── src/
-│   ├── components/                   # UI primitives and domain components
-│   │   ├── smarttrip/                # SmartTrip widgets (Hero, AiPlanner, Map, Fund, etc.)
-│   │   │   ├── booking/              # Airport search, E-ticket view, payment modal
-│   │   │   └── map/                  # Code-split Leaflet map client
-│   │   └── ui/                       # Accessible Radix UI primitives
-│   ├── data/                         # Static datasets (airports, flight generator, inventory)
-│   ├── lib/                          # Client utilities, Supabase client, auth context
-│   │   ├── server/                   # Typed TanStack Start server functions
-│   │   ├── smarttrip-store.ts        # Client state management & synchronization
-│   │   └── trip-plan.ts              # Heuristic offline itinerary generator & math
-│   ├── routes/                       # File-based routes with per-route SEO & JSON-LD
+│   ├── client/                       # BROWSER BUNDLE ONLY (Zero server secrets, zero Node APIs)
+│   │   ├── components/               # Brand & layout components (Navbar, Footer, Hero, etc.)
+│   │   │   └── ui/                   # Accessible Radix UI primitives
+│   │   ├── features/                 # Domain feature slices (planner, bookings, map, fund, etc.)
+│   │   ├── hooks/                    # Browser React hooks (use-mobile, etc.)
+│   │   └── lib/                      # Browser store (smarttrip-store), auth context, client env
+│   ├── routes/                       # Thin TanStack file-based routes with per-route SEO & JSON-LD
 │   │   ├── __root.tsx                # App shell, 404 handler, error boundary, Sonner toaster
 │   │   ├── index.tsx                 # Landing page
 │   │   ├── ai-planner.tsx            # AI trip planner route
@@ -200,11 +198,30 @@ dream-plan-fly/
 │   │   ├── privacy.tsx               # Privacy policy & cookie practice disclosure
 │   │   ├── settings.tsx              # Profile preferences & live currency switcher
 │   │   └── terms.tsx                 # Terms of service, AI advice & demo booking disclaimers
-│   └── server/                       # Backend services (Gemini, weather, currency, rate limiter)
+│   ├── server/                       # SERVER RUNTIME ONLY (Node APIs, secrets, database, cron)
+│   │   ├── config/                   # Typed server environment validator (env.server.ts)
+│   │   ├── db/                       # Server-side Supabase client (supabase-server.ts)
+│   │   ├── functions/                # TanStack Start `createServerFn` RPC endpoints (client-callable)
+│   │   └── services/                 # Backend engines (gemini-planner, weather, payments, cron)
+│   ├── shared/                       # UNIVERSAL PURE CODE (Zero dependencies on client or server)
+│   │   ├── constants/                # Curated static datasets (airports, flight generator, inventory)
+│   │   ├── types/                    # Domain models and shared contracts (travel, trip-plan, weather)
+│   │   └── utils/                    # Environment-agnostic utilities (card-validator)
+│   ├── router.tsx                    # TanStack Router configuration
+│   ├── server.ts                     # Root Nitro/TanStack Start HTTP request entry & security headers
+│   └── start.ts                      # Client router hydration entrypoint
 ├── supabase/
-│   └── migrations/                   # SQL migrations (RLS, schema, indexes, retention triggers)
+│   ├── migrations/                   # SQL migrations (RLS, schema, indexes, retention triggers)
+│   └── seed.sql                      # Optional demo seed data
 └── vite.config.ts                    # Vite + TanStack Start + Nitro configuration
 ```
+
+### 🛡️ Architectural Boundary Rules
+
+1. **Client Isolation**: Code in `src/client/**` may **never** import directly from server services, database, or config (`@/server/services/**`, `@/server/db/**`, `@/server/config/**`). Client components may only invoke typed RPC endpoints defined in `@/server/functions/*`.
+2. **Shared Purity**: Modules in `src/shared/**` are universal contracts. They must never import from `src/client/**` or `src/server/**`, and must never access `process.env` or `import.meta.env`.
+3. **Secret Hygiene**: Server secrets (`GEMINI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET`, `DEMO_PAY_SECRET`, `RAZORPAY_KEY_SECRET`) must never carry public `VITE_` or `NEXT_PUBLIC_` prefixes and are asserted to never exist in client build output.
+4. **Automated Enforcement**: Enforced at lint-time via ESLint `no-restricted-imports`, in CI via `npm run check:boundaries`, and post-build via `npm run scan-secrets`.
 
 ---
 
