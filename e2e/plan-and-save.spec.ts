@@ -1,39 +1,38 @@
 import { test, expect } from "@playwright/test";
+import { setupIsolatedTestPage } from "./test-helpers";
 
 test.describe("AI Trip Planner - Plan & Save Flow", () => {
+  test.beforeEach(async ({ page }) => {
+    await setupIsolatedTestPage(page);
+  });
+
   test("generates an itinerary and enables saving to trips", async ({ page }) => {
     await page.goto("/ai-planner");
     await page.waitForSelector('body[data-hydrated="true"]', { timeout: 15_000 });
 
     await expect(page).toHaveTitle(/AI Trip Planner/);
 
-    // Locate the prompt textarea
-    const promptInput = page.locator("textarea").first();
-    await expect(promptInput).toBeVisible();
+    // 1. Locate the prompt textarea via stable testid
+    const promptInput = page.getByTestId("planner-prompt-input");
+    await expect(promptInput).toBeVisible({ timeout: 10_000 });
 
-    // Fill with sample destination prompt
+    // 2. Fill prompt with destination parameters
     await promptInput.fill("4 days in Goa with beach and seafood under 25000");
 
-    // Click Generate My Trip button
-    const generateBtn = page.getByRole("button", {
-      name: /generate my trip/i,
-    });
-    await expect(generateBtn).toBeVisible();
+    // 3. Click Generate Plan button via stable testid
+    const generateBtn = page.getByTestId("generate-plan-button");
+    await expect(generateBtn).toBeVisible({ timeout: 10_000 });
     await generateBtn.click();
 
-    // Wait for generation to complete
-    await expect(
-      page.getByText(/Itinerary ready|Itinerary generated|AI service error/i).first(),
-    ).toBeVisible({ timeout: 25_000 });
-
-    // Verify Save to My Trips action is present and clickable
-    const saveButton = page.getByRole("button", { name: /save to my trips/i });
-    await expect(saveButton).toBeVisible();
+    // 4. Wait for itinerary generation to finish and display the Save button
+    const saveButton = page.getByTestId("save-plan-button");
+    await expect(saveButton).toBeVisible({ timeout: 25_000 });
     await saveButton.click();
 
-    // Expect confirmation toast or state update
-    await expect(page.getByText(/Plan saved to My Trips|Plan saved/i).first()).toBeVisible({
-      timeout: 10_000,
-    });
+    // 5. Expect confirmation toast notification
+    const saveToast = page
+      .locator("[data-sonner-toast]")
+      .filter({ hasText: /Plan saved to My Trips/i });
+    await expect(saveToast).toBeVisible({ timeout: 10_000 });
   });
 });

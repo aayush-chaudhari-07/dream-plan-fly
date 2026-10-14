@@ -646,3 +646,63 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `.gitignore`
   - `MIGRATION_LOG.md`
 
+## Phase 10: Playwright E2E Test Suite Stabilization for CI
+
+- **Date**: 2026-10-14
+- **Goal**: Resolve all 7 reported Playwright E2E test failures, eliminate CI flakiness, ensure production SSR server readiness, establish clean deterministic state isolation, and replace fragile locators with stable `data-testid` attributes without loosening assertions or skipping tests.
+- **Root Cause & Fix Breakdown**:
+  1. **Production Server 500 Crash on Startup (`__commonJSMin is not a function`)**:
+     - *Root Cause*: In the production Nitro/Rolldown build, `@supabase/ssr` imported CommonJS `cookie`, which created a circular module dependency where `__commonJSMin` was referenced before initialization in `_ssr/ssr.mjs`, causing immediate HTTP 500 on all server requests.
+     - *Fix*: Replaced `@supabase/ssr` with standard `@supabase/supabase-js` client in `src/lib/supabase/client.ts` and `src/lib/supabase/server.ts`. Configured `playwright.config.ts` `webServer` to serve `node .output/server/index.mjs` with `timeout: 120000` and `reuseExistingServer: !process.env.CI`.
+     - *App Change*: Updated `src/lib/supabase/client.ts` and `src/lib/supabase/server.ts`.
+  2. **`signup.spec.ts`: Strict-Mode Violation (`input[type="email"]` matched 2 elements)**:
+     - *Root Cause*: `input[type="email"]` matched both `#signup-email` inside the signup form and the newsletter input in `<Footer />`.
+     - *Fix*: Scoped test locators strictly to `page.getByTestId("signup-form")` (`page.getByTestId("signup-form").getByTestId("signup-email")`) without using `.first()`.
+     - *App Change*: Added `data-testid="signup-form"`, `data-testid="signup-name"`, `data-testid="signup-email"`, `data-testid="signup-password"`, `data-testid="signup-submit"` to `src/routes/signup.tsx`.
+  3. **`signup.spec.ts`: Header Text Mismatch**:
+     - *Root Cause*: Test asserted `/Join SmartTrip/i`, whereas the production UI design uses the heading "Plan Less. Travel More." with subtext "Create your free account...".
+     - *Fix*: Updated test assertion to verify `page.getByTestId("signup-heading")` contains `/Plan Less\. Travel More\./`.
+     - *App Change*: Added `data-testid="signup-heading"` to `src/routes/signup.tsx`.
+  4. **`fund-and-wishlist.spec.ts`: Wishlist Button / Sheet Not Visible**:
+     - *Root Cause*: CSS selector `button:has(svg.lucide-heart)` was brittle and raced layout/hydration.
+     - *Fix*: Added explicit testids. Test toggles wishlist on destination card `data-testid="wishlist-toggle-d1"`, opens navbar `data-testid="wishlist-button"`, and asserts `data-testid="wishlist-sheet"` visibility using auto-retrying web-first assertions.
+     - *App Change*: Added `data-testid="wishlist-button"` in `Navbar.tsx`, `data-testid="wishlist-sheet"` in `WishlistSheet.tsx`, and `data-testid="wishlist-toggle-${d.id}"` in `ExploreDestinations.tsx`.
+  5. **`fund-and-wishlist.spec.ts`: Trip Fund Dialog / "Contribute" Button Not Found**:
+     - *Root Cause*: Fragile text matching and card selection raced hydration of the fund section.
+     - *Fix*: Scoped to `data-testid="fund-card-ft1"`, clicked `data-testid="trip-fund-open"`, awaited `data-testid="trip-fund-dialog"`, and submitted via `data-testid="contribute-dialog-submit"`.
+     - *App Change*: Added `data-testid="trip-fund-section"`, `data-testid="fund-card-${trip.id}"`, `data-testid="trip-fund-open"`, `data-testid="trip-fund-dialog"`, `data-testid="contribute-input"`, and `data-testid="contribute-dialog-submit"` in `TripFund.tsx`.
+  6. **`plan-and-save.spec.ts`: "Generate Plan" Button Not Found**:
+     - *Root Cause*: Divergence in button text ("Generate My Trip" vs "Generate Plan") combined with text selector fragility.
+     - *Fix*: Replaced text-based locators with `data-testid="generate-plan-button"`, `data-testid="planner-prompt-input"`, and `data-testid="save-plan-button"`.
+     - *App Change*: Added `data-testid` attributes to `AiPlanner.tsx`.
+  7. **`search-and-book.spec.ts`: Expected Checkout/Confirmation URL Navigation Race**:
+     - *Root Cause*: Fast clicking on flight cards asserted URLs before client-side TanStack Router transitions settled, causing race conditions.
+     - *Fix*: Coupled user actions with explicit URL waits using `Promise.all([page.waitForURL(/\/checkout/), button.click()])` and `Promise.all([page.waitForURL(/\/booking-confirmation\//), button.click()])`. Added stable testids for flight cards, booking triggers, and e-ticket confirmations.
+     - *App Change*: Added `data-testid="first-flight-card"`, `data-testid="book-flight-btn"` in `bookings.tsx`, `data-testid="checkout-continue"` in `checkout.tsx`, and `data-testid="booking-confirmation"` in `ETicketView.tsx`.
+- **Deterministic State & CI Workflow Updates**:
+  - Created `e2e/test-helpers.ts` providing `setupIsolatedTestPage`: clears `localStorage`/`sessionStorage` before each test and routes external network requests (Open-Meteo, Frankfurter, OpenStreetMap tiles) to deterministic mock payloads so tests run 100% offline and free of rate limits.
+  - Updated `playwright.config.ts`: single worker in CI (`workers: 1`), 1 retry in CI (`retries: 1`), 120s timeout, production server preview command (`node .output/server/index.mjs`).
+  - Updated `.github/workflows/ci.yml`: installed chromium with dependencies, 15m timeout, artifact uploads on failure (`playwright-report/` and `test-results/` with `if: always()`).
+- **Files Touched**:
+  - `playwright.config.ts`
+  - `.github/workflows/ci.yml`
+  - `e2e/test-helpers.ts`
+  - `e2e/signup.spec.ts`
+  - `e2e/plan-and-save.spec.ts`
+  - `e2e/search-and-book.spec.ts`
+  - `e2e/fund-and-wishlist.spec.ts`
+  - `e2e/accessibility.spec.ts`
+  - `src/lib/supabase/client.ts`
+  - `src/lib/supabase/server.ts`
+  - `src/routes/signup.tsx`
+  - `src/routes/bookings.tsx`
+  - `src/routes/checkout.tsx`
+  - `src/components/smarttrip/Navbar.tsx`
+  - `src/components/smarttrip/WishlistSheet.tsx`
+  - `src/components/smarttrip/ExploreDestinations.tsx`
+  - `src/components/smarttrip/TripFund.tsx`
+  - `src/components/smarttrip/AiPlanner.tsx`
+  - `src/components/smarttrip/SearchCommandDialog.tsx`
+  - `src/components/smarttrip/booking/ETicketView.tsx`
+  - `MIGRATION_LOG.md`
+

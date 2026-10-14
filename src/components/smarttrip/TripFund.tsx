@@ -34,6 +34,7 @@ const QUICK_ADD = [500, 1000, 2500, 5000];
 
 function FundCard({ trip }: { trip: FutureTrip }) {
   const [amount, setAmount] = useState("");
+  const [contributeOpen, setContributeOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -135,7 +136,10 @@ function FundCard({ trip }: { trip: FutureTrip }) {
 
   return (
     <>
-      <article className="surface-card overflow-hidden rounded-3xl border border-border/70 flex flex-col justify-between">
+      <article
+        className="surface-card overflow-hidden rounded-3xl border border-border/70 flex flex-col justify-between"
+        data-testid={`fund-card-${trip.id}`}
+      >
         <div className="relative h-44 overflow-hidden">
           <img
             src={trip.image}
@@ -219,12 +223,24 @@ function FundCard({ trip }: { trip: FutureTrip }) {
           </div>
 
           <div className="mt-4 pt-3 border-t border-border/50">
-            <p className="text-[11px] font-semibold text-muted-foreground mb-2">Quick Deposits:</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-semibold text-muted-foreground">Quick Deposits:</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-2.5 text-xs rounded-full gap-1"
+                data-testid="trip-fund-open"
+                onClick={() => setContributeOpen(true)}
+              >
+                <PiggyBank className="size-3" /> Contribute
+              </Button>
+            </div>
             <div className="flex flex-wrap gap-1.5">
               {QUICK_ADD.map((v) => (
                 <button
                   key={v}
                   type="button"
+                  data-testid={`trip-fund-quick-${v}`}
                   onClick={() => contribute(v)}
                   className="rounded-full border border-border px-3 py-1 text-xs font-semibold transition-colors hover:border-primary hover:text-primary hover:bg-primary/5 cursor-pointer"
                 >
@@ -256,6 +272,7 @@ function FundCard({ trip }: { trip: FutureTrip }) {
                 size="sm"
                 className="rounded-xl h-9 px-3 shrink-0 gap-1"
                 aria-label="Add deposit"
+                data-testid="contribute-submit"
                 onClick={() => contribute(Number(amount))}
               >
                 <Plus className="size-3.5" /> Deposit
@@ -264,6 +281,72 @@ function FundCard({ trip }: { trip: FutureTrip }) {
           </div>
         </div>
       </article>
+
+      {/* Contribute Fund Dialog */}
+      <Dialog open={contributeOpen} onOpenChange={setContributeOpen}>
+        <DialogContent className="sm:max-w-md rounded-3xl" data-testid="trip-fund-dialog">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold">Contribute to {trip.name}</DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Add savings towards your target goal of {inr(trip.target)}.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">Amount (₹)</label>
+              <Input
+                type="number"
+                min="100"
+                max="10000000"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="e.g. 5000"
+                className="rounded-xl text-sm"
+                data-testid="contribute-input"
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-1.5">
+              {QUICK_ADD.map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full text-xs h-8"
+                  onClick={() => setAmount(v.toString())}
+                >
+                  +{inr(v)}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setContributeOpen(false)}
+              className="rounded-xl"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="hero"
+              size="sm"
+              className="rounded-xl gap-1.5"
+              data-testid="contribute-dialog-submit"
+              onClick={() => {
+                contribute(Number(amount) || 1000);
+                setContributeOpen(false);
+              }}
+            >
+              <PiggyBank className="size-3.5" /> Contribute Now
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Fund Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
@@ -489,7 +572,7 @@ export function TripFund() {
   };
 
   return (
-    <section className="container-page py-24">
+    <section id="fund" className="container-page py-24" data-testid="trip-fund-section">
       <SectionHeading
         eyebrow="Save for your future trip"
         title="Make Your Dream Trip Real"

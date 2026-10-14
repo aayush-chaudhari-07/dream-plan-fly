@@ -1,42 +1,66 @@
 import { test, expect } from "@playwright/test";
+import { setupIsolatedTestPage } from "./test-helpers";
 
 test.describe("Trip Fund & Wishlist Flows", () => {
+  test.beforeEach(async ({ page }) => {
+    await setupIsolatedTestPage(page);
+  });
+
   test("toggles destination wishlist and opens wishlist drawer", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('body[data-hydrated="true"]', { timeout: 15_000 });
 
-    // 1. Open wishlist sheet specifically from header Navbar
-    const wishlistNavBtn = page.locator('header button[aria-label="Wishlist"]').first();
+    // 1. Locate destination card and toggle heart button for Goa
+    const cardHeart = page.getByTestId("wishlist-toggle-goa");
+    await expect(cardHeart).toBeVisible({ timeout: 10_000 });
+    await cardHeart.click();
+
+    // 2. Open wishlist sheet specifically from header Navbar
+    const wishlistNavBtn = page.getByTestId("wishlist-button");
     await expect(wishlistNavBtn).toBeVisible({ timeout: 10_000 });
     await wishlistNavBtn.click();
 
-    // 2. Verify Wishlist sheet opened
+    // 3. Verify Wishlist sheet opened
+    const wishlistSheet = page.getByTestId("wishlist-sheet");
+    await expect(wishlistSheet).toBeVisible({ timeout: 10_000 });
     await expect(page.getByRole("dialog")).toBeVisible({ timeout: 10_000 });
-    await page.keyboard.press("Escape");
 
-    // 3. Locate and toggle heart button on a destination card
-    const cardHeart = page.locator('article button[aria-label*="wishlist" i]').first();
-    if (await cardHeart.isVisible()) {
-      await cardHeart.click();
-    }
+    // 4. Close wishlist sheet via Escape
+    await page.keyboard.press("Escape");
+    await expect(wishlistSheet).not.toBeVisible();
   });
 
   test("interacts with trip savings fund", async ({ page }) => {
     await page.goto("/");
     await page.waitForSelector('body[data-hydrated="true"]', { timeout: 15_000 });
 
-    // Scroll to TripFund section
-    const fundSection = page.locator("text=Trip Fund").first();
+    // 1. Scroll to TripFund section
+    const fundSection = page.getByTestId("trip-fund-section");
     await fundSection.scrollIntoViewIfNeeded();
     await expect(fundSection).toBeVisible();
 
-    // Click quick deposit button (e.g. +₹1,000)
-    const quickAddBtn = page.locator('button:has-text("+₹")').first();
-    if (await quickAddBtn.isVisible()) {
-      await quickAddBtn.click();
-      await expect(page.locator("[data-sonner-toast]").first()).toBeVisible({
-        timeout: 6_000,
-      });
-    }
+    // 2. Locate first fund card (ft1: Japan 2027) and open Contribute dialog
+    const fundCard = page.getByTestId("fund-card-ft1");
+    await expect(fundCard).toBeVisible({ timeout: 10_000 });
+
+    const openContributeBtn = fundCard.getByTestId("trip-fund-open");
+    await expect(openContributeBtn).toBeVisible({ timeout: 10_000 });
+    await openContributeBtn.click();
+
+    // 3. Verify Contribute dialog is open
+    const dialog = page.getByTestId("trip-fund-dialog");
+    await expect(dialog).toBeVisible({ timeout: 10_000 });
+
+    // 4. Submit contribution
+    const submitBtn = dialog.getByTestId("contribute-dialog-submit");
+    await expect(submitBtn).toBeVisible({ timeout: 10_000 });
+    await submitBtn.click();
+
+    // 5. Verify dialog closes and toast notification appears
+    await expect(dialog).not.toBeVisible();
+    const fundToast = page
+      .locator("[data-sonner-toast]")
+      .filter({ hasText: /added to|Milestone|Goal Reached/i });
+    await expect(fundToast).toBeVisible({ timeout: 10_000 });
   });
 });

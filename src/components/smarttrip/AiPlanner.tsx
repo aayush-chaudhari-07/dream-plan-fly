@@ -193,6 +193,7 @@ export function AiPlanner({ compact = false }: { compact?: boolean }) {
               className="mt-1 resize-none border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
               aria-label="Describe your trip"
               placeholder="E.g., I want a 5-day trip to Himachal Pradesh for 3 people under ₹35,000 with trekking and local cafes..."
+              data-testid="planner-prompt-input"
             />
           </div>
 
@@ -232,6 +233,7 @@ export function AiPlanner({ compact = false }: { compact?: boolean }) {
             className="mt-5 w-full gap-2"
             onClick={() => run()}
             disabled={loading}
+            data-testid="generate-plan-button"
           >
             {loading ? (
               <>
@@ -509,6 +511,7 @@ function PlanView({
         <Button
           variant="hero"
           className="flex-1 gap-1.5"
+          data-testid="save-plan-button"
           onClick={() => {
             const trip = smartTrip.savePlan(plan);
             toast.success("Plan saved to My Trips", { description: trip.name });

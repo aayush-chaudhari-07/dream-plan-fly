@@ -299,7 +299,7 @@ function CheckoutPage() {
                     variant="hero"
                     size="lg"
                     className="rounded-full px-8 gap-2 shadow-soft"
-                    data-testid="checkout-pay-btn"
+                    data-testid="checkout-continue"
                   >
                     Continue to Payment <ArrowRight className="size-4" />
                   </Button>

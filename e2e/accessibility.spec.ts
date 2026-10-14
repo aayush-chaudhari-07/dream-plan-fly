@@ -1,7 +1,12 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { setupIsolatedTestPage } from "./test-helpers";
 
 test.describe("Accessibility Audit (Axe-Core WCAG Standards)", () => {
+  test.beforeEach(async ({ page }) => {
+    await setupIsolatedTestPage(page);
+  });
+
   test("home page passes axe accessibility scan with zero critical violations", async ({
     page,
   }) => {
@@ -11,6 +16,7 @@ test.describe("Accessibility Audit (Axe-Core WCAG Standards)", () => {
 
     const scanResults = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .exclude(".leaflet-container")
       .analyze();
 
     // Filter out minor third-party tile or canvas warnings if any

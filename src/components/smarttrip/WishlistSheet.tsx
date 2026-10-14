@@ -43,6 +43,7 @@ export function WishlistSheet({ open, onOpenChange }: WishlistSheetProps) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
+        data-testid="wishlist-sheet"
         className="w-full sm:max-w-md flex flex-col p-0 bg-background/95 backdrop-blur-xl border-l border-border/60 shadow-2xl"
       >
         <SheetHeader className="p-6 pb-4 border-b border-border/50 text-left">

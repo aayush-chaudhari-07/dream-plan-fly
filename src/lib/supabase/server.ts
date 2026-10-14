@@ -1,5 +1,5 @@
-import { createServerClient } from "@supabase/ssr";
-import { getCookies, setCookie } from "@tanstack/react-start/server";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { getCookies } from "@tanstack/react-start/server";
 
 function getSupabaseUrl(): string {
   if (typeof process !== "undefined" && process.env?.["VITE_SUPABASE_URL"]) {
@@ -26,37 +26,37 @@ function getSupabaseAnonKey(): string {
   return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.placeholder";
 }
 
-export function getSupabaseServerClient() {
-  return createServerClient(getSupabaseUrl(), getSupabaseAnonKey(), {
-    cookies: {
-      getAll() {
-        try {
-          const cookieRecord = getCookies();
-          return Object.entries(cookieRecord || {}).map(([name, value]) => ({
-            name,
-            value,
-          }));
-        } catch {
-          return [];
-        }
-      },
-      setAll(cookiesToSet) {
-        try {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            setCookie(name, value, options);
-          });
-        } catch {
-          // Cookies may not be mutable in certain read-only SSR phases
-        }
-      },
+export function getSupabaseServerClient(): SupabaseClient {
+  return createClient(getSupabaseUrl(), getSupabaseAnonKey(), {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
     },
   });
 }
 
 export async function getServerUser() {
   try {
+    const cookieRecord = getCookies();
+    const cookies = cookieRecord || {};
+    // Look for Supabase auth cookie: sb-<project-ref>-auth-token
+    const authKey = Object.keys(cookies).find(
+      (k) => k.startsWith("sb-") && k.endsWith("-auth-token"),
+    );
+    let accessToken: string | null = null;
+    if (authKey && cookies[authKey]) {
+      try {
+        const raw = cookies[authKey];
+        const parsed = JSON.parse(raw);
+        accessToken = parsed.access_token || (Array.isArray(parsed) ? parsed[0] : null);
+      } catch {
+        accessToken = cookies[authKey];
+      }
+    }
+    if (!accessToken) return null;
     const supabase = getSupabaseServerClient();
-    const { data, error } = await supabase.auth.getUser();
+    const { data, error } = await supabase.auth.getUser(accessToken);
     if (error || !data?.user) return null;
     return data.user;
   } catch {

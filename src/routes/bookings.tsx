@@ -633,11 +633,11 @@ function BookingsPage() {
                     </Button>
                   </div>
                 ) : (
-                  filteredFlights.map((flight) => (
+                  filteredFlights.map((flight, index) => (
                     <div
                       key={flight.id}
                       className="surface-card p-5 sm:p-6 transition-all hover:border-primary/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-5"
-                      data-testid="flight-card"
+                      data-testid={index === 0 ? "first-flight-card" : "flight-card"}
                     >
                       <div className="space-y-3 flex-1">
                         <div className="flex items-center gap-3">

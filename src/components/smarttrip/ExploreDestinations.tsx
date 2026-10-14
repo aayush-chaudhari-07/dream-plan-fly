@@ -18,7 +18,10 @@ export function DestinationCard({
   onWish?: (id: string) => void;
 }) {
   return (
-    <article className="card-hover group relative w-[300px] shrink-0 overflow-hidden rounded-3xl border border-border bg-card shadow-soft sm:w-auto">
+    <article
+      className="card-hover group relative w-[300px] shrink-0 overflow-hidden rounded-3xl border border-border bg-card shadow-soft sm:w-auto"
+      data-testid={`destination-card-${d.id}`}
+    >
       <div className="block relative h-52 overflow-hidden">
         <Link
           to="/destination/$id"
@@ -47,6 +50,7 @@ export function DestinationCard({
         <button
           type="button"
           aria-label="Add to wishlist"
+          data-testid={`wishlist-toggle-${d.id}`}
           onClick={() => onWish?.(d.id)}
           className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-card/85 backdrop-blur transition-transform hover:scale-110 z-10 cursor-pointer"
         >

@@ -10,6 +10,9 @@ jobs:
   validate:
     name: Lint, Typecheck, Test, and Build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CI: "true"
 
     steps:
       - name: Checkout repository
@@ -44,3 +47,13 @@ jobs:
 
       - name: Run Playwright E2E tests
         run: npm run test:e2e
+
+      - name: Upload Playwright Report & Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14

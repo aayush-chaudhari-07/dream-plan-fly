@@ -128,6 +128,7 @@ export function Navbar() {
               onClick={() => setSearchOpen(true)}
               className="hidden md:inline-flex items-center gap-2 rounded-full bg-secondary/40 hover:bg-secondary border-border/50 text-xs text-muted-foreground hover:text-foreground px-3.5 h-9"
               aria-label="Search destinations and trips"
+              data-testid="search-button"
             >
               <Search className="size-3.5" />
               <span>Search destinations...</span>
@@ -143,6 +144,7 @@ export function Navbar() {
               aria-label="Search"
               onClick={() => setSearchOpen(true)}
               className="rounded-full text-foreground/70 md:hidden"
+              data-testid="search-button-mobile"
             >
               <Search className="size-4" />
             </Button>
@@ -154,6 +156,7 @@ export function Navbar() {
               aria-label="Wishlist"
               className="relative rounded-full text-foreground/70 hover:text-foreground"
               onClick={() => setWishlistOpen(true)}
+              data-testid="wishlist-button"
             >
               <Heart className="size-4" />
               {wishlist.length > 0 && (
