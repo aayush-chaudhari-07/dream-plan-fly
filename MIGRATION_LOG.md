@@ -971,7 +971,7 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
        nitro({
          ...(nitroPreset ? { preset: nitroPreset } : {}),
          vercel: { functions: { runtime: "nodejs22.x" } },
-       })
+       });
        ```
   2. **Zod Environment Preprocessing for Empty Strings**:
      - Updated `src/server/config/env.server.ts` and `src/client/lib/client-env.ts` with `emptyStringToUndefined` preprocessor. Any variable configured as empty string or whitespace in Vercel or `.env` automatically falls back to `undefined` without throwing validation errors.
@@ -1007,4 +1007,3 @@ This log tracks all changes, refactors, feature implementations, and fixes made 
   - `npm run scan-secrets`: 0 secrets detected.
   - `npm test`: 9 test suites, 85 unit tests passed.
   - `npx playwright test`: 12/12 E2E tests passed.
-
